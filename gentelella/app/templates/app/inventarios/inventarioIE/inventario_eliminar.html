@@ -1,0 +1,52 @@
+{% extends "app/base_site.html" %}
+
+
+
+{% block title %} Eliminar Inventario {% endblock title %}
+
+
+{% block content %}
+  <div class="right_col" role="main">
+    
+    <div class="row">
+        <!-- form para el ingreso de los datos de una nueva compra -->
+      <div class="clearfix"></div>
+
+        
+    </div>
+    <!-- /Form para el ingreso de los datos de una empresa nueva -->
+        <div class="row">
+        <div class="col-md-8 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Confirmación de Eliminación</h2>
+              
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <br />
+               
+              <form method="POST"  class="form-horizontal form-label-left input_mask">
+                {% csrf_token %}
+                <p><strong>¿Desea eliminar el registro de {{object}} ?</strong></p>
+                <button type="submit" class="btn btn-danger">Confirmar</button>
+                
+                  </div>
+                </div>
+                          
+              </form>
+            </div>
+          </div>
+
+        </div>
+        </div>
+      </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+  
+    <!-- jquery.inputmask -->
+  <script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+ {% endblock javascripts %}

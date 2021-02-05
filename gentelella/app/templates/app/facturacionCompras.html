@@ -1,0 +1,171 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Facturación Compras {% endblock title %}
+
+
+{% block content %}
+  <div class="right_col" role="main">
+    
+    <div class="row">
+        <div class="page-title">
+            <div class="title_left">
+              <h4>Pago Factura de Compras</h4>
+            </div>
+    
+            
+          </div>
+        <!-- form para el ingreso de los datos de una nueva compra -->
+      <div class="clearfix"></div>
+
+        
+    </div>
+    <!-- /Form para el ingreso de los datos de una empresa nueva -->
+    <div class="row">
+        <div class="col-md-6 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Compras Pendientes</h2>
+              
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <div class="table-responsive">
+                    <table id="datatable-checkbox" class="table table-striped jambo_table bulk_action">
+                      <thead>
+                        <tr class="headings">
+                            <th>
+                                <th><input type="checkbox" id="check-all" class="flat"></th>
+                            </th>
+                          <th class="column-title">Compra</th>                      
+                          <th class="column-title text-center">Fecha </th>
+                          <th class="column-title text-center">Peso Neto</th>
+                          <th class="column-title text-center">Peso Quintales</th>                           
+                        </tr>
+                      </thead>
+    
+                      <tbody>
+                        <tr class="even pointer">
+                            <td>
+                                <th><input type="checkbox" id="check-all" class="flat"></th>
+                             </td>                                               
+                          <td class="text-center">1105547820</td>
+                          <td class="text-center">May 23, 2014</td>
+                          <td class="text-center">222222</td>                      
+                          <td class="text-center">10123</td>                                          
+                        </tr>
+                        <tr class="even pointer">
+                            <td>
+                                <th><input type="checkbox" id="check-all" class="flat"></th>
+                             </td>
+                          <td class="text-center">1105547820</td>                          
+                          <td class="text-center">May 23, 2014 </td>
+                          <td class="text-center">11111</td>
+                          <td class="text-center">10123</td>                                                               
+                        </tr>
+                        <tr class="even pointer">
+                            <td>
+                                <th><input type="checkbox" id="check-all" class="flat"></th>
+                             </td>                          
+                          <td class="text-center">1105547820</td>
+                          <td class="text-center">May 23,2020</td>
+                          <td class="text-center">11111</td>                      
+                          <td class="text-center">10123</td>                                                                                   
+                      </tr>                                     
+                    </tbody>
+                  </table>
+                  </div> 
+              <div class="ln_solid"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-md-6 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Facturación Compras</h2>
+              
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <br />
+              
+              <form class="form-horizontal form-label-left">
+
+                <div class="form-group">
+                  <label class="control-label col-md-4 col-sm-3 col-xs-3">Número de Factura</label>
+                  <div class="col-md-8 col-sm-9 col-xs-9">
+                    <input type="text" class="form-control" data-inputmask="'mask' : '000-009-999'">
+                    <span class="fa fa-book form-control-feedback right" aria-hidden="true"></span>
+                  </div>
+                </div>                
+                
+                <div class="form-group">
+                    <label class="control-label col-md-4 col-sm-4 col-xs-4 has-feedback-left">Fecha de Emisión</label>                   
+                        <div class="col-md-8 xdisplay_inputx">
+                            <input type="text" class="form-control has-feedback-left" id="single_cal2" placeholder="Fecha de Emisión">
+                            <span class="fa fa-calendar form-control-feedback right" aria-hidden="true"></span>
+                        </div>       
+                 </div>                
+                <div class="form-group">
+                    <label class="control-label col-md-4 col-sm-4 col-xs-3 has-feedback-left">Cantidad</label>
+                    <div class="col-md-8 col-sm-8 col-xs-9">
+                      <input type="text" class="form-control">
+                      <span class="fa fa-yelp form-control-feedback right" aria-hidden="true"></span>
+                    </div>
+                  </div>                
+                <div class="form-group">
+                  <label class="control-label col-md-4 col-sm-4 col-xs-4">Precio Unitario</label>
+                  <div class="col-md-8 col-sm-8 col-xs-8">
+                    <input type="text" class="form-control" data-inputmask="'mask' : '99,99'">
+                    <span class="fa fa-dollar form-control-feedback right" aria-hidden="true"></span>
+                  </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-4 col-sm-4 col-xs-4">Total</label>
+                    <div class="col-md-8 col-sm-8 col-xs-8">
+                      <input type="text" class="form-control" placeholder="calcula monto PU*C">
+                      <span class="fa fa-dollar form-control-feedback right" aria-hidden="true"></span>
+                    </div>
+                  </div>               
+                <div class="form-group">
+                    <label class="control-label col-md-4 col-sm-4 col-xs-12">Tipo de Pago</label>
+                    <div class="col-md-4 col-sm-4 col-xs-12 form-group has-feedback">
+                        <select class="form-control">
+                           <option>Contado</option>
+                           <option>Crédito</option>                                          
+                        </select>
+                    </div>
+                </div>    
+                <div class="ln_solid"></div>    
+                                              
+                <div class="form-group">
+                  <div class="col-md-9 col-md-offset-3">
+                    <button type="submit" class="btn btn-primary">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                  </div>
+                </div>
+              </form>
+
+              
+
+                
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+        
+        </div>
+      </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+    <!-- jquery.inputmask -->
+  <script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+
+ {% endblock javascripts %}

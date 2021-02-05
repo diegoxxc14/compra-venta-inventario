@@ -1,0 +1,73 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Listado de Empresas {% endblock title %}
+
+{% block content %}
+  <div class="right_col" role="main">
+   
+    <div class="row">
+      
+    <div class="clearfix"></div>
+
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Listado de Transportista</h2>            
+            <div class="clearfix"></div>
+          </div>
+                                                          
+            <div class="x_content">              
+              <div class="table-responsive">
+                <table id="datatable" class="table table-striped jambo_table bulk_action">
+                  <thead>
+                    <tr class="headings">                                                             
+                      <th class="column-title text-center">Identificaciòn</th>
+                      <th class="column-title text-center">Nombres</th>                     
+                      <th class="column-title text-center">Dirección</th>
+                      <th class="column-title text-center">Teléfono</th> 
+                      <th class="column-title text-center">Correo</th>
+                      <th class="column-title text-center">Placa Trailer</th>
+                      <th class="column-title text-center">Acción </th>  
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for transportista in form %}
+                    <tr class="even pointer">                                                             
+                      <td class="text-center">{{transportista.identificacion}} </td>
+                      <td class="text-center">{{transportista.nombre}} </td>
+                      <td class="text-center"> {{transportista.direccion}} </td>
+                      <td class="text-center"> {{transportista.telefono}} </td> 
+                      <td class="text-center">{{transportista.correo}}</td>                      
+                      <td class="text-center">{{transportista.placaTrailer}}</td>
+                      <td class="text-center">
+                        <a href="{% url 'editar_responsableTransporte' transportista.id %}" class="btn btn-success btn-xs">Editar</a>
+                        <a href="{% url 'eliminar_responsableTransporte' transportista.id %}" class="btn btn-danger btn-xs">Eliminar</a>   
+                      </td>       
+                        
+                    </tr>
+                    {% endfor %}                   
+                  </tbody>
+                </table>
+                <div class="row no-print">
+                  <div class="col-xs-12">
+                    <button class="btn btn-default" onclick="window.print();"><i class="fa fa-print"></i> Imprimir</button>                    
+                    <button class="btn btn-primary "><i class="fa fa-download"></i> Generar PDF</button>
+                  </div>
+                </div>
+              </div>                      
+          </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+    <!-- Datatables -->
+  <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+ {% endblock javascripts %}
+
+

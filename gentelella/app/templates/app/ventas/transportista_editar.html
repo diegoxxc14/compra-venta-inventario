@@ -1,0 +1,103 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Editar Transportista {% endblock title %}
+
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+      
+      <div class="clearfix"></div>
+
+      <div class="row">
+        <!-- form para el ingreso de los datos de un transportista nuevo -->
+        <div class="col-md-8 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Editar Transportista</h2>
+              <ul class="nav navbar-right panel_toolbox">
+                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                </li>
+                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                </li>
+              </ul>
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+               <!-- Presentación de mensajes  -->
+                {% if messages %}
+                  {% for message in messages %}  
+                    <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible"{% endif %} role="alert">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      <strong>¡{{ message.tags|upper }}!</strong> {{ message }}
+                    </div>
+                {% endfor %}
+                {% endif %}  
+              <form method="POST" class="form-horizontal form-label-left">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-3">Identificación</label>
+                  <div class="col-md-9 col-sm-9 col-xs-9">
+                    {{form.identificacion}}
+                    <span class="fa fa-credit-card form-control-feedback right" aria-hidden="true"></span>
+                  </div>
+                </div>                
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-3 has-feedback-left">Nombres y Apellidos</label>
+                  <div class="col-md-9 col-sm-9 col-xs-9">                    
+                    {{form.nombre}}
+                    <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-3">Dirección</label>
+                  <div class="col-md-9 col-sm-9 col-xs-9">
+                    {{form.direccion}}
+                    <span class="fa fa-map-marker form-control-feedback right" aria-hidden="true"></span>
+                  </div>
+                </div>                
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-3">Teléfono</label>
+                  <div class="col-md-9 col-sm-9 col-xs-9">
+                    {{form.telefono}}
+                    <span class="fa fa-phone form-control-feedback right" aria-hidden="true"></span>
+                  </div>
+                </div>                                         
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-3">Placas</label>
+                  <div class="col-md-9 col-sm-9 col-xs-9">
+                    {{form.placaTrailer}}
+                    <span class="fa fa-bus form-control-feedback right" aria-hidden="true"></span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-3">Correo</label>
+                  <div class="col-md-9 col-sm-9 col-xs-9">
+                    {{form.correo}}
+                    <span class="fa fa-envelope form-control-feedback right" aria-hidden="true"></span>
+                  </div>
+                </div>                               
+                <div class="form-group">
+                  <div class="col-md-9 col-md-offset-3">
+                    <button type="submit" class="btn btn-primary">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Actualizar Transportista</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <!-- /Form para el ingreso de los datos de una transportista nuevo -->
+
+        
+      </div>
+    
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+    <!-- jquery.inputmask -->
+  <script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+ {% endblock javascripts %}

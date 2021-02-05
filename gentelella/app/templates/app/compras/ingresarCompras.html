@@ -1,0 +1,124 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Nueva Compra {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    
+    <div class="row">
+      <!-- form para el ingreso de los datos de una nueva compra -->
+    <div class="clearfix"></div>
+
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Compras de Maiz</h2>
+            
+            <div class="clearfix"></div>
+          </div>
+
+          <div class="x_content">              
+              <form class="form-horizontal form-label-left">                         
+                    
+                  <div class="form-group">
+                      <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
+                        <div>
+                          <a href="{% url 'compra_m' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Nueva</a>
+                          <a href="{% url 'reportes_compras' %}" class="btn btn-primary"><i class="fa fa-print"></i> Reportes</a>
+                        </div>
+                      </div>
+                  </div>    
+              </form>              
+              <br>
+              <div class="table-responsive">
+                <table id="datatable" class="table table-striped jambo_table bulk_action">
+                  <thead>
+                    <tr class="headings">                     
+                      <th class="column-title text-center">Nro.</th>
+                      <th class="column-title text-center">Fecha</th>
+                      <th class="column-title text-center">Razón Social Productor</th>
+                      <!--<th class="column-title text-center">Observación</th>-->
+                      <th class="column-title text-center">Estado</th>
+                      <th class="column-title text-center">Total</th>
+                      <th class="column-title text-center"><span class="fa fa-flash"></span></th> 
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {% for compra in compras %}
+                      <tr class="even pointer">                      
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="text-center">{{ compra.fechaCompra }}</td>
+                        <td class="text-center">{{ compra.idProductor }}</td>
+                        <!--<td class="text-center">{{ compra.observacion }}</td>-->
+                        <td class="text-center">
+                          {% if compra.pendiente %} <span class="label label-primary">Pendiente</span>
+                          {% else %} <span class="label label-success">Finalizada</span> {% endif %}</td>
+                        <td class="text-center">{{ compra.total }}</td>
+                        <td class="a-center ">                          
+                          <a href="{% url 'editar_compra' compra.pk %}" class="btn btn-primary btn-xs" title="Gestionar compra"><i class="fa fa-wrench"></i></a>
+                          <button {% if not compra.pendiente %} disabled {% endif %} id="{{ compra.pk }}" class="btn btn-danger btn-xs btnAnularCompra" title="Anular compra"><i class="fa fa-ban"></i></button>
+                        </td>
+                      </tr>
+                    {% endfor %}                                  
+                </tbody>
+              </table>
+              </div>                      
+          </div>
+        </div>
+
+      </div>
+  </div>
+    <!-- /Form para el ingreso de los datos de una empresa nueva -->
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+    <!-- jquery.inputmask -->
+  <script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+
+  <!-- Datatables -->
+  <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+  <!-- Sweet Alert -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script>
+    $(function () {
+
+      $("#datatable tbody").on("click", ".btnAnularCompra",function () {
+        swal({
+          title: "¿Está seguro de anular esta compra?",
+          text: "¡Una vez anulada, no podrá ser recuperada!",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+            
+            $.ajax({
+              data: {
+                "pk_compra": $(this).attr('id')
+              },
+              url: "{% url 'anular_compra' %}",
+              type: "POST",
+              success: function (data) {
+                location.reload();
+              },
+              error: function () {
+                swal("Oops", "¡Ocurrió un problema!", "error");
+              }
+            });
+          }
+        });
+      });
+    });
+  </script>
+ {% endblock javascripts %}

@@ -1,0 +1,133 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Listado de Compras {% endblock title %}
+
+{% block stylesheets %}
+{{ block.super }}
+<link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="right_col" role="main">
+
+  <div class="row">
+
+    <div class="clearfix"></div>
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Listado de Compras de Maíz Amarillo Duro</h2>
+          <div class="clearfix"></div>
+        </div>
+
+        <div class="x_content">
+
+
+          <form class="form-horizontal form-label-left" method="POST" action="{% url 'reportes_compras' %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="control-label col-md-2 col-sm-4 col-xs-3">Identificación:</label>
+              <div class="col-md-4 col-sm-6 col-xs-12 ">
+                <input name="nro_cedula" type="text" class="form-control" data-inputmask="'mask' : '9999999999'" value="{{ nro_cedula }}">
+                <span class="fa fa-list-alt form-control-feedback right"></span>
+              </div>
+            
+              <label class="control-label col-md-2 col-sm-4 col-xs-3">Productor:</label>
+              <div class="col-md-4 col-sm-6 col-xs-12">
+                <input readonly type="text" class="form-control" placeholder="Nombre del Productor">
+                <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-md-2 col-sm-4 col-xs-12">Estado:</label>
+              <div class="col-md-4 col-sm-6 col-xs-12">
+                <select name="estado" class="form-control">
+                  <option value="-1" {% if estado == -1 %} selected {% endif %}>Todas</option>
+                  <option value="1" {% if estado == 1 %} selected {% endif %}>Pendiente</option>
+                  <option value="0" {% if estado == 0 %} selected {% endif %}>Finalizada</option>
+                </select>
+              </div>
+              <label class="control-label col-md-2 col-sm-4 col-xs-12">Rango de fechas:</label>
+              <div class="col-md-4 col-sm-6 col-xs-12">
+                <div id="reportrange" class="pull-right input-prepend input-group">
+                  <input style="cursor: pointer;" type="text" name="rango_fechas" class="form-control"
+                    value='{{ fechaDesde|date:"F j, Y"}} - {{ fechaHasta|date:"F j, Y" }}' readonly>
+                  <span class="add-on input-group-addon" style="cursor: pointer;"><i
+                      class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                </div>
+              </div>
+            </div>
+            <div class="divider-dashed"></div>
+            <div class="form-group">
+              <div class="col-md-12 col-sm-6 col-xs-12 text-center">
+                <button id="btnBuscar" class="btn btn-success"><span class="fa fa-search"></span> Buscar</button>
+                <a class="btn btn-primary" href="{% url 'reportes_compras' %}"><span class="fa fa-refresh"></span> Restablecer</a>
+              </div>
+            </div>
+          </form>
+
+          <div class="table-responsive">
+            <table id="datatable" class="table table-striped jambo_table bulk_action">
+              <thead>
+                <tr class="headings">
+                  <th class="column-title text-center">Nro.</th>
+                  <th class="column-title text-center">Fecha</th>
+                  <th class="column-title text-center">Identificación</th>
+                  <th class="column-title text-center">Productor</th>
+                  <th class="column-title text-center">Estado</th>
+                  <th class="column-title text-center">Peso QQ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for compra in compras %}
+                <tr class="even pointer">
+                  <td class="text-center">{{ forloop.counter }}</td>
+                  <td class="text-center">{{ compra.fechaCompra }}</td>
+                  <td class="text-center">{{ compra.idProductor.identificacion }}</td>
+                  <td class="text-center">{{ compra.idProductor }}</td>
+                  <td class="text-center">
+                    {% if compra.pendiente %} <span class="label label-primary">Pendiente</span>
+                    {% else %} <span class="label label-success">Finalizada</span> {% endif %}</td>
+                  <td class="text-center">{{ compra.total }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <div class="row">
+              <form action="{% url 'imprimir_compras' %}" method="post" target="_blank">
+                {% csrf_token %}
+                <input hidden name="pks_compras" type="text" value="{% for c in compras %}{{ c.pk }} {% endfor %}"><!--Siempre debe ir con un espacio. Ejem: '23 '-->
+                <div class="col-md-12 col-sm-6 col-xs-12 text-center">
+                  <button id="btnGenerarPDF" class="btn btn-primary"><i class="fa fa-file-pdf-o"></i> Generar PDF</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+{{ block.super}}
+<!-- Datatables -->
+<script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+<!-- jquery.inputmask -->
+<script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+{% endblock javascripts %}
+
+{% block reportrange %}
+
+<script>
+  $(function () {
+    $('#reportrange').data('daterangepicker').setStartDate('{{ fechaDesde|date:"d/m/Y" }}');
+    $('#reportrange').data('daterangepicker').setEndDate('{{ fechaHasta|date:"d/m/Y" }}');
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Editar Artículo {% endblock title %}
+
+{% block stylesheets %}
+  {{ block.super }}
+  <link href="/static/vendors/pnotify/dist/pnotify.css" rel="stylesheet">
+  <link href="/static/vendors/pnotify/dist/pnotify.buttons.css" rel="stylesheet">
+  <link href="/static/vendors/pnotify/dist/pnotify.nonblock.css" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+        <div class="page-title">
+            <div class="title_left">
+              <h3>Edición de Articulo</h3>
+            </div>
+        </div>
+
+      <div class="clearfix"></div>
+
+      <div class="">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2><i class="fa fa-bars"></i> Artículo </h2>            
+              <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+              <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                  <li role="presentation" class="active"><a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Datos Generales</a>
+                  </li>
+                  <li role="presentation" class=""><a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">Abastecimiento</a>
+                  </li>
+                </ul>
+                <div id="myTabContent" class="tab-content">
+                  <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">                    
+                    <div class="row">                                       
+                        <div class="col-md-10 col-xs-12">
+                          <div class="x_panel">
+                            <div class="x_title">
+                              <h2>Datos Generales</h2>
+                              
+                              <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                              <br />
+                              <form class="form-horizontal form-label-left">
+                
+                                <div class="form-group">
+                                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Descripción (*)</label>
+                                  <div class="col-md-9 col-sm-9 col-xs-12">
+                                    <input type="text" class="form-control">
+                                  </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Unidad (*)</label>
+                                    <div class="col-md-4 col-sm-4 col-xs-12 form-group has-feedback">
+                                        <select class="form-control">
+                                           <option>Kilo</option>
+                                           <option>Libra</option>
+                                           <option>Quintal</option>
+                                           <option>Litro</option>
+                                           <option>Galón</option>
+                                           <option>Pieza</option>                                           
+                                        </select>
+                                    </div>
+                                </div>                                                                               
+                                <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Existencias  </label>
+                                    <div class="col-md-9 col-sm-9 col-xs-12">
+                                      <h5>00</h5>                    
+                                    </div>
+                                  </div>     
+                                
+                
+                                <div class="ln_solid"></div>
+                                <div class="form-group">
+                                  <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
+                                    <button type="button" class="btn btn-primary">Cancelar</button>
+                                    <button type="reset" class="btn btn-primary">Borrar</button>
+                                    <button type="submit" class="btn btn-success">Guardar</button>
+                                  </div>
+                                </div>
+                
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                
+                
+                        
+                        </div>
+                  </div>
+                  <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">                    
+                    <div class="row">                                       
+                        <div class="col-md-10 col-xs-12">
+                          <div class="x_panel">
+                            <div class="x_title">
+                              <h2>Abastecimiento</h2>                              
+                              <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+                              <p>Reglas de abastecimiento para la adquisición de artículos</p>
+                              <form class="form-horizontal form-label-left">
+                
+                                <div class="form-group">
+                                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Cantidad Mínima (*)</label>
+                                  <div class="col-md-9 col-sm-9 col-xs-12">
+                                    <input type="text" class="form-control" placeholder="10.00">
+                                  </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-3 col-sm-3 col-xs-12">Cantidad Máxima (*)</label>
+                                    <div class="col-md-9 col-sm-9 col-xs-12">
+                                      <input type="text" class="form-control" placeholder="20.00">
+                                    </div>
+                                </div>
+                                <div class="ln_solid"></div>
+                                <div class="form-group">
+                                  <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
+                                    <button type="button" class="btn btn-primary">Cancelar</button>
+                                    <button type="reset" class="btn btn-primary">Borrar</button>
+                                    <button type="submit" class="btn btn-success">Guardar</button>
+                                  </div>
+                                </div>
+                
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                
+                
+                        
+                        </div>
+                  </div>
+                  
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+
+        
+      </div>      
+    </div>
+    <div class="clearfix"></div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super }}
+  <!-- PNotify -->
+
+{% endblock javascripts %}
