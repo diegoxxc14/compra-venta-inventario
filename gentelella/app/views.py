@@ -1,36 +1,25 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
-from django.template import loader
-from django.http import HttpResponse
-from app.models import Articulo, Inventario, Productor, Empresa, ResponsableTransporte, PesajeCompraMaiz, CompraMaiz, BodegaMaiz
-from app.forms import ProductorForm, InventarioForm, EmpresaForm, ResponsableTransporteForm, CrearProveedorForm, CrearArticuloForm,CrearInventarioForm
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
-import json
+from django.core.serializers.json import DjangoJSONEncoder
+from django.template.loader import get_template
+from datetime import date, datetime, timedelta
+from decimal import Decimal
+from xhtml2pdf import pisa
+from app.models import Articulo, Inventario, Productor, Empresa, ResponsableTransporte, PesajeCompraMaiz, CompraMaiz, BodegaMaiz
+from app.forms import ProductorForm, InventarioForm, EmpresaForm, ResponsableTransporteForm, CrearProveedorForm, CrearArticuloForm,CrearInventarioForm
+from app.utils import * #Importamos métodos útiles
 from app.constants import * #Importar las constantes
-
-MESES = {
-    "Enero":"January",
-    "Febrero":"February",
-    "Marzo":"March",
-    "Abril":"April",
-    "Mayo":"May",
-    "Junio":"June",
-    "Julio":"July",
-    "Agosto":"August",
-    "Septiembre":"September",
-    "Octubre":"October",
-    "Noviembre":"November",
-    "Diciembre":"December"
-}
+import json
 
 def index(request):
     context = {}
     #template = loader.get_template('app/index.html')pagoCompras.html
-    template = loader.get_template('app/pagoCompras.html')
+    template = get_template('app/pagoCompras.html')
     return HttpResponse(template.render(context, request))
 
 #Paginas de la sección de COMPRAS
@@ -48,10 +37,6 @@ def buscar_productor(request):
     cedula = request.POST['nro_cedula']
     productor = Productor.objects.filter(identificacion=cedula)    
     return HttpResponse(serializers.serialize("json", productor), content_type='application/json')
-
-from datetime import date, datetime, timedelta
-from decimal import Decimal
-from django.core.serializers.json import DjangoJSONEncoder
 
 @csrf_exempt
 def guardar_pesajes(request):
@@ -306,13 +291,7 @@ class EliminarInventario(DeleteView):
 
 def listarVentas(request, template_name='app/inventarios/listar_ventas.html'):
     inventario = Inventario.objects.all()
-    return render(request, template_name, {'inventario':inventario})
-
-def convertir_fecha(fecha: str) -> datetime:
-    formato_fecha = '%B %d, %Y' # January 28, 2021
-    for m in MESES:
-        if m == fecha.split(' ')[0]:
-            return datetime.strptime(fecha.replace(m, MESES[m]), formato_fecha)            
+    return render(request, template_name, {'inventario':inventario})          
 
 def reportes_compras(request, template_name='app/inventarios/listar_compras.html'):
     estado = -1 #Por defecto busca todas las compras
@@ -352,43 +331,6 @@ def crear_articulo(request, template_name='app/inventarios/inventarioIE/articulo
     else:
         articuloform = CrearArticuloForm()
     return render(request, template_name,{'articuloform':articuloform}) 
-
-import os
-from django.conf import settings
-from django.http import HttpResponse
-from django.template.loader import get_template
-from xhtml2pdf import pisa
-from django.contrib.staticfiles import finders
-
-
-def link_callback(uri, rel):
-    """
-    Convert HTML URIs to absolute system paths so xhtml2pdf can access those
-    resources
-    """
-    result = finders.find(uri)
-    if result:
-        if not isinstance(result, (list, tuple)):
-            result = [result]
-        result = list(os.path.realpath(path) for path in result)
-        path=result[0]
-    else:
-        sUrl = settings.STATIC_URL        # Typically /static/
-        sRoot = settings.STATIC_ROOT      # Typically /home/userX/project_static/
-        mUrl = settings.MEDIA_URL         # Typically /media/
-        mRoot = settings.MEDIA_ROOT       # Typically /home/userX/project_static/media/
-
-        if uri.startswith(mUrl):
-            path = os.path.join(mRoot, uri.replace(mUrl, ""))
-        elif uri.startswith(sUrl):
-            path = os.path.join(sRoot, uri.replace(sUrl, ""))
-        else:
-            return uri
-
-    # make sure that file exists
-    if not os.path.isfile(path):
-        raise Exception('media URI must start with %s or %s' % (sUrl, mUrl))
-    return path
 
 def imprimir_compras(request):
     pks_input = request.POST['pks_compras'] #pks de la etiqueta input
@@ -495,6 +437,6 @@ def gentella_html(request):
 
     # Pick out the html file name from the url. And load that template.
     load_template = request.path.split('/')[-1]
-    template = loader.get_template('app/' + load_template)
+    template = get_template('app/' + load_template)
     return HttpResponse(template.render(context, request))
 
