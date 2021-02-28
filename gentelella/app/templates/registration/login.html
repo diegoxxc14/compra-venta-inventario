@@ -18,17 +18,22 @@
     <div class="login_wrapper">
       <div class="animate form login_form">
         <section class="login_content">
-          <form>
+          <form method="POST">
+            {% csrf_token %}
             <h1>Login Form</h1>
-            <div>
-              <input type="text" class="form-control" placeholder="Username" required="" />
+            <div class="form-group">
+              <!--<input type="text" class="form-control" placeholder="Username" required="" />-->
+              <label class="col-sm-2 col-md-3 control-label">Usuario:</label>
+              {{ form.username }}
+            </div>
+            <div class="form-group">
+              <!--<input type="password" class="form-control" placeholder="Password" required="" />-->
+              <label class="col-sm-2 col-md-3 control-label">Contraseña:</label>
+              {{ form.password }}
             </div>
             <div>
-              <input type="password" class="form-control" placeholder="Password" required="" />
-            </div>
-            <div>
-              <a class="btn btn-default submit" href="index.html">Log in</a>
-              <a class="reset_pass" href="#">Lost your password?</a>
+              <button class="btn btn-default submit">Iniciar sesión</button>
+              <a class="reset_pass" href="#">¿Olvidaste tu contraseña?</a>
             </div>
 
             <div class="clearfix"></div>

@@ -68,11 +68,12 @@ urlpatterns = [
     path('editarinventario/',views.editar_inventario, name='editar_i'),
 
 
-   
+    #Facturas Compra
+    path('facturacompra/',views.factura_compra, name='factura_compra'),
 
     re_path(r'^.*\.html', views.gentella_html, name='gentella'),
 
     # The home page
-    path('', views.index, name='index'),
+    path('', views.inicio, name='inicio'),
     
 ]

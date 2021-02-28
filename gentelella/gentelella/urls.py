@@ -23,4 +23,6 @@ urlpatterns = [
     url(r'^app/', include('app.urls')),
     url(r'^', include('app.urls')),
 
+    #URL necesaria para el login
+    url('accounts/', include('django.contrib.auth.urls')),
 ]

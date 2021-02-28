@@ -1,6 +1,6 @@
 <div class="left_col scroll-view">
   <div class="navbar nav_title" style="border: 0;">
-    <a href="index.html" class="site_title"><i class="fa fa-spinner"></i> <span>Centro Acopio Sabanilla</span></a>
+    <a href="{% url 'inicio' %}" class="site_title"><i class="fa fa-spinner"></i> <span>Centro Acopio Sabanilla</span></a>
   </div>
 
   <div class="clearfix"></div>
@@ -49,7 +49,7 @@
           </li>
           <li><a><i class="fa fa-money"></i>Pagos <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-              <li><a href="facturacionCompras.html">Facturación de Compras</a></li>
+              <li><a href="{% url 'factura_compra' %}">Facturación de Compras</a></li>
               <li><a href="facturacionVentas.html">Facturación de Ventas</a></li>
               <li><a href="facturacionTransporte.html">Facturación de Transporte</a></li>
             </ul>
