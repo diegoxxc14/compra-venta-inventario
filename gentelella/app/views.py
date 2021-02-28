@@ -8,6 +8,8 @@ from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template
 from datetime import date, datetime, timedelta
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from decimal import Decimal
 from xhtml2pdf import pisa
 from app.models import Articulo, Inventario, Productor, Empresa, ResponsableTransporte, PesajeCompraMaiz, CompraMaiz, BodegaMaiz
@@ -16,16 +18,17 @@ from app.utils import * #Importamos métodos útiles
 from app.constants import * #Importar las constantes
 import json
 
-def index(request):
-    context = {}
-    #template = loader.get_template('app/index.html')pagoCompras.html
-    template = get_template('app/pagoCompras.html')
-    return HttpResponse(template.render(context, request))
-
-#Paginas de la sección de COMPRAS
-def compra_maiz(request, template_name='app/compras/compra_maiz.html'):
+#Inicio
+@login_required
+def inicio(request, template_name='app/index.html'):
     return render(request, template_name)
 
+#Paginas de la sección de COMPRAS
+@login_required
+def crear_compra(request, template_name='app/compras/compra_maiz.html'):
+    return render(request, template_name)
+
+@login_required
 def editar_compra(request, pk, template_name='app/compras/editar_compra_maiz.html'):
     compra = CompraMaiz.objects.get(pk=pk)
     pesajes = PesajeCompraMaiz.objects.filter(idCompraMaiz=pk, vigente=True)
@@ -128,32 +131,25 @@ def finalizar_compra(request):
         
     return HttpResponse('ok')
 
-def ingreso_compras(request, template_name='app/compras/ingresarCompras.html'):
+@login_required
+def gestion_compras(request, template_name='app/compras/ingresarCompras.html'):
     compras = CompraMaiz.objects.filter(valida=True)
     return render(request, template_name, {'compras':compras})
 
-def nuevo_productor(request, template_name='app/compras/nuevoProductor.html'):
-    if request.method == 'POST':
-        form = ProductorForm(request.POST)
-        if form.is_valid():
-            form.save()
-        return redirect('compra_m')
-    else:
-        form = ProductorForm()
-    return render(request, template_name,{'form':form})
-
 #Vistas del CRUD de Productor
+@method_decorator(login_required, name='dispatch')
 class CrearProductor(CreateView):
     model = Productor
     template_name = 'app/compras/productor_crear.html'
     form_class = ProductorForm
-    success_url = reverse_lazy('listar_productor')
+    success_url = reverse_lazy('listar_productores')
 
+@method_decorator(login_required, name='dispatch')
 class EditarProductor(UpdateView):
     model = Productor
     form_class = ProductorForm
     template_name = 'app/compras/productor_editar.html'
-    success_url = reverse_lazy('listar_productor')
+    success_url = reverse_lazy('listar_productores')
 
     def form_valid(self, form):
         messages.add_message(self.request, messages.SUCCESS, 'Inventario editado correctamente.')
@@ -166,13 +162,15 @@ class EditarProductor(UpdateView):
 class EliminarProductor(DeleteView):
     model = Productor
     template_name = "app/compras/productor_eliminar.html"
-    success_url = reverse_lazy('listar_productor')
+    success_url = reverse_lazy('listar_productores')
 
-def listarProductor(request, template_name='app/compras/productor_listar.html'):
+@login_required
+def listar_productores(request, template_name='app/compras/productor_listar.html'):
     form = Productor.objects.all()
     return render(request, template_name, {'form':form})
 
 #Vistas del CRUD de Empresa
+@method_decorator(login_required, name='dispatch')
 class CrearEmpresa(CreateView):
     model = Empresa
     template_name = 'app/ventas/empresa_crear.html'
@@ -183,6 +181,7 @@ class CrearEmpresa(CreateView):
         messages.add_message(self.request, messages.WARNING, 'Hubo problemas para crear esta Empresa.')
         return super().form_invalid(form)
 
+@method_decorator(login_required, name='dispatch')
 class EditarEmpresa(UpdateView):
     model = Empresa
     form_class = EmpresaForm
@@ -198,7 +197,8 @@ class EliminarEmpresa(DeleteView):
     template_name = 'app/ventas/empresa_eliminar.html'
     success_url = reverse_lazy('listar_empresa')
 
-def listarEmpresa(request, template_name='app/ventas/empresa_listar.html'):
+@login_required
+def listar_empresas(request, template_name='app/ventas/empresa_listar.html'):
     form = Empresa.objects.all()
     return render(request, template_name, {'form':form})
 
@@ -293,6 +293,7 @@ def listarVentas(request, template_name='app/inventarios/listar_ventas.html'):
     inventario = Inventario.objects.all()
     return render(request, template_name, {'inventario':inventario})          
 
+@login_required
 def reportes_compras(request, template_name='app/inventarios/listar_compras.html'):
     estado = -1 #Por defecto busca todas las compras
     nro_cedula = ''
@@ -322,16 +323,7 @@ def reportes_compras(request, template_name='app/inventarios/listar_compras.html
     return render(request, template_name, {'compras':compras, 'estado':estado, 'nro_cedula':nro_cedula,
         'fechaDesde':fechaDesde, 'fechaHasta':fechaHasta, 'pk_compras':serializers.serialize("json", compras, fields=['pk'])})
 
-def crear_articulo(request, template_name='app/inventarios/inventarioIE/articulo_crear.html'):
-    if request.method == 'POST':
-        articuloform = CrearArticuloForm(request.POST)
-        if articuloform.is_valid():
-           articuloform.save()
-        return redirect('lista_implementos')
-    else:
-        articuloform = CrearArticuloForm()
-    return render(request, template_name,{'articuloform':articuloform}) 
-
+@login_required
 def imprimir_compras(request):
     pks_input = request.POST['pks_compras'] #pks de la etiqueta input
     pks_compras = pks_input[0:-1].split(' ') #Considerando que llega tipo: '23 '
@@ -360,6 +352,16 @@ def imprimir_compras(request):
        return HttpResponse('We had some errors <pre>' + html + '</pre>')
     return response
 
+def crear_articulo(request, template_name='app/inventarios/inventarioIE/articulo_crear.html'):
+    if request.method == 'POST':
+        articuloform = CrearArticuloForm(request.POST)
+        if articuloform.is_valid():
+           articuloform.save()
+        return redirect('lista_implementos')
+    else:
+        articuloform = CrearArticuloForm()
+    return render(request, template_name,{'articuloform':articuloform}) 
+
 def crear_inventario(request, template_name='app/inventarios/inventarioIE/inventario_crear.html'):
     if request.method == 'POST':
         inventarioform = CrearInventarioForm(request.POST)
@@ -379,35 +381,19 @@ def editar_inventario(request,inv):
 def lista_insumos_e_implementos(request, template_name='app/inventarios/inventarioIE/lista_insumos_e_implementos.html'):
     inventario = Inventario.objects.all()
     return render(request, template_name, {'inventario':inventario})
-'''
-def crear_productor(request, template_name='app/compras/productor_crear.html'):
-    if request.method == 'POST':
-        form = CrearProductorForm(request.POST)
-        if form.is_valid():
-            form.save()
-        return redirect('crear_productor')
-    else:
-        form = CrearProductorForm()
-    return render(request, template_name,{'form':form})
-'''
+
 def productor_view(request):
     if request.method == 'POST':
         form = ProductorForm(request.POST)
         if form.is_valid():
             form.save()
-        return redirect('compra_m')
+        return redirect('crear_compra')
     else:
         form = ProductorForm()
     return render(request, 'app/productor_form.html',{'form':form})
 
-#Paginas de la sección Inventarios
-def lista_compras(request, template_name='app/inventarios/inventarioCompras.html'):
-    return render(request, template_name)
-
 def lista_ventas(request, template_name='app/inventarios/inventarioVentas.html'):
     return render(request, template_name)
-
-
 
 def nuevo_proveedor(request, template_name='app/inventarios/nuevoProveedor.html'):
     return render(request, template_name)
@@ -429,7 +415,6 @@ def salida_inventario(request, template_name='app/inventarios/inventarioIE/egres
 def editar_inventario(request, template_name='app/inventarios/inventarioIE/editarInventario.html'):
     return render(request, template_name)
 
-
 def gentella_html(request):
     context = {}
     # The template to be loaded as per gentelella.
@@ -439,4 +424,3 @@ def gentella_html(request):
     load_template = request.path.split('/')[-1]
     template = get_template('app/' + load_template)
     return HttpResponse(template.render(context, request))
-
