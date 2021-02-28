@@ -175,7 +175,7 @@ class CrearEmpresa(CreateView):
     model = Empresa
     template_name = 'app/ventas/empresa_crear.html'
     form_class = EmpresaForm
-    success_url = reverse_lazy('listar_empresa')
+    success_url = reverse_lazy('listar_empresas')
 
     def form_invalid(self, form):
         messages.add_message(self.request, messages.WARNING, 'Hubo problemas para crear esta Empresa.')
@@ -186,7 +186,7 @@ class EditarEmpresa(UpdateView):
     model = Empresa
     form_class = EmpresaForm
     template_name = 'app/ventas/empresa_editar.html'
-    success_url = reverse_lazy('listar_empresa')
+    success_url = reverse_lazy('s')
 
     def form_invalid(self, form):
         messages.add_message(self.request, messages.WARNING, 'Hubo problemas para editar esta Empresa.')
@@ -195,7 +195,7 @@ class EditarEmpresa(UpdateView):
 class EliminarEmpresa(DeleteView):
     model = Empresa
     template_name = 'app/ventas/empresa_eliminar.html'
-    success_url = reverse_lazy('listar_empresa')
+    success_url = reverse_lazy('listar_empresas')
 
 @login_required
 def listar_empresas(request, template_name='app/ventas/empresa_listar.html'):

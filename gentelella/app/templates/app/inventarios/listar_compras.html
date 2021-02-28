@@ -98,7 +98,7 @@
             <div class="row">
               <form action="{% url 'imprimir_compras' %}" method="post" target="_blank">
                 {% csrf_token %}
-                <input hidden name="pks_compras" type="text" value="{% for c in compras %}{{ c.pk }} {% endfor %}"><!--Siempre debe ir con un espacio. Ejem: '23 '-->
+                <input hidden name="pks_compras" type="text" value="{% for c in compras %}{{ c.pk }} {% endfor %}" required><!--Siempre debe ir con un espacio. Ejem: '23 '-->
                 <div class="col-md-12 col-sm-6 col-xs-12 text-center">
                   <button id="btnGenerarPDF" class="btn btn-primary"><i class="fa fa-file-pdf-o"></i> Generar PDF</button>
                 </div>
