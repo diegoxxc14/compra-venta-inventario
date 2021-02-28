@@ -1,6 +1,6 @@
 <div class="left_col scroll-view">
   <div class="navbar nav_title" style="border: 0;">
-    <a href="index.html" class="site_title"><i class="fa fa-spinner"></i> <span>Centro Acopio Sabanilla</span></a>
+    <a href="{% url 'inicio' %}" class="site_title"><i class="fa fa-spinner"></i> <span>Centro Acopio Sabanilla</span></a>
   </div>
 
   <div class="clearfix"></div>
@@ -27,8 +27,8 @@
           <li><a><i class="fa fa-windows"></i>Compras <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
               <li><a href="{% url 'crear_productor' %}">Ingresar Productor</a></li>              
-              <li><a href="{% url 'listar_productor' %}">Listado de Productores</a></li>
-              <li><a href="{% url 'ingresar_com' %}">Gestión de Compras</a></li>
+              <li><a href="{% url 'listar_productores' %}">Listado de Productores</a></li>
+              <li><a href="{% url 'gestion_compras' %}">Gestión de Compras</a></li>
              </ul>
             </li>
           <li><a><i class="fa fa-shopping-cart"></i> Ventas <span class="fa fa-chevron-down"></span></a>
@@ -49,7 +49,7 @@
           </li>
           <li><a><i class="fa fa-money"></i>Pagos <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-              <li><a href="facturacionCompras.html">Facturación de Compras</a></li>
+              <li><a href="#">Facturación de Compras</a></li>
               <li><a href="facturacionVentas.html">Facturación de Ventas</a></li>
               <li><a href="facturacionTransporte.html">Facturación de Transporte</a></li>
             </ul>
@@ -64,8 +64,6 @@
               <li><a href="index.html">Dashboard</a></li>
               <li><a href="index2.html">Dashboard2</a></li>
               <li><a href="index3.html">Dashboard3</a></li>
-              <li><a href="ingresarEmpresa.html">Ingresar Productor</a></li>
-              <li><a href="ingresarTransportista.html">Ingresar Transportista</a></li>
             </ul>
         </li>
         <li><a><i class="fa fa-edit"></i> Forms <span class="fa fa-chevron-down"></span></a>
@@ -153,7 +151,6 @@
               </li>
           </ul>
         </li>
-        <li><a href="javascript:void(0)"><i class="fa fa-laptop"></i> Landing Page <span class="label label-success pull-right">Coming Soon</span></a></li>
       </ul>
     </div>
   </div>
