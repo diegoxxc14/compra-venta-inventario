@@ -20,7 +20,7 @@ import json
 
 #Inicio
 @login_required
-def inicio(request, template_name='app/index.html'):
+def inicio(request, template_name='app/index2.html'):
     return render(request, template_name)
 
 #Paginas de la sección de COMPRAS
