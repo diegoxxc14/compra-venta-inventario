@@ -98,7 +98,7 @@
             <div class="row">
               <form action="{% url 'imprimir_compras' %}" method="post" target="_blank">
                 {% csrf_token %}
-                <input hidden name="pks_compras" type="text" value="{% for c in compras %}{{ c.pk }} {% endfor %}" required><!--Siempre debe ir con un espacio. Ejem: '23 '-->
+                <input id="pks_compras" hidden name="pks_compras" type="text" value="{% for c in compras %}{{ c.pk }} {% endfor %}" required><!--Siempre debe ir con un espacio. Ejem: '23 '-->
                 <div class="col-md-12 col-sm-6 col-xs-12 text-center">
                   <button id="btnGenerarPDF" class="btn btn-primary"><i class="fa fa-file-pdf-o"></i> Generar PDF</button>
                 </div>
@@ -120,10 +120,19 @@
 
 <!-- jquery.inputmask -->
 <script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+  $(function () {
+    $("#btnGenerarPDF").on("click", function () {
+      if ($("#pks_compras").val() == "") {
+        swal("Oops", "No se puede generar el reporte.", "error");  
+      }
+    });
+  });
+</script>
 {% endblock javascripts %}
 
 {% block reportrange %}
-
 <script>
   $(function () {
     $('#reportrange').data('daterangepicker').setStartDate('{{ fechaDesde|date:"d/m/Y" }}');
