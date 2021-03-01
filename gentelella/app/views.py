@@ -186,7 +186,7 @@ class EditarEmpresa(UpdateView):
     model = Empresa
     form_class = EmpresaForm
     template_name = 'app/ventas/empresa_editar.html'
-    success_url = reverse_lazy('s')
+    success_url = reverse_lazy('listar_empresas')
 
     def form_invalid(self, form):
         messages.add_message(self.request, messages.WARNING, 'Hubo problemas para editar esta Empresa.')
