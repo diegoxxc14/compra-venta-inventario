@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<style>
+    @page {
+            size: a4 portrait;
+
+        @frame content_frame {
+            /* Content Frame */
+            left: 50pt;
+            width: 512pt;
+            top: 10pt;
+              height: 632pt;
+        }
+
+        @frame footer_frame {
+            /* Another static Frame */
+            -pdf-frame-content: footer_content;
+            left: 50pt;
+            width: 512pt;
+            top: 772pt;
+            height: 20pt;
+        }
+    }   
+    
+
+    .head {
+        text-align: center;
+        color:#669999;
+        text-transform: uppercase;
+    } 
+
+    .reporte {
+       color: #669999;
+    }
+ 
+     
+
+    #invoice thead tr th {
+        text-align: center;
+        background-color:  #1a5276;
+        color: white;
+        text-shadow: 1px 1px 1px black;
+        border: 1px solid #abb2b9;
+        padding-top: 4px;
+    }
+
+    #invoice thead tr {
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    #invoice tbody tr {        
+        border: 1px solid #abb2b9;
+        
+        color: #669999;
+        padding: 0;
+    }
+
+    .text-center{
+        text-align: center;
+    }
+</style>
+<body>  
+    <p class="head">
+        <b>{{ reporte.empresa|upper }}</b> <br>
+        {{ reporte.direccion }}
+    </p>
+    <p class="reporte">
+        <b>REPORTE:</b> {{ reporte.nombre }} <br>
+        <b>FECHA:</b> {{ reporte.fecha}} <b> HORA:</b> {{ reporte.hora}}
+    </p>
+
+    <!-- Content for Static Frame 'footer_frame' -->
+    <div id="footer_content">(c) - Página <pdf:pagenumber>
+            de <pdf:pagecount>
+    </div>   
+    
+
+    <table border="0.5" id="invoice">
+        <thead>
+        <tr>
+            <th style="width: 30%;">FECHA</th>
+            <th style="width: 40%;">PRODUCTOR</th>
+            <th style="width: 15%;">ESTADO</th>
+            <th style="width: 15%;">TOTAL</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for com in compras %}
+            <tr style="padding-top: 3px;">
+                <td class="text-center">{{ com.fechaCompra }}</td>
+                <td class="text-center">{{ com.idProductor.nombres }}</td>
+                <td class="text-center">
+                    {% if com.pendiente %} Pendiente {% else %} Finalizada {% endif %}
+                </td>
+                <td class="text-center">{{ com.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

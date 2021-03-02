@@ -332,14 +332,23 @@ def imprimir_compras(request):
         pks_compras[i]=int(value)
         
     compras = CompraMaiz.objects.filter(pk__in=pks_compras)
+
+    date = datetime.now()
+    fecha = date.strftime('%d/%m/%Y')
+    hora = date.strftime('%H:%M:%S')
     
     #Código necesario para generar el reporte PDF
-    template_path = 'app/compras/reporte_pdf.html'
-    context = {'compras': compras}
+    #template_path = 'app/compras/reporte_pdf.html'
+    template_path = 'app/reportes/reporte_compras_pdf.html'
+    context = {'compras': compras, 
+                'reporte' : {'empresa':'Centro de Acopio de Sabanilla',
+                'direccion':'Sabanilla-Loja-Ecuador',
+                'nombre':'Compras de maíz amarillo duro','fecha':fecha,'hora':hora}
+    }
     
     # Create a Django response object, and specify content_type as pdf
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+    response['Content-Disposition'] = 'attachment; filename="reporte %s.pdf"' % (fecha)
     # find the template and render it.
     template = get_template(template_path)
     html = template.render(context)
