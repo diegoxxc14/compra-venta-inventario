@@ -132,7 +132,7 @@ def finalizar_compra(request):
     return HttpResponse('ok')
 
 @login_required
-def gestion_compras(request, template_name='app/compras/ingresarCompras.html'):
+def gestion_compras(request, template_name='app/compras/gestion_compras.html'):
     compras = CompraMaiz.objects.filter(valida=True)
     return render(request, template_name, {'compras':compras})
 
@@ -423,6 +423,13 @@ def salida_inventario(request, template_name='app/inventarios/inventarioIE/egres
 
 def editar_inventario(request, template_name='app/inventarios/inventarioIE/editarInventario.html'):
     return render(request, template_name)
+
+#Pagos
+def facturacion_compra(request, template_name='app/pagos/factura_crear_compras.html'):
+    context = {
+        'tiposDocumento': TIPO_DOCUMENTO, 'tiposPago': TIPO_PAGO
+    }
+    return render(request, template_name, context)
 
 def gentella_html(request):
     context = {}

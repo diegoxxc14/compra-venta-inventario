@@ -58,6 +58,8 @@ urlpatterns = [
     path('ingresoinventario/',views.ingreso_inventario, name='ingreso_i'),
     path('editarinventario/',views.editar_inventario, name='editar_i'),
 
+    path('crear_facturacion/',views.facturacion_compra, name='facturacion_compra'),
+
     re_path(r'^.*\.html', views.gentella_html, name='gentella'),
 
 ]
