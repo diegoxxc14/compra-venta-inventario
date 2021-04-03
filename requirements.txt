@@ -12,3 +12,4 @@ reportlab==3.5.59
 six==1.15.0
 webencodings==0.5.1
 xhtml2pdf==0.2.5
+django-widget-tweaks

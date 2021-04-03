@@ -26,25 +26,25 @@
         <ul class="nav side-menu">
           <li><a><i class="fa fa-windows"></i>Compras <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
-              <li><a href="{% url 'crear_productor' %}">Ingresar Productor</a></li>              
+              <li><a href="{% url 'crear_productor' %}">Crear Productor</a></li>              
               <li><a href="{% url 'listar_productores' %}">Listado de Productores</a></li>
               <li><a href="{% url 'gestion_compras' %}">Gestión de Compras</a></li>
              </ul>
             </li>
           <li><a><i class="fa fa-shopping-cart"></i> Ventas <span class="fa fa-chevron-down"></span></a>
-            <ul class="nav child_menu">              
-              <li><a href="nuevaVenta.html">Nueva Venta</a></li>
-              <li><a href="{% url 'crear_empresa' %}">Nueva Empresa</a></li>
+            <ul class="nav child_menu">
+              <li><a href="{% url 'gestion_ventas' %}">Gestión de Ventas</a></li>
+              <li><a href="{% url 'crear_empresa' %}">Crear Empresa</a></li>
               <li><a href="{% url 'listar_empresas' %}">Listado de Empresas</a></li>
-              <li><a href="{% url 'crear_responsableTransporte' %}">Nuevo Transportista</a></li>
+              <li><a href="{% url 'crear_responsableTransporte' %}">Crear Responsable Transporte</a></li>
               <li><a href="{% url 'listar_responsableTransporte' %}">Listado de Transportistas</a></li>
             </ul>
           </li>
           <li><a><i class="fa fa-book"></i>Inventarios <span class="fa fa-chevron-down"></span></a>
             <ul class="nav child_menu">
               <li><a href="{% url 'reportes_compras' %}">Reportes de Compras</a></li>
-              <li><a href="{% url 'listar_ventas' %}">Reportes de Ventas</a></li>
-              <li><a href="{% url 'listar_inventario' %}">Inventario General</a></li>
+              <li><a href="{% url 'reportes_ventas' %}">Reportes de Ventas</a></li>
+              <li><a href="{% url 'inventario_general' %}">Inventario General</a></li>
             </ul>
           </li>
           <li><a><i class="fa fa-money"></i>Pagos <span class="fa fa-chevron-down"></span></a>

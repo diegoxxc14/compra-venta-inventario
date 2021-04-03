@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from decimal import Decimal
 from xhtml2pdf import pisa
-from app.models import Articulo, Inventario, Productor, Empresa, ResponsableTransporte, PesajeCompraMaiz, CompraMaiz, BodegaMaiz
+from app.models import Articulo, Inventario, Productor, Empresa, ResponsableTransporte, PesajeCompraMaiz,PesajeVentaMaiz, CompraMaiz, VentaMaiz, BodegaMaiz
 from app.forms import ProductorForm, InventarioForm, EmpresaForm, ResponsableTransporteForm, CrearProveedorForm, CrearArticuloForm,CrearInventarioForm
 from app.utils import * #Importamos métodos útiles
 from app.constants import * #Importar las constantes
@@ -219,19 +219,12 @@ class CrearResponsableTransporte(CreateView):
     form_class = ResponsableTransporteForm
     success_url = reverse_lazy('listar_responsableTransporte')
 
-    def form_invalid(self, form):
-        messages.add_message(self.request, messages.WARNING, 'Hubo problemas para crear este Responsable de Transporte.')
-        return super().form_invalid(form)
-
 class EditarResponsableTransporte(UpdateView):
     model = ResponsableTransporte
     form_class = ResponsableTransporteForm
     template_name = 'app/ventas/transportista_editar.html'
     success_url = reverse_lazy('listar_responsableTransporte')
-
-    def form_invalid(self, form):
-        messages.add_message(self.request, messages.WARNING, 'Hubo problemas para editar este Responsable de Transporte.')
-        return super().form_invalid(form)
+    
 
 class EliminarResponsableTransporte(DeleteView):
     model = ResponsableTransporte
@@ -241,6 +234,185 @@ class EliminarResponsableTransporte(DeleteView):
 def listarResponsableTransporte(request, template_name='app/ventas/transportista_listar.html'):
     form = ResponsableTransporte.objects.all()
     return render(request, template_name, {'form':form})
+
+#PAGINAS DE LA SECCION VENTAS
+
+#Vista de gestion de ventas
+def gestion_ventas(request, template_name='app/ventas/gestion_ventas.html'):
+    ventas = VentaMaiz.objects.filter(valida=True)
+    return render(request, template_name, {'ventas':ventas})
+
+#Vista de venta nueva
+def venta_nueva_maiz(request, template_name='app/ventas/venta_nueva_maiz.html'):
+    return render(request, template_name)
+
+@csrf_exempt
+def buscar_empresa(request):
+    ruc = request.POST['nro_ruc']
+    empresa = Empresa.objects.filter(ruc=ruc)    
+    return HttpResponse(serializers.serialize("json", empresa), content_type='application/json')
+
+#crear un buscador autocomplete de productor
+@csrf_exempt
+def buscar_productor_autocomplete(request):    
+    data = {}
+    try:
+        action = request.POST['action']
+        if action == 'autocomplete':
+            data = []
+            prods = Productor.objects.filter(nombres__icontains= request.POST['term'])[0:10]
+            for i in prods:
+                item = i.toJSON()
+                item['value'] = i.nombres 
+                data.append(item)  
+        else:
+            data['error'] = 'Ha ocurrido un error'
+    except Exception as e:
+        data['error'] = str(e)
+    return JsonResponse(data, safe=False)           
+
+#crear un buscador de empresa autocomplete
+@csrf_exempt
+def buscar_empresa_autocomplete(request):    
+    data = {}
+    try:
+        action = request.POST['action']
+        if action == 'autocomplete':
+            data = []
+            prods = Empresa.objects.filter(razonSocial__icontains= request.POST['term'])[0:10]
+            for i in prods:
+                item = i.toJSON()
+                item['value'] = i.razonSocial 
+                data.append(item)  
+        else:
+            data['error'] = 'Ha ocurrido un error'
+    except Exception as e:
+        data['error'] = str(e)
+    return JsonResponse(data, safe=False)           
+
+#crear un buscador autocomplete de responsable de transporte
+@csrf_exempt
+def buscar_ResponsableTransporte(request):    
+    data = {}
+    try:
+        action = request.POST['action']
+        if action == 'autocomplete':
+            data = []
+            prods = ResponsableTransporte.objects.filter(nombre__icontains= request.POST['term'])[0:10]
+            for i in prods:
+                item = i.toJSON()
+                item['value'] = i.nombre 
+                data.append(item)  
+        else:
+            data['error'] = 'Ha ocurrido un error'
+    except Exception as e:
+        data['error'] = str(e)
+    return JsonResponse(data, safe=False)           
+
+
+@csrf_exempt
+def guardar_pesajes_venta(request):
+    formato_fecha = '%d/%m/%Y %H:%M:%S'
+    #Datos enviados en la petición AJAX
+    pk_empresa = int(request.POST['pk_empresa'])
+    pk_responsable_transporte = int(request.POST['pk_responsable_transporte'])
+    pesajes = json.loads(request.POST['pesajes'])
+    total_pesajes = Decimal(request.POST['total_pesajes'])
+    observacion = request.POST['observacion']
+    
+    #Obtener la empresa
+    empresa = Empresa.objects.get(pk=pk_empresa)
+    
+    #Obtener el Responsable de Transporte
+    responsable_transporte= ResponsableTransporte.objects.get(pk=pk_responsable_transporte)
+
+    #Guardar la Compra de Maíz
+    venta_maiz = VentaMaiz(observaciones=observacion, humedad=HUMEDAD, 
+        impureza=IMPUREZA, total=total_pesajes, idEmpresa=empresa,idResponsableTransporte=responsable_transporte)
+    venta_maiz.save()
+
+    #Guardar los Pesajes correspondientes a al Compra de Maíz
+    for pes in pesajes:
+        fecha = datetime.strptime(pes['fecha'], formato_fecha)
+        nuevoPesaje = PesajeVentaMaiz(fechaPesaje=fecha, pesoBruto=int(pes['pesoBruto']),
+            pesoTara=int(pes['pesoTara']), pesoNeto=int(pes['pesoNeto']),
+            factorConversion=Decimal(pes['factorConversion']), pesoQuintales=Decimal(pes['pesoQuintales']),
+            idVentaMaiz=venta_maiz)
+        nuevoPesaje.save()
+    
+    #Guardar registro en Bodega # bodega debemos guardar el ingreso y la salida del mismo
+    #bodega_registro =  BodegaMaiz(cantidad=total_pesajes, 
+    #    tipoMovimiento=SALIDA, stockMaiz=total_pesajes, idCompraMaiz=compra_maiz)
+    #bodega_registro.save()
+    
+    #return HttpResponse(json.dumps(respuesta, cls=DjangoJSONEncoder), content_type='application/json')
+    return HttpResponse('ok')
+
+#editar venta de maiz
+@login_required
+def editar_venta(request, pk, template_name='app/ventas/editar_venta_maiz.html'):
+    venta = VentaMaiz.objects.get(pk=pk)
+    pesajes = PesajeVentaMaiz.objects.filter(idVentaMaiz=pk, vigente=True)
+    return render(request, template_name, 
+        {'venta':venta, 'pesajes':serializers.serialize("json", pesajes, fields=['fechaPesaje','pesoBruto','pesoTara','pesoNeto','factorConversion','pesoQuintales'])})
+
+#editar pesajes de ventas
+@csrf_exempt
+def editar_pesajes_venta(request):
+    formato_fecha = '%d/%m/%Y %H:%M:%S'
+    #Datos enviados desde la petición AJAX
+    pk_venta = int(request.POST['pk_venta'])
+    pes_editar = json.loads(request.POST['pesajes'])
+    total_pesajes = Decimal(request.POST['total_pesajes'])
+    observacion = request.POST['observacion']
+
+    #Obtener la compra a editar
+    venta_maiz = VentaMaiz.objects.get(pk=pk_venta)    
+    venta_maiz.observacion = observacion
+    venta_maiz.total = total_pesajes
+    venta_maiz.save()
+
+    #Anulo los Pesajes anteriores
+    pes_anular = PesajeVentaMaiz.objects.filter(idVentaMaiz=pk_venta, vigente=True)
+    for pes_anu in pes_anular:
+        pes_anu.vigente = False
+        pes_anu.save()
+
+    #Guardar los nuevos Pesajes editados correspondientes a al Compra de Maíz
+    for pes in pes_editar:
+        fecha = datetime.strptime(pes['fechaPesaje'], formato_fecha)
+        nuevoPesaje = PesajeVentaMaiz(fechaPesaje=fecha, pesoBruto=int(pes['pesoBruto']),
+            pesoTara=int(pes['pesoTara']), pesoNeto=int(pes['pesoNeto']),
+            factorConversion=Decimal(pes['factorConversion']), pesoQuintales=Decimal(pes['pesoQuintales']),
+            idVentaMaiz=venta_maiz)
+        nuevoPesaje.save()
+    
+    #Guardar registro en Bodega
+    #bodega_registro =  BodegaMaiz(cantidad=total_pesajes, 
+    #   tipoMovimiento=INGRESO, stockMaiz=total_pesajes, idCompraMaiz=compra_maiz)
+    #bodega_registro.save()
+
+    #return HttpResponse(json.dumps(respuesta, cls=DjangoJSONEncoder), content_type='application/json')
+    return HttpResponse('ok')
+
+@csrf_exempt
+def anular_venta(request):
+    pk_venta = int(request.POST['pk_venta'])
+    venta = VentaMaiz.objects.get(pk=pk_venta)
+    venta.valida = False
+    venta.save()
+        
+    return HttpResponse('ok')
+
+@csrf_exempt
+def finalizar_venta(request):
+    pk_venta = int(request.POST['pk_venta'])
+    venta = VentaMaiz.objects.get(pk=pk_venta)
+    venta.pendiente = False
+    venta.save()
+        
+    return HttpResponse('ok')
+
 
 def crear_proveedor(request, template_name='app/inventarios/inventarioIE/proveedor_crear.html'):
     if request.method == 'POST':
@@ -293,15 +465,16 @@ def listarVentas(request, template_name='app/inventarios/listar_ventas.html'):
     inventario = Inventario.objects.all()
     return render(request, template_name, {'inventario':inventario})          
 
+   
 @login_required
 def reportes_compras(request, template_name='app/inventarios/listar_compras.html'):
     estado = -1 #Por defecto busca todas las compras
-    nro_cedula = ''
+    nom_productor = ''
     
     if request.POST:
         rango_fechas = request.POST['rango_fechas'].split(' - ')
         estado = int(request.POST['estado'])
-        nro_cedula = request.POST['nro_cedula']
+        nom_productor = request.POST['nom_productor']
         
         fechaDesde = convertir_fecha(rango_fechas[0])
         fechaHasta = convertir_fecha(rango_fechas[1])
@@ -317,10 +490,10 @@ def reportes_compras(request, template_name='app/inventarios/listar_compras.html
     if estado != -1: #"Pendiente" o "Finalizada"
         compras = compras.filter(pendiente=bool(estado))
     
-    if nro_cedula != '': #Si se envía una cédula para buscar
-        compras = compras.filter(idProductor__identificacion=nro_cedula)
+    if nom_productor != '': #Si se envía un nombre para buscar
+        compras = compras.filter(idProductor__nombres=nom_productor)
 
-    return render(request, template_name, {'compras':compras, 'estado':estado, 'nro_cedula':nro_cedula,
+    return render(request, template_name, {'compras':compras, 'estado':estado, 'nom_productor':nom_productor,
         'fechaDesde':fechaDesde, 'fechaHasta':fechaHasta, 'pk_compras':serializers.serialize("json", compras, fields=['pk'])})
 
 @login_required
@@ -361,6 +534,84 @@ def imprimir_compras(request):
        return HttpResponse('We had some errors <pre>' + html + '</pre>')
     return response
 
+
+@login_required
+def reportes_ventas(request, template_name='app/inventarios/listar_ventas_prueba.html'):
+    estado = -1 #Por defecto busca todas las ventas 'app/inventarios/listar_ventas.html'
+    #nro_ruc = ''
+    nom_empresa = ''#agreamos para la busqueda por empresa
+    
+    if request.POST:
+        rango_fechas = request.POST['rango_fechas'].split(' - ')
+        estado = int(request.POST['estado'])
+        nom_empresa = request.POST['nom_empresa']
+        
+        fechaDesde = convertir_fecha(rango_fechas[0])
+        fechaHasta = convertir_fecha(rango_fechas[1])
+
+    else:
+        #Ventas de los últimos 7 días
+        fechaHasta = date.today() #Hasta hoy
+        fechaDesde = fechaHasta - timedelta(days=6) #Desde 6 días atrás        
+    
+    #"Todas" las ventas
+    ventas = VentaMaiz.objects.filter(valida=True, fechaVenta__range=(fechaDesde, fechaHasta + timedelta(days=1))) #Sumo 1 día ya que no incluye la fechaHasta
+    
+    if estado != -1: #"Pendiente" o "Finalizada"
+        ventas = ventas.filter(pendiente=bool(estado))
+    
+    #if nro_ruc != '': #Si se envía un ruc para buscar
+     #   ventas = ventas.filter(idEmpresa__ruc=nro_ruc)
+
+    if nom_empresa != '': #Si se envia un nombre para buscar
+        ventas = ventas.filter(idEmpresa__razonSocial=nom_empresa)
+
+    return render(request, template_name, {'ventas':ventas, 'estado':estado, 'nom_empresa':nom_empresa,
+        'fechaDesde':fechaDesde, 'fechaHasta':fechaHasta, 'pk_ventas':serializers.serialize("json", ventas, fields=['pk'])})
+
+@login_required
+def imprimir_ventas(request):
+    pks_input = request.POST['pks_ventas'] #pks de la etiqueta input
+    pks_ventas = pks_input[0:-1].split(' ') #Considerando que llega tipo: '23 '
+
+    for i, value in enumerate(pks_ventas): #Convertir pks de 'str' a 'int'
+        pks_ventas[i]=int(value)
+        
+    ventas = VentaMaiz.objects.filter(pk__in=pks_ventas)
+
+    date = datetime.now()
+    fecha = date.strftime('%d/%m/%Y')
+    hora = date.strftime('%H:%M:%S')
+    
+    #Código necesario para generar el reporte PDF
+    #template_path = 'app/compras/reporte_pdf.html'
+    template_path = 'app/reportes/reporte_ventas_pdf.html'
+    context = {'ventas': ventas, 
+                'reporte' : {'empresa':'Centro de Acopio de Sabanilla',
+                'direccion':'Sabanilla-Loja-Ecuador',
+                'nombre':'Ventas de maíz amarillo duro','fecha':fecha,'hora':hora}
+    }
+    
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte venta %s.pdf"' % (fecha)
+    # find the template and render it.
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create a pdf
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+
+    # if error then show some funy view
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
+@login_required
+def inventario_general(request, template_name='app/inventarios/inventario_general.html'):
+    form = Empresa.objects.all()
+    return render(request, template_name, {'form':form})
+ 
 def crear_articulo(request, template_name='app/inventarios/inventarioIE/articulo_crear.html'):
     if request.method == 'POST':
         articuloform = CrearArticuloForm(request.POST)

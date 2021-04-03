@@ -1,0 +1,155 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Inventario General {% endblock title %}
+
+{% block stylesheets %}
+{{ block.super }}
+<link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+    <div class="clearfix"></div>
+    
+    <div class="row">
+        <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="x_panel">
+              <div class="x_title">
+                <h2><i class="fa fa-square-o"></i> Modals</h2>
+                <div class="clearfix"></div>
+              </div>
+              <div class="x_content">
+    
+                <!-- modals -->
+                <!-- Large modal -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Large modal</button>
+    
+                <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+    
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Text in a modal</h4>
+                        <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</p>
+                        <p>Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla.</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+    
+                    </div>
+                  </div>
+                </div>
+    
+                <!-- Small modal -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Small modal</button>
+    
+                <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
+                  <div class="modal-dialog mo dal-sm">
+                    <div class="modal-content">
+    
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel2">Modal title</h4>
+                      </div>
+                      <div class="modal-body">
+                        <h4>Text in a modal</h4>
+                        <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</p>
+                        <p>Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla.</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+    
+                    </div>
+                  </div>
+                </div>
+                <!-- /modals -->
+              </div>
+            </div>
+          </div>
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Inventario General de insumos e implementos</h2>            
+            <div class="clearfix"></div>
+          </div>
+              <form class="form-horizontal form-label-left">                   
+                <div class="form-group">
+                  <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
+                    <div>
+                      <a href="{% url 'crear_empresa' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Nueva</a>                      
+                      <a href="{% url 'crear_empresa' %}" class="btn btn-info"><i class="fa fa-plus"></i> Categorias</a>                      
+                      <a href="{% url 'crear_empresa' %}" class="btn btn-success"><i class="fa fa-plus"></i> Productos</a>
+                      <a href="{% url 'crear_empresa' %}" class="btn btn-default"><i class="fa fa-plus"></i> Nueva</a>                      
+                      <a href="{% url 'crear_empresa' %}" class="btn btn-danger"><i class="fa fa-plus"></i> Categorias</a>                      
+                      <a href="{% url 'crear_empresa' %}" class="btn btn-warning"><i class="fa fa-plus"></i> Productos</a>                     
+                      <a href="{% url 'crear_empresa' %}" class="btn btn-dark"><i class="fa fa-plus"></i> Productos</a>
+                    </div>
+                  </div>
+                </div>    
+              </form>
+              <br>              
+              <div class="x_content">
+                <table id="datatable" class="table table-striped jambo_table bulk_action">
+                  <thead>
+                    <tr class="headings">                                                             
+                      <th class="column-title text-center">RUC</th>
+                      <th class="column-title text-center">Razón Social</th>                     
+                      <th class="column-title text-center">Dirección</th>
+                      <th class="column-title text-center">Teléfono</th> 
+                      <th class="column-title text-center">Correo</th>
+                      <th class="column-title text-center"><span class="fa fa-flash"></span></th>   
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for empresa in form %}
+                    <tr class="even pointer">                                                             
+                      <td class="text-center">{{empresa.ruc}} </td>
+                      <td class="text-center">{{empresa.razonSocial}} </td>
+                      <td class="text-center"> {{empresa.direccion}} </td>
+                      <td class="text-center"> {{empresa.telefono}} </td> 
+                      <td class="text-center">{{empresa.correo}}</td>
+                      <td class="text-center ">
+                        <a href="{% url 'editar_empresa' empresa.id %}" class="btn btn-primary btn-xs" title="Gestionar empresa"><i class="fa fa-wrench"></i></a>
+                      </td>                        
+                    </tr>
+                    {% endfor %}                   
+                  </tbody>
+                </table>
+                                    
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+    <!-- Datatables -->
+  <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+  <script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+  <script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+  <script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+ {% endblock javascripts %}
+
+

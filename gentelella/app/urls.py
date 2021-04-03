@@ -28,6 +28,21 @@ urlpatterns = [
     path('editar_empresa/<int:pk>/', views.EditarEmpresa.as_view(), name = 'editar_empresa'),
     path('eliminar_empresa/<int:pk>/',views.EliminarEmpresa.as_view(), name = 'eliminar_empresa'),
 
+    #URLs de la sección Ventas    
+    path('gestion_ventas/',views.gestion_ventas, name='gestion_ventas'),
+    path('venta_nueva_maiz/',views.venta_nueva_maiz, name='venta_nueva_maiz'),    
+    path('buscar_empresa/', views.buscar_empresa, name = 'buscar_empresa'),  
+    path('guardar_pesajes_venta/', views.guardar_pesajes_venta, name='guardar_pesajes_venta'),    
+    path('buscar_responsable_transporte/', views.buscar_ResponsableTransporte, name='buscar_responsable_transporte'),
+    path('buscar_empresa_autocomplete/', views.buscar_empresa_autocomplete, name = 'buscar_empresa_autocomplete'),
+    path('buscar_productor_autocomplete/', views.buscar_productor_autocomplete, name = 'buscar_productor_autocomplete'),
+
+    path('editar_venta/<int:pk>/', views.editar_venta, name='editar_venta'),    
+    path('editar_pesajes_venta/', views.editar_pesajes_venta, name='editar_pesajes_venta'),
+    path('finalizar_venta/', views.finalizar_venta, name='finalizar_venta'),
+    path('anular_venta/', views.anular_venta, name='anular_venta'),
+
+
     #Transportista
     path('crear_responsableTransporte/',views.CrearResponsableTransporte.as_view(), name='crear_responsableTransporte'),
     path('listar_responsableTransporte/', views.listarResponsableTransporte, name= 'listar_responsableTransporte'),
@@ -42,9 +57,15 @@ urlpatterns = [
     path('eliminar_inventario/<int:pk>/',views.EliminarInventario.as_view(), name = 'eliminar_inventario'),
     path('listar_inventario/', views.ListarInventario.as_view(), name= 'listar_inventario'),
 
-    path('listar_ventas/', views.listarVentas, name='listar_ventas'),
+    #URLs para la generación de reportes
     path('reportes_compras/', views.reportes_compras, name='reportes_compras'),
     path('imprimir_compras/', views.imprimir_compras, name='imprimir_compras'),
+    path('reportes_ventas/', views.reportes_ventas, name='reportes_ventas'),
+    path('imprimir_ventas/', views.imprimir_ventas, name='imprimir_ventas'),
+
+    #URLs para la seccion de inventario de insumos e implementos
+    path('inventario_general/',views.inventario_general, name='inventario_general'),
+
 
     #URLs de la sección inventarios    
     path('listaventas/',views.lista_ventas, name='lista_v'),

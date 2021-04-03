@@ -1,27 +1,22 @@
 {% extends "app/base_site.html" %}
 
-{% block title %} Nueva Compra {% endblock title %}
+{% block title %} Gestion de Ventas {% endblock title %}
 
 {% block stylesheets %}
   {{ block.super }}
   <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-  <link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
-  <link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
-  <link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-  <link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
 {% endblock stylesheets %}
 
 {% block content %}
   <div class="right_col" role="main">
     
     <div class="row">
-      <!-- form para el ingreso de los datos de una nueva compra -->
     <div class="clearfix"></div>
 
       <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
           <div class="x_title">
-            <h2>Compras de Maiz</h2>
+            <h2>Ventas de Maiz</h2>
             
             <div class="clearfix"></div>
           </div>
@@ -32,8 +27,8 @@
                   <div class="form-group">
                       <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
                         <div>
-                          <a href="{% url 'crear_compra' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Nueva</a>
-                          <a href="{% url 'reportes_compras' %}" class="btn btn-primary"><i class="fa fa-print"></i> Reportes</a>
+                          <a href="{% url 'venta_nueva_maiz' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Nueva</a>
+                          <a href="{% url 'reportes_ventas' %}" class="btn btn-primary"><i class="fa fa-print"></i> Reportes</a>
                         </div>
                       </div>
                   </div>    
@@ -45,8 +40,7 @@
                     <tr class="headings">                     
                       <th class="column-title text-center">Nro.</th>
                       <th class="column-title text-center">Fecha</th>
-                      <th class="column-title text-center">Razón Social Productor</th>
-                      <!--<th class="column-title text-center">Observación</th>-->
+                      <th class="column-title text-center">Razón Social Empresa</th>
                       <th class="column-title text-center">Estado</th>
                       <th class="column-title text-center">Total</th>
                       <th class="column-title text-center"><span class="fa fa-flash"></span></th> 
@@ -54,19 +48,18 @@
                   </thead>
 
                   <tbody>
-                    {% for compra in compras %}
+                    {% for venta in ventas %} 
                       <tr class="even pointer">                      
                         <td class="text-center">{{ forloop.counter }}</td>
-                        <td class="text-center">{{ compra.fechaCompra }}</td>
-                        <td class="text-center">{{ compra.idProductor }}</td>
-                        <!--<td class="text-center">{{ compra.observacion }}</td>-->
+                        <td class="text-center">{{ venta.fechaVenta }}</td>
+                        <td class="text-center">{{ venta.idEmpresa }}</td>
                         <td class="text-center">
-                          {% if compra.pendiente %} <span class="label label-primary">Pendiente</span>
+                          {% if venta.pendiente %} <span class="label label-primary">Pendiente</span>
                           {% else %} <span class="label label-success">Finalizada</span> {% endif %}</td>
-                        <td class="text-center">{{ compra.total }}</td>
+                        <td class="text-center">{{ venta.total }}</td>
                         <td class="a-center ">                          
-                          <a href="{% url 'editar_compra' compra.pk %}" class="btn btn-primary btn-xs" title="Gestionar compra"><i class="fa fa-wrench"></i></a>
-                          <button {% if not compra.pendiente %} disabled {% endif %} id="{{ compra.pk }}" class="btn btn-danger btn-xs btnAnularCompra" title="Anular compra"><i class="fa fa-ban"></i></button>
+                          <a href="{% url 'editar_venta' venta.pk %}" class="btn btn-primary btn-xs" title="Gestionar venta"><i class="fa fa-wrench"></i></a>
+                          <button {% if not venta.pendiente %} disabled {% endif %} id="{{ venta.pk }}" class="btn btn-danger btn-xs btnAnularVenta" title="Anular venta"><i class="fa fa-ban"></i></button>
                         </td>
                       </tr>
                     {% endfor %}                                  
@@ -78,7 +71,6 @@
 
       </div>
   </div>
-    <!-- /Form para el ingreso de los datos de una empresa nueva -->
   </div>
 {% endblock content %}
 
@@ -96,9 +88,9 @@
   <script>
     $(function () {
 
-      $("#datatable tbody").on("click", ".btnAnularCompra",function () {
+      $("#datatable tbody").on("click", ".btnAnularVenta",function () {
         swal({
-          title: "¿Está seguro de anular esta compra?",
+          title: "¿Está seguro de anular esta venta?",
           text: "¡Una vez anulada, no podrá ser recuperada!",
           icon: "warning",
           buttons: true,
@@ -109,9 +101,9 @@
             
             $.ajax({
               data: {
-                "pk_compra": $(this).attr('id')
+                "pk_venta": $(this).attr('id')
               },
-              url: "{% url 'anular_compra' %}",
+              url: "{% url 'anular_venta' %}",
               type: "POST",
               success: function (data) {
                 location.reload();

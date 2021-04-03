@@ -1,6 +1,6 @@
 {% extends "app/base_site.html" %}
 
-{% block title %} Nueva Compra {% endblock title %}
+{% block title %} Nueva Venta {% endblock title %}
 
 {% block stylesheets %}
   {{ block.super }}
@@ -9,6 +9,9 @@
   <link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
   <link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
   <link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+  
+  <!-- plugin autocompletado -->
+  <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
 {% endblock stylesheets %}
 
 {% block content %}
@@ -21,37 +24,41 @@
       <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
           <div class="x_title">
-            <h2>Pesaje Compra de Maiz</h2>
+            <h2>Pesaje Venta de Maiz</h2>
             <div class="clearfix"></div>
           </div>
+
           <div class="x_content">
+
             <div class="form-horizontal form-label-left">
               <div class="form-group">
-                <label class="control-label col-md-2 col-sm-4 col-xs-3">Identificación:</label>
-                <div class="col-md-4 col-sm-6 col-xs-12 ">
+                <label class="control-label col-md-2 col-sm-2 col-xs-3">Empresa:</label>
+                <div class="col-md-4 col-sm-4 col-xs-12">
                   <div class="input-group">
-                    <input id="nro_cedula" type="text" class="form-control" data-inputmask="'mask' : '9999999999'">
-
+                    <input type="text" id="empresa" class="form-control" 
+                    placeholder="Nombre de la Empresa">
                     <span class="input-group-btn">
-                      <button id="btnBuscar" class="btn btn-primary"><span class="fa fa-search"></span> Buscar</button>
+                      <button id="btnLimpiarE" type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>
                     </span>
-                  </div>
+                  </div>       
                 </div>
-
-                <label class="control-label col-md-2 col-sm-4 col-xs-3">Productor:</label>
-                <div class="col-md-4 col-sm-6 col-xs-12">
-                  <input id="nom_productor" readonly="readonly" type="text" class="form-control"
-                    placeholder="Nombre del Productor">
-                  <span class="fa fa-user form-control-feedback right" aria-hidden="true">
-                  </span>
+                <label class="control-label col-md-2 col-sm-2 col-xs-3">Transportista:</label>
+                <div class="col-md-4 col-sm-4 col-xs-12">
+                  <div class="input-group">
+                    <input type="text" id="transportista" class="form-control" 
+                    placeholder="Nombre del Transportista">
+                    <span class="input-group-btn">
+                      <button id="btnLimpiarRT" type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>
+                    </span>
+                  </div>       
                 </div>
-              </div>
+              </div>              
               <div class="form-group">
-                <label class="control-label col-md-2 col-sm-3 col-xs-12">Observación:</label>
-                <div class="col-md-10 col-sm-9 col-xs-12">
-                  <textarea id="observacion" class="form-control" rows="2" placeholder="..."></textarea>
-                </div>
-              </div>
+                  <label class="control-label col-md-2 col-sm-4 col-xs-12">Observación:</label>
+                  <div class="col-md-10 col-sm-6 col-xs-12">
+                    <textarea id="observacion" class="form-control" rows="2" placeholder="..."></textarea>
+                  </div>             
+              </div>              
             </div>
             <div class="divider-dashed"></div>
           </div>
@@ -80,20 +87,20 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <div class="col-md-2 col-sm-6 col-xs-12">
-                <label class="control-label text-right">Peso Neto:</label>
+            <div class="form-group form-label-left">
+              <div class="col-md-2 col-sm-2 col-xs-12">
+                <label class="control-label">Peso Neto:</label>
               </div>
-              <div class="col-md-2 col-sm-5 col-xs-12">
+              <div class="col-md-2 col-sm-2 col-xs-12">
                 <input id="peso_neto" type="number" class="form-control" readonly="readonly" value="0">
               </div>
-              <div class="col-md-2 col-sm-6 col-xs-12">
-                <label class="control-label 2">Peso Quintales:</label>
+              <div class="col-md-2 col-sm-2 col-xs-12">
+                <label class="control-label">Peso Quintales:</label>
               </div>
-              <div class="col-md-2 col-sm-5 col-xs-12">
+              <div class="col-md-2 col-sm-2 col-xs-12">
                 <input id="peso_quintales" type="number" class="form-control" readonly="readonly" value="0.00">
               </div>
-              <div class="col-md-4 col-sm-6 col-xs-12">
+              <div class="col-md-4 col-sm-4 col-xs-12">
                 <div class="btn-group btn-group-justified">
                   <div class="btn-group" role="group">
                     <button id="btnCalcular" class="btn btn-primary"><span class="fa fa-calculator"></span>
@@ -112,9 +119,9 @@
             </div>
             <div class="divider-dashed"></div>
             <div class="form-group">
-              <div class="col-md-12 col-sm-6 col-xs-12 text-center">
-                <button id="btnGuardar" class="btn btn-success"><span class="fa fa-save"></span> Guardar Compra</button>
-                <a class="btn btn-default" href="{% url 'gestion_compras' %}"><span class="fa fa-undo"></span>
+              <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <button id="btnGuardar" class="btn btn-success"><span class="fa fa-save"></span> Guardar Venta</button>
+                <a class="btn btn-default" href="{% url 'gestion_ventas' %}"><span class="fa fa-undo"></span>
                   Regresar</a>
               </div>
             </div>
@@ -168,25 +175,23 @@
   <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
   <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
    <!-- Datatables -->
-  <script src="/static/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-  <script src="/static/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-  <script src="/static/vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
-  <script src="/static/vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
-  <script src="/static/vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
   <script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
   <script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
   <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
   <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
   <script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
-  <script src="/static/vendors/jszip/dist/jszip.min.js"></script>
-  <script src="/static/vendors/pdfmake/build/pdfmake.min.js"></script>
-  <script src="/static/vendors/pdfmake/build/vfs_fonts.js"></script>
+     
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
 
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script>
     $(function () {
 
-      var productor = null; 
+      
+      var empresa = null;
+      //**var empresa_auto = null;
+      var responsable_transporte = null; 
       var pesaje_editar = null;
 
       //** Declarar la tabla de Pesajes
@@ -270,22 +275,23 @@
         swal("Success", "¡Pesaje editado correctamente!", "success");
       });
 
-      //** Buscar y cargar Productor
-      $("#btnBuscar").on('click', function () {
+      //** Buscar y cargar Empresa
+      $("#btnBuscar").on('click', function () {        
+        console.log($('#nro_ruc').val())
         $.ajax({
           data: {
-            "nro_cedula": $('#nro_cedula').val()
+            "nro_ruc": $('#nro_ruc').val()
           },
-          url: "{% url 'buscar_productor' %}",
+          url: "{% url 'buscar_empresa' %}",
           type: "POST",
           success: function (data) {
             if (data.length > 0) { //Si data tiene registros
-              productor = data[0];
-              $("#nom_productor").val(productor.fields.nombres);
+              empresa = data[0];
+              $("#nom_empresa").val(empresa.fields.razonSocial);
             } else {
-              $("#nom_productor").val(""); //Borrar nombre del productor
-              productor = null;
-              console.log("Productor no existe.");
+              $("#nom_empresa").val(""); //Borrar nombre del empresa
+              empresa = null;
+              console.log("Empresa no existe.");
             }
           },
           error: function () {
@@ -293,6 +299,68 @@
           }
         });
       });
+ 
+        //** autocompletado de los reponsables de transporte
+      $("#transportista").autocomplete({
+        source: function(request,response){
+          $.ajax({         
+            url: "{% url 'buscar_responsable_transporte' %}",
+            type: "POST",
+            data: { 
+              'action': 'autocomplete',
+              'term': request.term
+            },
+            success: function (data) {
+              response(data);
+            },
+            error: function () {
+              console.log("Hubo un problema.");
+            }
+          });
+        },
+        delay: 500,
+        minLength: 3,
+        select: function( event, ui ) {
+          responsable_transporte = ui.item
+          console.log(responsable_transporte.id) 
+        }    
+      });
+    
+      //Limpiar campo de busqueda de responsable de transporte
+      $('#btnLimpiarRT').on('click', function () {
+        $("#transportista").val("");
+        });
+      
+      //** autocompletado de empresa
+      $("#empresa").autocomplete({
+        source: function(request,response){
+          $.ajax({         
+            url: "{% url 'buscar_empresa_autocomplete' %}",
+            type: "POST",
+            data: { 
+              'action': 'autocomplete',
+              'term': request.term
+            },
+            success: function (data) {
+              response(data);
+            },
+            error: function () {
+              console.log("Hubo un problema.");
+            }
+          });
+        },
+        delay: 500,
+        minLength: 3,
+        select: function( event, ui ) {
+          empresa = ui.item          
+        }    
+      });
+    
+      //Limpiar campo de busqueda de la empresa
+      $('#btnLimpiarE').on('click', function () {
+        $("#empresa").val("");
+        });
+
 
       //** Eliminar un Pesaje de la tabla
       $('#tabla_pesaje tbody').on( 'click', '.tbEliminarPesaje', function () {
@@ -321,25 +389,26 @@
 
       //** Guardar Pesajes
       $("#btnGuardar").on('click', function () {
-        if (calcularTotalPesaje() > 0 && productor != null) { //Si hay Pesajes en la tabla y productor
+        if (calcularTotalPesaje() > 0 && empresa != null) { //Si hay Pesajes en la tabla y empresa
           let datos_tabla = tablaPesaje.rows().data();
           let pesajes = $.makeArray();
-          let pk_productor = productor.pk;
+          let pk_empresa = empresa.id;          
+          let pk_responsable_transporte = responsable_transporte.id;//nuevo
 
           for (let i = 0; i < datos_tabla.length; i++) {
             pesajes.push(datos_tabla[i]);
           }
           $.ajax({
             data: {
-              "pesajes":JSON.stringify(pesajes), "pk_productor":pk_productor, 
+              "pesajes":JSON.stringify(pesajes), "pk_empresa":pk_empresa,"pk_responsable_transporte":pk_responsable_transporte, 
               "total_pesajes": $("#totalPesajes").text(), "observacion": $("#observacion").val()
             },
-            url: "{% url 'guardar_pesajes' %}",
+            url: "{% url 'guardar_pesajes_venta' %}",
             type: "POST",
             success: function (data) {
-              swal("Success", "¡Compra guardada correctamente!", "success");
+              swal("Success", "¡Venta guardada correctamente!", "success");
               //Limpiar todos los campos y tabla
-              limpiarCamposCompra();
+              limpiarCamposVenta();
             },
             error: function () {
               swal("Oops", "¡Ocurrió un problema!", "error");
@@ -381,10 +450,11 @@
       }
     
       //** Limpiar todos los campos de la compra
-      function limpiarCamposCompra() {
-        $('#nro_cedula').val("");
-        $("#nom_productor").val("");
-        productor = null;
+      function limpiarCamposVenta() {
+        $('#nro_ruc').val("");
+        $("#nom_empresa").val("");
+        $('#transportista').val("");
+        empresa = null;
         limpiarCamposCalculo();
         $("#totalPesajes").text("0.00");
         tablaPesaje.rows().remove().draw(false);

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from django.db import models
+from django.forms import model_to_dict#agregamos la nueva forms
 
 # Create your models here.
 UNIDAD = [
@@ -28,6 +29,10 @@ class Productor(models.Model):
     def __str__(self):
         return self.nombres
 
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+
 class BodegaMaiz(models.Model): #Registro del stock en Bodega
     fecha = models.DateTimeField(auto_now_add=True) #Guarda la fecha de creación de un objeto
     tipoMovimiento = models.CharField(max_length=25)
@@ -44,12 +49,16 @@ class ResponsableTransporte(models.Model):
     placaTrailer = models.CharField(max_length=10)
 
     class Meta:
-        verbose_name = 'Conductor'
-        verbose_name_plural = 'Conductores'
+        verbose_name = 'Responsable Transporte'
+        verbose_name_plural = 'Responsables Transporte'
         ordering = ['nombre']
     
     def __str__(self):
         return self.nombre
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
 
 class CompraMaiz(models.Model): #Datos de la Compra
     fechaCompra = models.DateTimeField(auto_now_add=True)
@@ -93,6 +102,7 @@ class PesajeVentaMaiz(models.Model):
     pesoNeto = models.IntegerField()
     factorConversion = models.DecimalField(max_digits=4,decimal_places=2)
     pesoQuintales = models.DecimalField(max_digits=7,decimal_places=2)
+    vigente = models.BooleanField(default=True) #Si cada pesaje está vigente en la compra   
     idVentaMaiz = models.ForeignKey('VentaMaiz', on_delete = models.CASCADE)
 
 class Empresa(models.Model):
@@ -102,22 +112,32 @@ class Empresa(models.Model):
     telefono = models.CharField(max_length=10)
     correo = models.EmailField(max_length=100, blank=True, null=True)
     class Meta:
-        verbose_name = 'Productor'
-        verbose_name_plural = 'Productores'
+        verbose_name = 'Empresa'
+        verbose_name_plural = 'Empresas'
         ordering = ['razonSocial']
     
     def __str__(self):
         return self.razonSocial
 
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+
 class VentaMaiz(models.Model):
-    fechaVenta = models.DateField()
+    fechaVenta = models.DateTimeField(auto_now_add=True)
+    fechaModificacion = models.DateTimeField(auto_now=True)    
     observaciones = models.CharField(max_length=100)
-    humedad = models.DecimalField(max_digits=4, decimal_places=2)
-    impureza = models.DecimalField(max_digits=3, decimal_places=2)
+    humedad = models.IntegerField() #Dato constante
+    impureza = models.IntegerField() #Dato constante
+    valida = models.BooleanField(default=True) #Si la venta es válida, no eliminada
+    pendiente = models.BooleanField(default=True) #Si la venta estará pendiente o no
+    total = models.DecimalField(max_digits=7, decimal_places=2)
     idEmpresa = models.ForeignKey('Empresa', on_delete = models.CASCADE)
-    idBodegaMaiz = models.ForeignKey('BodegaMaiz', on_delete = models.CASCADE)
     idResponsableTransporte = models.ForeignKey('ResponsableTransporte', on_delete = models.CASCADE)
 
+    class Meta:
+        ordering = ['-pk']
+        
 class FacturaVenta(models.Model):
     numeroFactura = models.IntegerField(unique=True)
     fechaEmision = models.DateField()

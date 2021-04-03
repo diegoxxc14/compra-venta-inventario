@@ -1,5 +1,7 @@
 {% extends "app/base_site.html" %}
 
+{% load widget_tweaks %}
+
 {% block title %} Login {% endblock title %}
 
 {% block stylesheets %}
@@ -20,77 +22,50 @@
         <section class="login_content">
           <form method="POST">
             {% csrf_token %}
-            <h1>Login Form</h1>
-            <div class="form-group">
-              <!--<input type="text" class="form-control" placeholder="Username" required="" />-->
-              <label class="col-sm-2 col-md-3 control-label">Usuario:</label>
-              {{ form.username }}
+            <h1>Iniciar sesión</h1>                     
+            <div class="form-group">              
+              {{ form.username|add_class:'form-control'|attr:'placeholder:Ingrese su username' }}             
             </div>
-            <div class="form-group">
-              <!--<input type="password" class="form-control" placeholder="Password" required="" />-->
-              <label class="col-sm-2 col-md-3 control-label">Contraseña:</label>
-              {{ form.password }}
+            <div class="form-group">              
+              {{ form.password|add_class:'form-control'|attr:'placeholder:Ingrese su password' }}
             </div>
             <div>
-              <button class="btn btn-default submit">Iniciar sesión</button>
-              <a class="reset_pass" href="#">¿Olvidaste tu contraseña?</a>
-            </div>
-
-            <div class="clearfix"></div>
-
-            <div class="separator">
-              <p class="change_link">New to site?
-                <a href="#signup" class="to_register"> Create Account </a>
-              </p>
-
+              <button class="btn btn-primary submit"><span class="fa fa-sign-in"></span> Iniciar sesión</button>
+            </div>           
+            
+            </script> 
               <div class="clearfix"></div>
-              <br />
-
-              <div>
-                <h1><i class="fa fa-paw"></i> Gentelella Alela!</h1>
-                <p>©2016 All Rights Reserved. Gentelella Alela! is a Bootstrap 3 template. Privacy and Terms</p>
+              <div class="separator">
+                <div>
+                  <h1><i class="fa fa-paw"></i> Centro de Acopio Sabanilla!</h1>
+                </div>
               </div>
             </div>
           </form>
         </section>
-      </div>
-
-      <div id="register" class="animate form registration_form">
-        <section class="login_content">
-          <form>
-            <h1>Create Account</h1>
-            <div>
-              <input type="text" class="form-control" placeholder="Username" required="" />
-            </div>
-            <div>
-              <input type="email" class="form-control" placeholder="Email" required="" />
-            </div>
-            <div>
-              <input type="password" class="form-control" placeholder="Password" required="" />
-            </div>
-            <div>
-              <a class="btn btn-default submit" href="index.html">Submit</a>
-            </div>
-
-            <div class="clearfix"></div>
-
-            <div class="separator">
-              <p class="change_link">Already a member ?
-                <a href="#signin" class="to_register"> Log in </a>
-              </p>
-
-              <div class="clearfix"></div>
-              <br />
-
-              <div>
-                <h1><i class="fa fa-paw"></i> Gentelella Alela!</h1>
-                <p>©2016 All Rights Reserved. Gentelella Alela! is a Bootstrap 3 template. Privacy and Terms</p>
-              </div>
-            </div>
-          </form>
-        </section>
-      </div>
+      </div>      
     </div>
+     <!-- Sweet Alert -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script type="application/javascript">
+      {% if form.errors %}               
+        var errors = '';
+        {% for field in form %}
+            {% for error in field.errors %}
+                errors += '{{ error }}\n';
+            {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+            errors += '{{ error }}\n';
+        {% endfor %}
+        swal("Error", errors, "error");
+      {% endif %}
+      </script>   
   </div>
 {% endblock body %}
+
+
+{% block javascripts %}
+  {{ block.super}}
+{% endblock javascripts %}
 

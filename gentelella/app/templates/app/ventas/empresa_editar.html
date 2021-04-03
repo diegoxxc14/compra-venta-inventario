@@ -11,7 +11,7 @@
 
       <div class="row">
         <!-- form para el ingreso de los datos de una empresa nueva -->
-        <div class="col-md-8 col-sm-12 col-xs-12">
+        <div class="col-md-12 col-sm-12 col-xs-12">
           <div class="x_panel">
             <div class="x_title">
               <h2>Editar Empresa</h2>
@@ -37,44 +37,46 @@
               <form method="POST" class="form-horizontal form-label-left">
                 {% csrf_token %}
                 <div class="form-group">
-                  <label class="control-label col-md-3 col-sm-3 col-xs-3 has-feedback-left">Razón Social</label>
-                  <div class="col-md-9 col-sm-9 col-xs-9">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12 has-feedback-left">Razón Social</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
                     {{form.razonSocial}}                                                          
                     <span class="fa fa-building form-control-feedback right" aria-hidden="true"></span>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label class="control-label col-md-3 col-sm-3 col-xs-3">RUC</label>
-                  <div class="col-md-9 col-sm-9 col-xs-9">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">RUC</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
                     {{form.ruc}}                    
                     <span class="fa fa-building form-control-feedback right" aria-hidden="true"></span>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label class="control-label col-md-3 col-sm-3 col-xs-3">Teléfono</label>
-                  <div class="col-md-9 col-sm-9 col-xs-9">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Teléfono</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
                     {{form.telefono}}
                     <span class="fa fa-phone form-control-feedback right" aria-hidden="true"></span>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label class="control-label col-md-3 col-sm-3 col-xs-3">Dirección</label>
-                  <div class="col-md-9 col-sm-9 col-xs-9">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Dirección</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
                     {{form.direccion}}
                     <span class="fa fa-map-marker form-control-feedback right" aria-hidden="true"></span>
                   </div>
                 </div>                            
                 <div class="form-group">
-                  <label class="control-label col-md-3 col-sm-3 col-xs-3">Correo</label>
-                  <div class="col-md-9 col-sm-9 col-xs-9">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Correo</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
                     {{form.correo}} 
                     <span class="fa fa-envelope form-control-feedback right" aria-hidden="true"></span>
                   </div>
                 </div>     
+                <div class="ln_solid"></div>
                 <div class="form-group">
-                  <div class="col-md-9 col-md-offset-3">
-                    <button type="submit" class="btn btn-primary">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Actualizar Empresa</button>
+                  <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-3 col-sm-offset-3">
+                    <a class="btn btn-default" href="{% url 'listar_empresas' %}"><span class="fa fa-undo"></span>
+                      Regresar</a>
+                    <button type="submit" class="btn btn-success"><span class="fa fa-save"></span> Guardar Empresa</button>
                   </div>
                 </div>
 
@@ -82,11 +84,8 @@
             </div>
           </div>
         </div>
-        <!-- /Form para el ingreso de los datos de una empresa nueva -->
-
-        
-      </div>
-    
+        <!-- /Form para el ingreso de los datos de una empresa nueva -->        
+      </div>    
     </div>
   </div>
 {% endblock content %}
@@ -95,4 +94,18 @@
   {{ block.super}}
     <!-- jquery.inputmask -->
   <script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+  <!-- sweetalert -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+ 
+  <script>
+    {% if form.errors %}
+      var errors = '';
+      {% for field in form %}
+        {% for error in field.errors %}
+          errors += '{{error}}\n';
+        {% endfor %}
+      {% endfor %}
+      swal("Error", errors, "error");
+    {% endif %}
+  </script>
  {% endblock javascripts %}
