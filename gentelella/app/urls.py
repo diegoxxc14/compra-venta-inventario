@@ -50,8 +50,7 @@ urlpatterns = [
     path('eliminar_responsableTransporte/<int:pk>/',views.EliminarResponsableTransporte.as_view(), name = 'eliminar_responsableTransporte'),
     
     #URLs de la sección inventarios insumos
-    path('crear_proveedor/',views.crear_proveedor, name='crear_proveedor'),
-    path('crear_articulo/', views.crear_articulo, name='crear_articulo'),
+        
     path('crear_inventario/',views.CrearInventario.as_view(), name = 'crear_inventario'),    
     path('editar_inventario/<int:pk>/', views.EditarInventario.as_view(), name = 'editar_inventario'),
     path('eliminar_inventario/<int:pk>/',views.EliminarInventario.as_view(), name = 'eliminar_inventario'),
@@ -66,6 +65,27 @@ urlpatterns = [
     #URLs para la seccion de inventario de insumos e implementos
     path('inventario_general/',views.inventario_general, name='inventario_general'),
 
+    #URLS
+    path('crear_categoria/',views.CrearCategoria.as_view(), name='crear_categoria'),    
+    path('listar_categoria/',views.listar_categoria, name='listar_categoria'), 
+    path('crear_articulo/',views.CrearArticulo.as_view(), name='crear_articulo'),     
+    path('editar_articulo/<int:pk>/', views.EditarArticulo.as_view(), name = 'editar_articulo'),
+
+    path('ingresar_articulo/',views.ingresar_articulo, name='ingresar_articulo'),
+    path('buscar_articulo_autocomplete/', views.buscar_articulo_autocomplete, name = 'buscar_articulo_autocomplete'),
+    
+    #URLs para la sección de proveedor
+    path('crear_proveedor/',views.crear_proveedor, name='crear_proveedor'),
+    path('listar_proveedor/',views.listar_proveedor, name='listar_proveedor'),
+    path('editar_proveedor/<int:pk>/', views.EditarProveedor.as_view(), name = 'editar_proveedor'),
+    
+    #URLs para la seccion de empleado
+    path('crear_empleado/',views.CrearEmpleado.as_view(), name='crear_empleado'),    
+    path('listar_empleado/',views.listar_empleado, name='listar_empleado'),
+    path('editar_empleado/<int:pk>/', views.EditarEmpleado.as_view(), name = 'editar_empleado'),
+    
+
+
 
     #URLs de la sección inventarios    
     path('listaventas/',views.lista_ventas, name='lista_v'),
@@ -78,8 +98,11 @@ urlpatterns = [
     path('egresoinventario/',views.salida_inventario, name='salida_i'),
     path('ingresoinventario/',views.ingreso_inventario, name='ingreso_i'),
     path('editarinventario/',views.editar_inventario, name='editar_i'),
+    #pagos
 
     path('crear_facturacion/',views.facturacion_compra, name='facturacion_compra'),
+    path('crear_facturacion1/',views.CrearDocumentoCompra1, name='facturacion_compra1'),
+    path('buscar_pesaje_compra/',views.buscar_PesajesCompra, name='buscar_pesaje_compra'),
 
     re_path(r'^.*\.html', views.gentella_html, name='gentella'),
 

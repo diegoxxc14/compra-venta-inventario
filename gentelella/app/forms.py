@@ -1,7 +1,7 @@
 from django.contrib.admin.widgets import AutocompleteSelect
 from django.contrib import admin
 from django import forms
-from app.models import Productor,Empresa,ResponsableTransporte,Proveedor,Articulo,Proveedor,Inventario
+from app.models import Productor,Empresa,ResponsableTransporte,Proveedor,Articulo,Categoria,Proveedor,Inventario, Empleado, DocumentoCompra
 
 
 class ProductorForm(forms.ModelForm):
@@ -41,7 +41,7 @@ class ResponsableTransporteForm(forms.ModelForm):
             'placaTrailer' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'Placas del trailer'}),
         }  
 
-class CrearProveedorForm(forms.ModelForm):
+class ProveedorForm(forms.ModelForm):
     class Meta:
         model = Proveedor
         fields = ['ruc','razonSocial','direccion','telefono','correo']
@@ -82,16 +82,52 @@ class InventarioForm(forms.ModelForm):
             'cantidadMax' : forms.NumberInput(attrs={'class':'form-control', 'placeholder':'2'}),
             'idProveedor' : forms.Select(attrs={'class':'form-control', 'placeholder':'Elija una opción'})
         }
-        
 
-class CrearArticuloForm(forms.ModelForm):
+
+class ArticuloForm(forms.ModelForm):
     class Meta:
         model = Articulo
-        fields = ['descripcion','cantidadMin','cantidadMax','idProveedor']
+        fields = ['descripcion','stock','estado','unidadMedida','idCategoria']
         widgets = {
-            'descripcion' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'Nombre del Articulo'}),
-            'cantidadMin' : forms.NumberInput(attrs={'class':'form-control', 'placeholder':'2'}),
-            'cantidadMax' : forms.NumberInput(attrs={'class':'form-control', 'placeholder':'2'}),
-            'idProveedor' : forms.Select(attrs={'class':'form-control', 'placeholder':'.......'})
+            'descripcion' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'descripcion del Articulo'}),
+            'stock' : forms.NumberInput(attrs={'class':'form-control', 'placeholder':'stock'}),
+            'estado' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'Estado del Articulo'}),
+            'unidadMedida' : forms.Select(attrs={'class':'form-control'}),
+            'idCategoria' : forms.Select(attrs={'class':'form-control', 'placeholder':'.......'})
         }
-        
+
+class CategoriaForm(forms.ModelForm):
+    class Meta:
+        model = Categoria
+        fields = ['nombre','descripcion']
+        widgets = {            
+            'nombre' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'Nombre de la Categoria'}),
+            'descripcion' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'Descripción de la Categoria'}),
+        }
+
+class EmpleadoForm(forms.ModelForm):
+    class Meta:
+        model = Empleado 
+        fields = ['identificacion','nombres','direccion','telefono','correo']
+        widgets = {
+            'identificacion' : forms.TextInput(attrs={'class':'form-control', 'data-inputmask':"'mask' : '9999999999'"}),
+            'nombres' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'Nombres completos del empleado'}),
+            'direccion' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'Dirección del Empleado'}),
+            'telefono' : forms.TextInput(attrs={'class':'form-control', 'data-inputmask':"'mask' : '9999999999'"}),
+            'correo' : forms.EmailInput(attrs={'class':'form-control', 'placeholder':'ejemplo@mail.com'})
+        }
+
+class DocumentoCompraForm(forms.ModelForm):
+    class Meta:
+        model = DocumentoCompra
+        fields = ['tipoDocumento','numeroDocumento','fechaEmision','cantidad','preciounitario','precioTotal','tipoPago','idCompraMaiz','idProductor']
+        widgets = {
+         'tipoDocumento' : forms.Select(attrs= {'class': 'form-control'}),         
+         'numeroDocumento' : forms.TextInput(attrs={'class': 'form-control','data-inputmask':"'mask' : '009-009-9999'"}),
+         'fechaEmision' : forms.DateInput( attrs={'class':'date-picker xdisplay_inputx form-control','id':'single_cal1'}),
+         'cantidad' : forms.TextInput(attrs={'class': 'form-control','id':'cantidad','readonly':"readonly"}),
+         'preciounitario' : forms.TextInput(attrs={'class': 'form-control'}),         
+         'precioTotal' : forms.TextInput(attrs={'class': 'form-control'}),         
+         'idProductor' : forms.Select(attrs={'class': 'select2', 'style': 'width: 100%'}),  
+          'tipoPago' : forms.Select(attrs= {'class': 'form-control'})
+        }

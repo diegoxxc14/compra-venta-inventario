@@ -1,0 +1,84 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Listado Categoria {% endblock title %}
+
+{% block stylesheets %}
+{{ block.super }}
+<link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+    <div class="clearfix"></div>
+    
+    <div class="row">     
+        
+        <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Listado de Categorias</h2>            
+            <div class="clearfix"></div>
+          </div>                        
+              <div class="x_content">
+                <form class="form-horizontal form-label-left">                   
+                    <div class="form-group">
+                      <div class="col-md-12 col-sm-12 col-xs-12 col-md-offset-0">                        
+                        <div>
+                          <a href="{% url 'crear_categoria' %}" class="btn btn-success"><i class="fa fa-plus"></i> Nueva</a>                                       
+                          <a href="{% url 'inventario_general' %}" class="btn btn-default"><i class="fa fa-orders"></i> Inventario General</a>
+                        </div>
+                      </div>
+                    </div>    
+                  </form>
+                  <br>                
+                <div class="clearfix"></div>
+                <table id="datatable" class="table table-striped jambo_table bulk_action">
+                  <thead>
+                    <tr class="headings">                                                           
+                      <th class="column-title text-center">Nro</th>
+                      <th class="column-title text-center">Nombre</th>
+                      <th class="column-title text-center">Categoria</th> 
+                      <th class="column-title text-center">Opciones</th>   
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for articulo in form %}
+                    <tr class="even pointer">
+                      <td class="text-center">{{ forloop.counter }}</td>                                                             
+                      <td class="text-center">{{articulo.nombre}} </td> 
+                      <td class="text-center">{{articulo.descripcion}} </td>
+                      <td class="text-center ">
+                        <a href="" class="btn btn-info btn-xs" title="Gestionar articulos"><i class="fa fa-pencil"></i></a> 
+                      </td>                        
+                    </tr>
+                    {% endfor %}                   
+                  </tbody>
+                </table>
+                                    
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+    <!-- Datatables -->
+  <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+  <script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+  <script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+  <script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+ {% endblock javascripts %}
+
+

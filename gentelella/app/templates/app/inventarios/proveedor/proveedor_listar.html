@@ -1,0 +1,88 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Listado de Proveedor {% endblock title %}
+
+{% block stylesheets %}
+{{ block.super }}
+<link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">
+    <div class="">
+    <div class="clearfix"></div>
+    
+    <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Listado de Proveedores</h2>            
+            <div class="clearfix"></div>
+          </div>
+              <form class="form-horizontal form-label-left">                   
+                <div class="form-group">
+                  <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
+                    <div>
+                      <a href="{% url 'crear_proveedor' %}" class="btn btn-success"><i class="fa fa-plus"></i> Nueva</a>
+                      <a href="{% url 'inventario_general' %}" class="btn btn-default"><i class="fa fa-orders"></i> Inventario General </a>
+                    </div>
+                  </div>
+                </div>    
+              </form>
+              <br>              
+              <div class="x_content">
+                <table id="datatable" class="table table-striped jambo_table bulk_action">
+                  <thead>
+                    <tr class="headings">                      
+                      <th class="column-title text-center">Nro</th>
+                      <th class="column-title text-center">RUC</th>
+                      <th class="column-title text-center">Razón Social</th>                     
+                      <th class="column-title text-center">Dirección</th>
+                      <th class="column-title text-center">Teléfono</th> 
+                      <th class="column-title text-center">Correo</th>
+                      <th class="column-title text-center">Opciones</th>   
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for proveedor in form %}
+                    <tr class="even pointer">
+                      <td class="text-center">{{ forloop.counter }}</td>                                                         
+                      <td class="text-center">{{proveedor.ruc}} </td>
+                      <td class="text-center">{{proveedor.razonSocial}} </td>
+                      <td class="text-center">{{proveedor.direccion}} </td>
+                      <td class="text-center">{{proveedor.telefono}} </td> 
+                      <td class="text-center">{{proveedor.correo}}</td>
+                      <td class="text-center ">
+                        <a href=" {% url 'editar_proveedor' proveedor.id %}" class="btn btn-info btn-xs" title="Editar proveedor"><i class="fa fa-pencil"></i></a>
+                      </td>                        
+                    </tr>
+                    {% endfor %}                   
+                  </tbody>
+                </table>
+                                    
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+    <!-- Datatables -->
+  <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+  <script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+  <script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+  <script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+ {% endblock javascripts %}
+
+

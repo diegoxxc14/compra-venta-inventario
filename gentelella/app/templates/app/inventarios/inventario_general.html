@@ -16,72 +16,9 @@
     <div class="">
     <div class="clearfix"></div>
     
-    <div class="row">
-        <div class="col-md-6 col-sm-6 col-xs-12">
-            <div class="x_panel">
-              <div class="x_title">
-                <h2><i class="fa fa-square-o"></i> Modals</h2>
-                <div class="clearfix"></div>
-              </div>
-              <div class="x_content">
-    
-                <!-- modals -->
-                <!-- Large modal -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-lg">Large modal</button>
-    
-                <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
-                  <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-    
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
-                        </button>
-                        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-                      </div>
-                      <div class="modal-body">
-                        <h4>Text in a modal</h4>
-                        <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</p>
-                        <p>Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla.</p>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                      </div>
-    
-                    </div>
-                  </div>
-                </div>
-    
-                <!-- Small modal -->
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bs-example-modal-sm">Small modal</button>
-    
-                <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true">
-                  <div class="modal-dialog mo dal-sm">
-                    <div class="modal-content">
-    
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
-                        </button>
-                        <h4 class="modal-title" id="myModalLabel2">Modal title</h4>
-                      </div>
-                      <div class="modal-body">
-                        <h4>Text in a modal</h4>
-                        <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.</p>
-                        <p>Aenean lacinia bibendum nulla sed consectetur. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec sed odio dui. Donec ullamcorper nulla non metus auctor fringilla.</p>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                      </div>
-    
-                    </div>
-                  </div>
-                </div>
-                <!-- /modals -->
-              </div>
-            </div>
-          </div>
-    <div class="col-md-12 col-sm-12 col-xs-12">
+    <div class="row">     
+        
+        <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
           <div class="x_title">
             <h2>Inventario General de insumos e implementos</h2>            
@@ -90,15 +27,64 @@
               <form class="form-horizontal form-label-left">                   
                 <div class="form-group">
                   <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
-                    <div>
-                      <a href="{% url 'crear_empresa' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Nueva</a>                      
-                      <a href="{% url 'crear_empresa' %}" class="btn btn-info"><i class="fa fa-plus"></i> Categorias</a>                      
-                      <a href="{% url 'crear_empresa' %}" class="btn btn-success"><i class="fa fa-plus"></i> Productos</a>
-                      <a href="{% url 'crear_empresa' %}" class="btn btn-default"><i class="fa fa-plus"></i> Nueva</a>                      
-                      <a href="{% url 'crear_empresa' %}" class="btn btn-danger"><i class="fa fa-plus"></i> Categorias</a>                      
-                      <a href="{% url 'crear_empresa' %}" class="btn btn-warning"><i class="fa fa-plus"></i> Productos</a>                     
-                      <a href="{% url 'crear_empresa' %}" class="btn btn-dark"><i class="fa fa-plus"></i> Productos</a>
+                    <!-- Split button Proveedor -->
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-success">Proveedor</button>
+                      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href=" {% url 'crear_proveedor' %}">Crear Proveedor</a>
+                        </li>
+                        <li><a href=" {% url 'listar_proveedor' %}">Listar Proveedor</a>
+                        </li>
+                      </ul>
                     </div>
+                    <!-- Split button Empleado -->
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-success">Empleado</button>
+                      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href=" {% url 'crear_empleado' %}">Crear Empleado</a>
+                        </li>
+                        <li><a href="{% url 'listar_empleado' %}">Listar Empleado</a>
+                        </li>
+                      </ul>
+                    </div>
+                    <!-- Split button Articulo -->
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-dark">Articulo</button>
+                      <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href=" {% url 'crear_articulo' %}">Crear Articulo</a>
+                        </li>
+                        <li><a href=" {% url 'ingresar_articulo' %}">Ingreso Articulo</a>
+                        </li>
+                        <li><a href="{% url 'listar_empleado' %}">Salida Articulo</a>
+                        </li>
+                      </ul>
+                    </div>
+                    <!-- Split button Categoria -->
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-dark">Categoria</button>
+                      <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href=" {% url 'crear_categoria' %}">Crear Categoria</a>
+                        </li>
+                        <li><a href="{% url 'listar_categoria' %}">Listar Categoria</a>
+                        </li>
+                      </ul>
+                    </div>                                                             
                   </div>
                 </div>    
               </form>
@@ -106,25 +92,27 @@
               <div class="x_content">
                 <table id="datatable" class="table table-striped jambo_table bulk_action">
                   <thead>
-                    <tr class="headings">                                                             
-                      <th class="column-title text-center">RUC</th>
-                      <th class="column-title text-center">Razón Social</th>                     
-                      <th class="column-title text-center">Dirección</th>
-                      <th class="column-title text-center">Teléfono</th> 
-                      <th class="column-title text-center">Correo</th>
-                      <th class="column-title text-center"><span class="fa fa-flash"></span></th>   
+                    <tr class="headings">                                                           
+                      <th class="column-title text-center">Nro</th>
+                      <th class="column-title text-center">Descripción</th>
+                      <th class="column-title text-center">Categoria</th>
+                      <th class="column-title text-center">Stock</th>                     
+                      <th class="column-title text-center">Estado</th>
+                      <th class="column-title text-center">Unidad</th> 
+                      <th class="column-title text-center">Opciones</th>   
                     </tr>
                   </thead>
                   <tbody>
-                    {% for empresa in form %}
-                    <tr class="even pointer">                                                             
-                      <td class="text-center">{{empresa.ruc}} </td>
-                      <td class="text-center">{{empresa.razonSocial}} </td>
-                      <td class="text-center"> {{empresa.direccion}} </td>
-                      <td class="text-center"> {{empresa.telefono}} </td> 
-                      <td class="text-center">{{empresa.correo}}</td>
+                    {% for articulo in form %}
+                    <tr class="even pointer">
+                      <td class="text-center">{{ forloop.counter }}</td>                                                             
+                      <td class="text-center">{{articulo.descripcion}} </td>                       
+                      <td class="text-center">{{articulo.idCategoria}}</td>
+                      <td class="text-center"><span class="badge badge-success"> {{articulo.stock}} </span></td>
+                      <td class="text-center"> {{articulo.estado}} </td>
+                      <td class="text-center"> {{articulo.unidadMedida}} </td>
                       <td class="text-center ">
-                        <a href="{% url 'editar_empresa' empresa.id %}" class="btn btn-primary btn-xs" title="Gestionar empresa"><i class="fa fa-wrench"></i></a>
+                        <a href=" {% url 'editar_articulo' articulo.id %} " class="btn btn-info btn-xs" title="Gestionar articulos"><i class="fa fa-pencil"></i></a>
                       </td>                        
                     </tr>
                     {% endfor %}                   

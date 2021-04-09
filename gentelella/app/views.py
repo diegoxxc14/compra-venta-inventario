@@ -12,8 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from decimal import Decimal
 from xhtml2pdf import pisa
-from app.models import Articulo, Inventario, Productor, Empresa, ResponsableTransporte, PesajeCompraMaiz,PesajeVentaMaiz, CompraMaiz, VentaMaiz, BodegaMaiz
-from app.forms import ProductorForm, InventarioForm, EmpresaForm, ResponsableTransporteForm, CrearProveedorForm, CrearArticuloForm,CrearInventarioForm
+from app.models import Articulo, Categoria, Inventario, Productor, Empresa, Proveedor, ResponsableTransporte, PesajeCompraMaiz,PesajeVentaMaiz, CompraMaiz, VentaMaiz, BodegaMaiz, Empleado, DocumentoCompra
+from app.forms import ProductorForm, InventarioForm, EmpresaForm, ResponsableTransporteForm, ProveedorForm, CrearInventarioForm, ArticuloForm, CategoriaForm, EmpleadoForm,DocumentoCompraForm
 from app.utils import * #Importamos métodos útiles
 from app.constants import * #Importar las constantes
 import json
@@ -151,14 +151,6 @@ class EditarProductor(UpdateView):
     template_name = 'app/compras/productor_editar.html'
     success_url = reverse_lazy('listar_productores')
 
-    def form_valid(self, form):
-        messages.add_message(self.request, messages.SUCCESS, 'Inventario editado correctamente.')
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        messages.add_message(self.request, messages.WARNING, 'Hubo problemas para editar esta inventario.')
-        return super().form_invalid(form)
-
 class EliminarProductor(DeleteView):
     model = Productor
     template_name = "app/compras/productor_eliminar.html"
@@ -263,7 +255,26 @@ def buscar_productor_autocomplete(request):
             prods = Productor.objects.filter(nombres__icontains= request.POST['term'])[0:10]
             for i in prods:
                 item = i.toJSON()
-                item['value'] = i.nombres 
+                item['text'] = i.nombres
+                data.append(item)  
+        else:
+            data['error'] = 'Ha ocurrido un error'
+    except Exception as e:
+        data['error'] = str(e)
+    return JsonResponse(data, safe=False)           
+
+#crear un buscador autocomplete de productor
+@csrf_exempt
+def buscar_articulo_autocomplete(request):    
+    data = {}
+    try:
+        action = request.POST['action']
+        if action == 'autocomplete':
+            data = []
+            prods = Articulo.objects.filter(descripcion__icontains= request.POST['term'])[0:10]
+            for i in prods:
+                item = i.toJSON()
+                item['text'] = i.descripcion
                 data.append(item)  
         else:
             data['error'] = 'Ha ocurrido un error'
@@ -413,22 +424,29 @@ def finalizar_venta(request):
         
     return HttpResponse('ok')
 
-
-def crear_proveedor(request, template_name='app/inventarios/inventarioIE/proveedor_crear.html'):
+#Vista de Proveedor
+def crear_proveedor(request, template_name='app/inventarios/proveedor/proveedor_crear.html'):
     if request.method == 'POST':
-        proveedorform = CrearProveedorForm(request.POST)
+        proveedorform = ProveedorForm(request.POST)
         if proveedorform.is_valid():
            proveedorform.save()
-        return redirect('lista_implementos')
+        return redirect('inventario_general')
     else:
-        proveedorform = CrearProveedorForm()
+        proveedorform = ProveedorForm()
     return render(request, template_name,{'proveedorform':proveedorform}) 
 
-class CrearArticuloView(CreateView):
-    model = Articulo
-    template_name = "app/inventarios/inventarioIE/articulo_crear.html"
-    form_class = CrearArticuloForm
-    success_url = 'lista_implementos'
+@login_required
+def listar_proveedor(request, template_name='app/inventarios/proveedor/proveedor_listar.html'):
+    form = Proveedor.objects.all()
+    return render(request, template_name, {'form':form})
+
+@method_decorator(login_required, name='dispatch')
+class EditarProveedor(UpdateView):
+    model = Proveedor
+    form_class = ProveedorForm
+    template_name = 'app/inventarios/proveedor/proveedor_editar.html'
+    success_url = reverse_lazy('listar_proveedor')
+
 
 #views del Inventario
 class CrearInventario(CreateView):
@@ -609,18 +627,87 @@ def imprimir_ventas(request):
 
 @login_required
 def inventario_general(request, template_name='app/inventarios/inventario_general.html'):
-    form = Empresa.objects.all()
+    form = Articulo.objects.all()
     return render(request, template_name, {'form':form})
+# crear un  articulo
+@method_decorator(login_required, name='dispatch')
+class CrearArticulo(CreateView):
+    model = Articulo
+    template_name = 'app/inventarios/articulos/articulo_crear.html'
+    form_class = ArticuloForm
+    success_url = reverse_lazy('inventario_general')
+
+@method_decorator(login_required, name='dispatch')
+class EditarArticulo(UpdateView):
+    model = Articulo
+    form_class = ArticuloForm
+    template_name = 'app/inventarios/articulos/articulo_editar.html'
  
-def crear_articulo(request, template_name='app/inventarios/inventarioIE/articulo_crear.html'):
+
+@method_decorator(login_required, name='dispatch')
+class CrearCategoria(CreateView):
+    model = Categoria
+    template_name = 'app/inventarios/categoria/categoria_crear.html'
+    form_class = CategoriaForm
+    success_url = reverse_lazy('inventario_general')
+
+@login_required
+def listar_categoria(request, template_name='app/inventarios/categoria/categoria_listar.html'):
+    form = Categoria.objects.all()
+    return render(request, template_name, {'form':form})
+
+
+@csrf_exempt
+def ingresar_articulo(request, template_name='app/inventarios/articulos/articulo_ingreso.html'):       
     if request.method == 'POST':
-        articuloform = CrearArticuloForm(request.POST)
-        if articuloform.is_valid():
-           articuloform.save()
-        return redirect('lista_implementos')
+        form = DocumentoCompraForm(request.POST)
+        action = request.POST['action']
+        if action == 'autocomplete':
+            data = []
+            for i in Articulos.objects.filter(descripcion__icontains= request.POST['term'])[0:10]:
+                item = i.toJSON()
+                item['text'] = i.descripcion                
+                data.append(item)        
+        elif action == 'search_productor':
+                data = []
+                term = request.POST['term']
+                clients = Productor.objects.filter(nombres__icontains=term)[0:10]
+                for i in clients:
+                    item = i.toJSON()
+                    item['text'] = i.nombres
+                    data.append(item)
+        else:
+            data['error'] = 'No ha ingresado a ninguna opción'    
+        return JsonResponse(data, safe=False)           
+        if form.is_valid():
+            form.save()
+        return redirect('facturacompra1')
+        
     else:
-        articuloform = CrearArticuloForm()
-    return render(request, template_name,{'articuloform':articuloform}) 
+        form = DocumentoCompraForm()
+    return render(request, template_name,{'form':form})
+
+
+#Vistas del CRUD de empleado
+@method_decorator(login_required, name='dispatch')
+class CrearEmpleado(CreateView):
+    model = Empleado
+    template_name = 'app/inventarios/empleado/empleado_crear.html'
+    form_class = EmpleadoForm
+    success_url = reverse_lazy('inventario_general')
+
+@login_required
+def listar_empleado(request, template_name='app/inventarios/empleado/empleado_listar.html'):
+    form = Empleado.objects.all()
+    return render(request, template_name, {'form':form})
+
+@method_decorator(login_required, name='dispatch')
+class EditarEmpleado(UpdateView):
+    model = Empleado
+    form_class = EmpleadoForm
+    template_name = 'app/inventarios/empleado/empleado_editar.html'
+    success_url = reverse_lazy('listar_empleado')
+
 
 def crear_inventario(request, template_name='app/inventarios/inventarioIE/inventario_crear.html'):
     if request.method == 'POST':
@@ -681,6 +768,58 @@ def facturacion_compra(request, template_name='app/pagos/factura_crear_compras.h
         'tiposDocumento': TIPO_DOCUMENTO, 'tiposPago': TIPO_PAGO
     }
     return render(request, template_name, context)
+
+@csrf_exempt
+def CrearDocumentoCompra1(request, template_name='app/pagos/factura_crear_compras.html'):       
+    if request.method == 'POST':
+        form = DocumentoCompraForm(request.POST)
+        action = request.POST['action']
+        if action == 'autocomplete':
+            data = []
+            for i in Productor.objects.filter(nombres__icontains= request.POST['term'])[0:10]:
+                item = i.toJSON()
+                item['value'] = i.nombres 
+                data.append(item)        
+        elif action == 'search_productor':
+                data = []
+                term = request.POST['term']
+                clients = Productor.objects.filter(nombres__icontains=term)[0:10]
+                for i in clients:
+                    item = i.toJSON()
+                    item['text'] = i.nombres
+                    data.append(item)
+        else:
+            data['error'] = 'No ha ingresado a ninguna opción'    
+        return JsonResponse(data, safe=False)           
+        if form.is_valid():
+            form.save()
+        return redirect('facturacompra1')
+        
+    else:
+        form = DocumentoCompraForm()
+    return render(request, template_name,{'form':form})
+
+#vistas de facturacion 
+class CrearDocumentoCompra(CreateView):
+    model = DocumentoCompra
+    template_name = "app/pagos/factura_crear_compras.html"
+    form_class = DocumentoCompraForm
+    success_url = 'lista_implementos' 
+@csrf_exempt
+def buscar_PesajesCompra(request):
+    data = {}
+    try:
+        action = request.POST['action']
+        if action == 'buscar_pesaje_compra':
+            data = []
+            for i in PesajeCompraMaiz.objects.filter(idCompraMaiz_id=1):
+                data.append(i.toJSON())
+        else:
+            data['error'] = 'Ha ocurrido un error'
+    except Exception as e:
+        data['error'] = str(e)
+    return JsonResponse(data, safe=False)
+
 
 def gentella_html(request):
     context = {}

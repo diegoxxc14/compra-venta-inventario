@@ -48,6 +48,16 @@
                   </span>
                   </div>                
               </div>
+              <div class="form-group">
+                <label class="control-label">Buscador de Articulos:</label>
+                <div class="input-group">
+                  <input type="text" id="articulo" class="form-control select2">
+                  <span class="input-group-btn">
+                    <button id="btnLimpiarProductor" type="button" class="btn btn-danger"><i
+                    class="fa fa-times"></i></button>
+                  </span>
+                  </div>                
+              </div>
 
               <hr>
                           
@@ -169,8 +179,9 @@
       var tablaFacturaCompras;      
       listadoPesajesCompra();
       $('.select2').select2({
+        theme: "bootstrap4",
         language: 'es'
-    });
+      });
       //intanciacion de la tabla 
       function creartabla(){
         tablaFacturaCompras = $('#tabla_facturacion_compras').DataTable({
@@ -223,7 +234,7 @@
         var data = tablaFacturaCompras.row(tr.row).data();
         console.log(data);
       }
-    //Funcionalidad de autocompletado de los productores
+     //Funcionalidad de autocompletado de los productores
     $("#productor").autocomplete({
       source: function(request,response){
         $.ajax({
@@ -252,7 +263,36 @@
     });
     
     
-    
+    // Autocompletado de articulos con ajax y select2
+    $('#articulo').select2({   
+        language: "es",
+        allowClear: true,
+        language: {
+            inputTooShort: function () {
+              return "Debe ingresar mas caracteres...";
+            }
+          },
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: window.location.pathname,
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    action: 'autocomplete'
+                }
+                return queryParameters;
+            },
+            processResults: function (data) {
+                return {                    
+                    results: data
+                };
+            },
+        },
+        placeholder: 'Ingrese una descripción',
+        minimumInputLength: 3,
+    });
+   
     // Autocompletado de productor con ajax y select2
      $('#id_idProductor').select2({   
         language: "es",
@@ -507,10 +547,6 @@
     
 
    })
-
-   
-  
-
-  </script>
+ </script>
  
  {% endblock javascripts %}

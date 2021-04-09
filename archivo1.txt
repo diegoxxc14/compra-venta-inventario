@@ -1,1 +1,3 @@
 Este es un archivo de prueba cambio 1
+
+(version_prueba) C:\Users\Rene\Documents\proyectosDjango\trabajos relacionados\hades\version estable\107 hades-master\hades-master\app>

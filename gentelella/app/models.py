@@ -83,6 +83,7 @@ class DocumentoCompra(models.Model):
     precioTotal = models.DecimalField(max_digits=8,decimal_places=2)
     estado = models.CharField(max_length=25)
     tipoPago = models.CharField(max_length=25)
+    idProductor = models.ForeignKey('Productor', on_delete=models.CASCADE)#para probar
     idCompraMaiz = models.ForeignKey('CompraMaiz', on_delete = models.CASCADE)
 
 class PesajeCompraMaiz(models.Model): #Los Pesajes correspondientes a una Compra
@@ -94,6 +95,17 @@ class PesajeCompraMaiz(models.Model): #Los Pesajes correspondientes a una Compra
     pesoQuintales = models.DecimalField(max_digits=7,decimal_places=2)
     vigente = models.BooleanField(default=True) #Si cada pesaje está vigente en la compra
     idCompraMaiz = models.ForeignKey('CompraMaiz', on_delete = models.CASCADE)
+
+    class Meta:
+        verbose_name = 'PesajeCompraMaiz'
+        verbose_name_plural = 'PesajeCompraMaiz'
+        ordering = ['fechaPesaje']
+    
+    def __str__(self):
+        return self.pesoQuintales
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
 
 class PesajeVentaMaiz(models.Model):
     fechaPesaje = models.DateField()
@@ -178,19 +190,62 @@ class Inventario(models.Model):
     def __str__(self):
         return self.descripcion
 
+#creamos un tabla Categoria que se debe cambiar en el modelo de base de datos 
+    #idProveedor = models.ForeignKey('Proveedor', on_delete = models.CASCADE)
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=150, unique=True)
+    descripcion = models.CharField(max_length=500, null=True, blank=True, verbose_name='Descripción')
+
+    def __str__(self):
+        return self.nombre
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+
+    class Meta:
+        verbose_name = 'Categoria'
+        verbose_name_plural = 'Categorias'
+        ordering = ['nombre']
+
 class Articulo(models.Model):
-    descripcion = models.CharField(max_length=100)
+    idCategoria = models.ForeignKey('Categoria', on_delete = models.CASCADE)
+    descripcion = models.CharField(max_length=100,unique=True)
+    stock = models.IntegerField(blank = False, null = False)
     estado = models.CharField(max_length=25,blank=True, null=True)
-    cantidadMin = models.IntegerField(default=2)
-    cantidadMax = models.IntegerField(default=10)
-    idProveedor = models.ForeignKey('Proveedor', on_delete = models.CASCADE)
+    unidadMedida = models.CharField(max_length=100, choices=UNIDAD)
 
     class Meta:
         verbose_name = 'Articulo'
         verbose_name_plural = 'Articulos'
-    
+        ordering = ['descripcion']
+
     def __str__(self):
-      return self.descripcion
+        return self.descripcion        
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+#cambiamos la tabla revisar
+class Articulos(models.Model):
+    idCategoria = models.ForeignKey('Categoria', on_delete = models.CASCADE)
+    descripcion = models.CharField(max_length=100,unique=True)
+    stock = models.IntegerField(blank = False, null = False)
+    estado = models.CharField(max_length=25,blank=True, null=True)
+    unidadMedida = models.CharField(max_length=100, choices=UNIDAD)
+
+    class Meta:
+        verbose_name = 'Articulo'
+        verbose_name_plural = 'Articulos'
+        ordering = ['descripcion']
+
+    def __str__(self):
+        return self.descripcion        
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+
 
 class Proveedor(models.Model):
     ruc = models.CharField(max_length=13,unique=True, blank=False, null=False)
@@ -206,12 +261,11 @@ class Proveedor(models.Model):
     def __str__(self):
       return self.razonSocial
 
-class OrdenUso(models.Model):
-    cantidad = models.IntegerField()
-    unidadMedida = models.CharField(max_length=25)
-    fechaSalida = models.DateField()
-    idInventario = models.ForeignKey('Inventario', on_delete = models.CASCADE) 
-    idEmpleado = models.ForeignKey('Empleado', on_delete = models.CASCADE)
+#class SalidaArticulo(models.Model):
+#    cantidad = models.IntegerField()
+#    fecha = models.DateTimeField(auto_now=True)
+#    idArticulo = models.ForeignKey('Articulo', on_delete = models.CASCADE) 
+#    idEmpleado = models.ForeignKey('Empleado', on_delete = models.CASCADE)
 
 class Empleado(models.Model):
     identificacion = models.CharField(max_length=10,unique=True, blank=False, null=False)
