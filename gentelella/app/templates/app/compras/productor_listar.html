@@ -5,16 +5,11 @@
 {% block stylesheets %}
 {{ block.super }}
 <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
 <link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
 {% endblock stylesheets %}
 
 {% block content %}
   <div class="right_col" role="main">
-    <div class="">
-    <div class="clearfix"></div>
     
     <div class="row">
       <div class="col-md-12 col-sm-12 col-xs-12">
@@ -23,38 +18,41 @@
             <h2>Listado de Productores</h2>            
             <div class="clearfix"></div>
           </div>
+          <div class="x_content">
           <form class="form-horizontal form-label-left">                   
             <div class="form-group">
               <div class="col-md-12 col-sm-12 col-xs-12 col-md-offset-0">                        
                 <div>
-                  <a href="{% url 'crear_productor' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Nueva</a>
+                  <a href="{% url 'crear_productor' %}" class="btn btn-success"><i class="fa fa-plus-square"></i> Nuevo Productor</a>
                 </div>
               </div>
             </div>    
           </form>
           <br>                                           
-            <div class="x_content">           
-                <table id="datatable" class="table table-striped jambo_table bulk_action">
+                       
+                <table id="tblProductor" class="table table-striped jambo_table bulk_action">
                   <thead>
-                    <tr class="headings">                                                             
+                    <tr class="headings">
+                      <th class="column-title text-center">Nro.</th>                                                             
                       <th class="column-title text-center">Identificación </th>
                       <th class="column-title text-center">Productor</th>                     
                       <th class="column-title text-center">Dirección </th>
                       <th class="column-title text-center">Teléfono</th> 
                       <th class="column-title text-center">Correo</th>
-                      <th class="column-title text-center"><span class="fa fa-flash"></span></th>  
+                      <th class="column-title text-center">Opciones</th>  
                     </tr>
                   </thead>
                   <tbody>
                     {% for productor in form %}
-                    <tr class="even pointer">                                                              
+                    <tr class="even pointer">
+                      <td class="text-center">{{ forloop.counter }}</td>                                                              
                       <td class="text-center">{{productor.identificacion}} </td>
                       <td class="text-center">{{productor.nombres}} </td>
                       <td class="text-center"> {{productor.direccion}} </td>
                       <td class="text-center"> {{productor.telefono}} </td> 
                       <td class="text-center">{{productor.correo}}</td>
                       <td class="text-center ">
-                        <a href="{% url 'editar_productor' productor.id %}" class="btn btn-primary btn-xs" title="Gestionar productor"><i class="fa fa-wrench"></i></a> 
+                        <a href="{% url 'editar_productor' productor.id %}" class="btn btn-info btn-xs" title="Gestionar productor"><i class="fa fa-pencil"></i></a> 
                       </td>
                     </tr>
                     {% endfor %}                   
@@ -66,7 +64,7 @@
         </div>
       </div>
   
-    </div>  
+     
   </div>
 {% endblock content %}
 
@@ -74,17 +72,20 @@
   {{ block.super}}
     <!-- Datatables -->
   <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
-  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-  <script src="/static/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-  <script src="/static/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-  <script src="/static/vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
-  <script src="/static/vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
-  <script src="/static/vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
-  <script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-  <script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>  
   <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
   <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-  <script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+  <script>
+    $(function(){
+
+      $('#tblProductor').DataTable( {
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+          }
+      });
+
+    })
+  </script>
  {% endblock javascripts %}
 
 

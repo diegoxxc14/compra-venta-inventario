@@ -133,14 +133,14 @@
             <table id="tabla_pesaje" class="table table-striped jambo_table bulk_action">
               <thead>
                 <tr class="headings">
-                  <th class="column-title">Nro.</th>
-                  <th class="column-title text-center">Fecha </th>
-                  <th class="column-title text-center">Peso Bruto </th>
-                  <th class="column-title text-center">Peso Tara </th>
-                  <th class="column-title text-center">Peso Neto </th>
-                  <th class="column-title text-center">Factor Conversión </th>
-                  <th class="column-title text-center">Peso Quintales </th>
-                  <th class="column-title text-center"></th>
+                  <th class="column-title" scope="col" style="width: 7%;">Nro.</th>
+                  <th class="column-title text-center" scope="col" style="width: 18%;">Fecha </th>
+                  <th class="column-title text-center" scope="col" style="width: 12.5%;">Peso Bruto </th>
+                  <th class="column-title text-center" scope="col" style="width: 12.5%;">Peso Tara </th>
+                  <th class="column-title text-center" scope="col" style="width: 12.5%;">Peso Neto </th>
+                  <th class="column-title text-center" scope="col" style="width: 12.5%;">F. Conversión </th>
+                  <th class="column-title text-center" scope="col" style="width: 12.5%;">Peso Quintales </th>
+                  <th class="column-title text-center" scope="col" style="width: 12.5%;">Opciones</th>
                 </tr>
               </thead>
 
@@ -201,10 +201,23 @@
           {
             "targets": -1,
             "data": null,
-            "defaultContent": "<div class='a-center'><button class='btn btn-warning btn-xs tbEditarPesaje' title='Editar Pesaje'>" +
+            class : 'text-center',
+            "defaultContent": "<div class='a-center'><button class='btn btn-info btn-xs tbEditarPesaje' title='Editar Pesaje'>" +
               "<i class='fa fa-pencil'></i></button><button class='btn btn-danger btn-xs tbEliminarPesaje' title='Eliminar Pesaje'>" +
               "<i class='fa fa-trash-o'></i></button></div>"
-          }
+          },
+          {
+            targets: [6],
+            class: 'text-center',
+            render: function (data, type, row) {
+              return '<span class="badge badge-default">' + data + '</span>';
+              }
+          },
+          {
+            targets: [1,2,3,4,5,7],
+            class: 'text-center',
+            
+          },
         ],
         displayLength: 5,
         columns: [
@@ -229,34 +242,40 @@
         });
       }).draw();
 
-      //** Calcular el Pesaje
+      //** Calcular el Pesaje $('#peso_bruto').val() != null ** $('#peso_tara').val() != null)
       $("#btnCalcular").on('click', function () {
-        if ($('#factor_conversion').val() != null && $('#peso_bruto').val() != null
-          && $('#peso_tara').val() != null) { // Si no se selecciona un factor
+        if ($('#factor_conversion').val() != null &&  $('#peso_bruto').val().length != 0  &&  $('#peso_tara').val().length != 0 ) { // Si no se selecciona un factor
           let pesoNeto = calcularPesoNeto();
-          $('#peso_neto').val(pesoNeto);
-          $('#peso_quintales').val(calcularPesoQuintales(pesoNeto));
-
-          //Controlar si todo va bien habilitar btnAgregarPesaje
-          if (pesaje_editar != null) { //Si es una edición de Pesaje
-            $("#btnEditarPesaje").attr("disabled", false);    
-          } else {
+          if(pesoNeto<0){
+            $("#btnAgregarPesaje").attr("disabled", true);
+            swal("Warning", "¡Datos ingresado para el calculo de suma incorrecto!", "warning"); 
+          } else if (pesaje_editar != null) { //Si es una edición de Pesaje
+            $("#btnEditarPesaje").attr("disabled", false);
+            $('#peso_neto').val(pesoNeto);
+            $('#peso_quintales').val(calcularPesoQuintales(pesoNeto));     
+          } else if(pesoNeto > 0 ){
             $("#btnAgregarPesaje").attr("disabled", false);
-          }
-        } else {
-          swal("Warning", "¡Debe ingresar todos los campos!", "warning");
+            $('#peso_neto').val(pesoNeto);
+            $('#peso_quintales').val(calcularPesoQuintales(pesoNeto));     
+          }          
+        } else {          
+          swal("Warning", "¡Debe ingresar todos los campos de pesaje!", "warning");
         }
       });
       
       //** Agregar un nuevo Pesaje a la tabla
       $('#btnAgregarPesaje').on('click', function () {
-        let pesajeNuevo = convertPesajeToJson(new Date().toLocaleString(), $('#peso_bruto').val(), $("#peso_tara").val(),
+        if($('#peso_neto').val() > 0  &&  $('#peso_bruto').val() > 0 && $('#peso_tara').val() > 0 ){
+          let pesajeNuevo = convertPesajeToJson(new Date().toLocaleString(), $('#peso_bruto').val(), $("#peso_tara").val(),
           $('#peso_neto').val(), $('#factor_conversion').val(), $('#peso_quintales').val());
-        tablaPesaje.rows.add(pesajeNuevo).draw(false);
+          tablaPesaje.rows.add(pesajeNuevo).draw(false);
+          $(this).attr("disabled", true);
+          $("#totalPesajes").text(calcularTotalPesaje());
+          limpiarCamposCalculo();
+        }else {
+          swal("Warning", "¡Valores ingresados son incorrectos2!", "warning");
+        }
         
-        $(this).attr("disabled", true);
-        $("#totalPesajes").text(calcularTotalPesaje());
-        limpiarCamposCalculo();
       });
 
       //** Editar un Pesaje de la tabla
@@ -285,6 +304,7 @@
           url: "{% url 'buscar_empresa' %}",
           type: "POST",
           success: function (data) {
+            console.log(data)
             if (data.length > 0) { //Si data tiene registros
               empresa = data[0];
               $("#nom_empresa").val(empresa.fields.razonSocial);
@@ -352,7 +372,8 @@
         delay: 500,
         minLength: 3,
         select: function( event, ui ) {
-          empresa = ui.item          
+          empresa = ui.item
+          console.log(empresa.id)           
         }    
       });
     
@@ -389,7 +410,7 @@
 
       //** Guardar Pesajes
       $("#btnGuardar").on('click', function () {
-        if (calcularTotalPesaje() > 0 && empresa != null) { //Si hay Pesajes en la tabla y empresa
+        if (calcularTotalPesaje() > 0 && empresa != null) { //Si hay Pesajes en la tabla y empresa 
           let datos_tabla = tablaPesaje.rows().data();
           let pesajes = $.makeArray();
           let pk_empresa = empresa.id;          
@@ -452,7 +473,7 @@
       //** Limpiar todos los campos de la compra
       function limpiarCamposVenta() {
         $('#nro_ruc').val("");
-        $("#nom_empresa").val("");
+        $("#empresa").val("");
         $('#transportista').val("");
         empresa = null;
         limpiarCamposCalculo();

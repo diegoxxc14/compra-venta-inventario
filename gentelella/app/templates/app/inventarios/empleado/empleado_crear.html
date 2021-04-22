@@ -14,7 +14,7 @@
       <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
           <div class="x_title">
-            <h2>Nuevo Empleado</h2>
+            <h2>Crear Empleado</h2>
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
@@ -56,12 +56,15 @@
                   <span class="fa fa-envelope form-control-feedback right" aria-hidden="true"></span>
                 </div>
               </div>
-              <div class="ln_solid"></div>                
+              <br>               
                 <div class="form-group">
-                    <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-3 col-sm-offset-3 col-xs-offset-3">                   
-                      <button type="reset" class="btn btn-primary"><i class="fa fa-eraser"></i> Borrar Todo</button>
-                      <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Guardar</button>
-                      <a href="{% url 'inventario_general' %}" class="btn btn-default"><i class="fa fa-undo"></i> Regresar </a>
+                    <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-3 col-sm-offset-3 col-xs-offset-3">
+                      <button type="submit" class="btn btn-primary ">
+                        <i class="fa fa-save"></i> Guardar registro
+                      </button>
+                      <a href="{% url 'listar_empleado' %}" class="btn btn-danger btn-flat">
+                        <i class="fa fa-times"></i> Cancelar
+                      </a>                    
                     </div>
                 </div>
             </form>

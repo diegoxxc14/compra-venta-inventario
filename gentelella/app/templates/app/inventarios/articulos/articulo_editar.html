@@ -1,6 +1,6 @@
 {% extends "app/base_site.html" %}
 
-{% block title %} Crear Articulo {% endblock title %}
+{% block title %} Editar Articulo {% endblock title %}
 
 
 {% block content %}
@@ -29,13 +29,6 @@
                   </div>
                 </div>
                 <div class="form-group">
-                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Stock</label>
-                  <div class="col-md-6 col-sm-6 col-xs-12">
-                    {{form.stock}}                    
-                    <span class="fa fa-cubes form-control-feedback right" aria-hidden="true"></span>
-                  </div>
-                </div>
-                <div class="form-group">
                   <label class="control-label col-md-3 col-sm-3 col-xs-12">Unidad</label>
                   <div class="col-md-6 col-sm-6 col-xs-12">
                     {{form.unidadMedida}}
@@ -43,25 +36,22 @@
                   </div>
                 </div> 
                 <div class="form-group">
-                  <label class="control-label col-md-3 col-sm-3 col-xs-12">Estado</label>
-                  <div class="col-md-6 col-sm-6 col-xs-12">
-                    {{form.estado}}
-                    <span class="fa fa-tags form-control-feedback right" aria-hidden="true"></span>
-                  </div>
-                </div>
-                <div class="form-group">
                   <label class="control-label col-md-3 col-sm-3 col-xs-12">Categoria</label>
                   <div class="col-md-6 col-sm-6 col-xs-12">
                     {{form.idCategoria}}
                   </div>
-                </div>              
-                <div class="ln_solid"></div>
-                <div class="form-group">
-                  <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-3 col-sm-offset-3 col-xs-offset-3" >                    
-                    <button type="submit" class="btn btn-success"><span class="fa fa-save"></span> Guardar</button>
-                    <a href="{% url 'inventario_general' %}" class="btn btn-default"><i class="fa fa-undo"></i> Regresar </a>  
-                  </div>
                 </div>
+                <br>              
+                <div class="card-footer">                  
+                  <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-3 col-sm-offset-3 col-xs-offset-3">
+                    <button type="submit" class="btn btn-primary ">
+                      <i class="fa fa-save"></i> Guardar registro
+                    </button>
+                    <a href="{% url 'listar_articulo' %}" class="btn btn-danger btn-flat">
+                      <i class="fa fa-times"></i> Cancelar
+                    </a>
+                  </div>                  
+                </div> 
 
               </form>
             </div>

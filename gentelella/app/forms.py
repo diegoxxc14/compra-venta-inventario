@@ -87,11 +87,9 @@ class InventarioForm(forms.ModelForm):
 class ArticuloForm(forms.ModelForm):
     class Meta:
         model = Articulo
-        fields = ['descripcion','stock','estado','unidadMedida','idCategoria']
+        fields = ['descripcion','unidadMedida','idCategoria']
         widgets = {
-            'descripcion' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'descripcion del Articulo'}),
-            'stock' : forms.NumberInput(attrs={'class':'form-control', 'placeholder':'stock'}),
-            'estado' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'Estado del Articulo'}),
+            'descripcion' : forms.TextInput(attrs={'class':'form-control', 'placeholder':'Descripcion del articulo'}),
             'unidadMedida' : forms.Select(attrs={'class':'form-control'}),
             'idCategoria' : forms.Select(attrs={'class':'form-control', 'placeholder':'.......'})
         }

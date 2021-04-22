@@ -1,8 +1,7 @@
 {% extends "app/base_site.html" %}
 
 
-
-{% block title %} Eliminar Inventario {% endblock title %}
+{% block title %} Eliminar Categoria {% endblock title %}
 
 
 {% block content %}
@@ -28,7 +27,7 @@
                
               <form method="POST"  class="form-horizontal form-label-left input_mask">
                 {% csrf_token %}
-                <p><strong>¿Desea eliminar el registro de {{object}} ?</strong></p>
+                <p><strong>¿Desea eliminar el registro de {{object.nombre}} ?</strong></p>
                 <button type="submit" class="btn btn-danger">Confirmar</button>
                 
                   </div>

@@ -21,85 +21,41 @@
         <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
           <div class="x_title">
-            <h2>Inventario General de insumos e implementos</h2>            
+            <h2>Inventario General de Insumos e Implementos</h2>            
             <div class="clearfix"></div>
           </div>
               <form class="form-horizontal form-label-left">                   
                 <div class="form-group">
                   <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
-                    <!-- Split button Proveedor -->
                     <div class="btn-group">
-                      <button type="button" class="btn btn-success">Proveedor</button>
-                      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href=" {% url 'crear_proveedor' %}">Crear Proveedor</a>
-                        </li>
-                        <li><a href=" {% url 'listar_proveedor' %}">Listar Proveedor</a>
-                        </li>
-                      </ul>
+                      <a href="{% url 'ingresar_articulo' %}" class="btn btn-success btn-flat">
+                        <i class="fa fa-plus-square"></i> Ingresar Articulo
+                      </a>
                     </div>
-                    <!-- Split button Empleado -->
                     <div class="btn-group">
-                      <button type="button" class="btn btn-success">Empleado</button>
-                      <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href=" {% url 'crear_empleado' %}">Crear Empleado</a>
-                        </li>
-                        <li><a href="{% url 'listar_empleado' %}">Listar Empleado</a>
-                        </li>
-                      </ul>
+                      <a href="{% url 'salida_articulo' %}" class="btn btn-success btn-flat">
+                        <i class="fa fa-minus-square"></i> Salida Articulo
+                      </a>
                     </div>
-                    <!-- Split button Articulo -->
                     <div class="btn-group">
-                      <button type="button" class="btn btn-dark">Articulo</button>
-                      <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href=" {% url 'crear_articulo' %}">Crear Articulo</a>
-                        </li>
-                        <li><a href=" {% url 'ingresar_articulo' %}">Ingreso Articulo</a>
-                        </li>
-                        <li><a href="{% url 'listar_empleado' %}">Salida Articulo</a>
-                        </li>
-                      </ul>
+                      <a href="{% url 'inventario_documento_pdf' %}" class="btn btn-success btn-flat">
+                        <i class="fa fa-file-pdf-o"></i> Reporte
+                      </a>
                     </div>
-                    <!-- Split button Categoria -->
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-dark">Categoria</button>
-                      <button type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href=" {% url 'crear_categoria' %}">Crear Categoria</a>
-                        </li>
-                        <li><a href="{% url 'listar_categoria' %}">Listar Categoria</a>
-                        </li>
-                      </ul>
-                    </div>                                                             
+
                   </div>
                 </div>    
               </form>
               <br>              
               <div class="x_content">
-                <table id="datatable" class="table table-striped jambo_table bulk_action">
+                <table id="tblInventario" class="table table-striped jambo_table bulk_action">
                   <thead>
                     <tr class="headings">                                                           
                       <th class="column-title text-center">Nro</th>
                       <th class="column-title text-center">Descripción</th>
                       <th class="column-title text-center">Categoria</th>
-                      <th class="column-title text-center">Stock</th>                     
-                      <th class="column-title text-center">Estado</th>
-                      <th class="column-title text-center">Unidad</th> 
-                      <th class="column-title text-center">Opciones</th>   
+                      <th class="column-title text-center">Stock</th>   
+                      <th class="column-title text-center">Unidad</th>   
                     </tr>
                   </thead>
                   <tbody>
@@ -107,13 +63,9 @@
                     <tr class="even pointer">
                       <td class="text-center">{{ forloop.counter }}</td>                                                             
                       <td class="text-center">{{articulo.descripcion}} </td>                       
-                      <td class="text-center">{{articulo.idCategoria}}</td>
-                      <td class="text-center"><span class="badge badge-success"> {{articulo.stock}} </span></td>
-                      <td class="text-center"> {{articulo.estado}} </td>
-                      <td class="text-center"> {{articulo.unidadMedida}} </td>
-                      <td class="text-center ">
-                        <a href=" {% url 'editar_articulo' articulo.id %} " class="btn btn-info btn-xs" title="Gestionar articulos"><i class="fa fa-pencil"></i></a>
-                      </td>                        
+                      <td class="text-center">{{articulo.idCategoria}}</td>                      
+                      <td class="text-center"><span class="badge badge-default"> {{articulo.stock}} </span></td>
+                      <td class="text-center"> {{articulo.unidadMedida}} </td>                        
                     </tr>
                     {% endfor %}                   
                   </tbody>
@@ -132,12 +84,20 @@
     <!-- Datatables -->
   <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
   <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-
-  <script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-  <script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
   <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
   <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-  <script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+  
+  <script>
+    $(function(){
+
+      $('#tblInventario').DataTable( {
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+          }
+      } );
+
+    })
+  </script>
  {% endblock javascripts %}
 
 

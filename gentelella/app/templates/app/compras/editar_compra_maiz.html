@@ -26,38 +26,29 @@
         </div>
 
         <div class="x_content">
-
-          <div class="form-horizontal form-label-left">
+          <div class="form-horizontal form-label-left ">
             <div class="form-group">
-              <label class="control-label col-md-2 col-sm-4 col-xs-3">Identificación:</label>
-              <div class="col-md-4 col-sm-6 col-xs-12 ">
+              <label class="control-label col-md-2 col-sm-1 col-xs-12">Productor:</label>
+              <div class="col-md-4 col-sm-3 col-xs-12">
                 <div class="input-group">
-                  <input id="nro_cedula" type="text" class="form-control"
-                    value="{{ compra.idProductor.identificacion }}" readonly>
-
-                  <span class="input-group-btn">
-                    <button id="btnBuscar" class="btn btn-primary" disabled><span class="fa fa-search"></span>
-                      Buscar</button>
-                  </span>
-                </div>
-              </div>
-
-              <label class="control-label col-md-2 col-sm-4 col-xs-3">Productor:</label>
-              <div class="col-md-4 col-sm-6 col-xs-12">
-                <input id="nom_productor" type="text" class="form-control" value="{{ compra.idProductor.nombres }}"
+                  <input type="text" name="productor" id="productor" class="form-control" 
+                  value="{{ compra.idProductor.nombres }}"
                   readonly>
-                <span class="fa fa-user form-control-feedback right" aria-hidden="true">
-                </span>
+                  <span class="input-group-btn">
+                    <button id="btnLimpiarE" type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>
+                  </span>
+                </div>                  
               </div>
-            </div>
-            <div class="form-group">
+                         
               <label class="control-label col-md-2 col-sm-3 col-xs-12">Observación:</label>
-              <div class="col-md-10 col-sm-9 col-xs-12">
+              <div class="col-md-4 col-sm-9 col-xs-12">
                 <textarea id="observacion" class="form-control" rows="2"
                   placeholder="...">{{ compra.observacion }}</textarea>
               </div>
-            </div>
+            </div>                      
           </div>
+
+          
           <div class="divider-dashed"></div>
         </div>
 
@@ -119,10 +110,10 @@
           <div class="divider-dashed"></div>
           <div class="form-group">
             <div class="col-md-12 col-sm-6 col-xs-12 text-center">
-              <button id="btnGuardar" class="btn btn-warning" {% if not compra.pendiente %} disabled {% endif %}><span
-                  class="fa fa-edit"></span> Editar Compra</button>
+              <button id="btnGuardar" class="btn btn-primary" {% if not compra.pendiente %} disabled {% endif %}><span
+                  class="fa fa-check"></span> Actualizar Compra</button>
               <button id="btnFinalizar" class="btn btn-success" {% if not compra.pendiente %} disabled {% endif %}><span
-                  class="fa fa-check"></span> Finalizar Compra</button>
+                  class="fa fa-folder"></span> Finalizar Compra</button>
               <a class="btn btn-default" href="{% url 'gestion_compras' %}"><span class="fa fa-undo"></span>
                 Regresar</a>
             </div>
@@ -140,9 +131,9 @@
                 <th class="column-title text-center">Peso Bruto </th>
                 <th class="column-title text-center">Peso Tara </th>
                 <th class="column-title text-center">Peso Neto </th>
-                <th class="column-title text-center">Factor Conversión </th>
+                <th class="column-title text-center">F. Conversión </th>
                 <th class="column-title text-center">Peso Quintales </th>
-                <th class="column-title text-center"></th>
+                <th class="column-title text-center">Opciones</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -151,7 +142,7 @@
         </div>
 
         <div class="form-group">
-          <div class="col-md-9 col-md-offset-3">
+          <div class="col-md-9 col-md-offset-3 col-sm-offset-3 col-xs-offset-3">
             <label class="control-label col-md-3 col-sm-3 col-xs-3 ">Total:</label>
             <div class="col-md-9 col-sm-9 col-xs-9">
               <label id="totalPesajes" class="control-label col-md-3 col-sm-3 col-xs-3 has-feedback-left">0.00</label>
@@ -205,10 +196,21 @@
         {
           "targets": -1,
           "data": null,
-          "defaultContent": "<div class='a-center'><button {% if not compra.pendiente %} disabled {% endif %} class='btn btn-warning btn-xs tbEditarPesaje' title='Editar Pesaje'>" +
+          "defaultContent": "<div class='a-center'><button {% if not compra.pendiente %} disabled {% endif %} class='btn btn-info btn-xs tbEditarPesaje' title='Editar Pesaje'>" +
             "<i class='fa fa-pencil'></i></button><button {% if not compra.pendiente %} disabled {% endif %} class='btn btn-danger btn-xs tbEliminarPesaje' title='Eliminar Pesaje'>" +
             "<i class='fa fa-trash-o'></i></button></div>"
-        }
+        },
+        {
+          targets: [6],
+          class: 'text-center',
+          render: function (data, type, row) {
+            return '<span class="badge badge-default">' + data + '</span>';
+            }
+        },
+        {
+          targets: [1,2,3,4,5,7],
+          class: 'text-center',            
+        },
       ],
       displayLength: 5,
       columns: [
@@ -410,6 +412,7 @@
     function limpiarCamposCompra() {
       $('#nro_cedula').val("");
       $("#nom_productor").val("");
+      $("#productor").val("");
       limpiarCamposCalculo();
       $("#totalPesajes").text("0.00");
       tablaPesaje.rows().remove().draw(false);

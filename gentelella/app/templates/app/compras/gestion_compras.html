@@ -1,6 +1,6 @@
 {% extends "app/base_site.html" %}
 
-{% block title %} Nueva Compra {% endblock title %}
+{% block title %} Gestión Compras {% endblock title %}
 
 {% block stylesheets %}
   {{ block.super }}
@@ -32,8 +32,8 @@
                   <div class="form-group">
                       <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
                         <div>
-                          <a href="{% url 'crear_compra' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Nueva</a>
-                          <a href="{% url 'reportes_compras' %}" class="btn btn-primary"><i class="fa fa-print"></i> Reportes</a>
+                          <a href="{% url 'crear_compra' %}" class="btn btn-success btn-flat"><i class="fa fa-plus-square"></i> Nueva Compra</a>
+                          <a href="{% url 'reportes_compras' %}" class="btn btn-success btn-flat"><i class="fa fa-file-pdf-o"></i> Reporte Compras</a>
                         </div>
                       </div>
                   </div>    
@@ -49,7 +49,7 @@
                       <!--<th class="column-title text-center">Observación</th>-->
                       <th class="column-title text-center">Estado</th>
                       <th class="column-title text-center">Total</th>
-                      <th class="column-title text-center"><span class="fa fa-flash"></span></th> 
+                      <th class="column-title text-center">Opciones</th> 
                     </tr>
                   </thead>
 
@@ -61,11 +61,12 @@
                         <td class="text-center">{{ compra.idProductor }}</td>
                         <!--<td class="text-center">{{ compra.observacion }}</td>-->
                         <td class="text-center">
-                          {% if compra.pendiente %} <span class="label label-primary">Pendiente</span>
-                          {% else %} <span class="label label-success">Finalizada</span> {% endif %}</td>
-                        <td class="text-center">{{ compra.total }}</td>
-                        <td class="a-center ">                          
-                          <a href="{% url 'editar_compra' compra.pk %}" class="btn btn-primary btn-xs" title="Gestionar compra"><i class="fa fa-wrench"></i></a>
+                          {% if compra.pendiente %} <span class="label label-info">Pendiente</span>
+                          {% else %} <span class="label label-danger">Finalizada</span> {% endif %}</td>
+                        <td class="text-center"> <span class="badge badge-default">{{ compra.total }}</span></td>
+                        <td class="text-center ">                          
+                          <a href="{% url 'editar_compra' compra.pk %}" class="btn btn-info btn-xs" title="Gestionar compra"><i class="fa fa-wrench"></i></a>
+                          <a href=" {% url 'pesaje_compra_doc_pdf' compra.pk %} " class="btn btn-info btn-xs" title="Descargar Pesajes"><i class="fa fa-file-pdf-o"></i></a>
                           <button {% if not compra.pendiente %} disabled {% endif %} id="{{ compra.pk }}" class="btn btn-danger btn-xs btnAnularCompra" title="Anular compra"><i class="fa fa-ban"></i></button>
                         </td>
                       </tr>

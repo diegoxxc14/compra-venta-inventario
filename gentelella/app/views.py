@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.http import JsonResponse, HttpResponse
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, View
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
@@ -12,11 +12,14 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from decimal import Decimal
 from xhtml2pdf import pisa
-from app.models import Articulo, Categoria, Inventario, Productor, Empresa, Proveedor, ResponsableTransporte, PesajeCompraMaiz,PesajeVentaMaiz, CompraMaiz, VentaMaiz, BodegaMaiz, Empleado, DocumentoCompra
+from app.models import Articulo,IngresoArticulo,DetalleIngresoArticulos,DetalleSalidaArticulos,SalidaArticulo,Categoria, Inventario, Productor, Empresa, Proveedor, ResponsableTransporte, PesajeCompraMaiz,PesajeVentaMaiz, CompraMaiz, VentaMaiz, BodegaMaiz, Empleado, DocumentoCompra
 from app.forms import ProductorForm, InventarioForm, EmpresaForm, ResponsableTransporteForm, ProveedorForm, CrearInventarioForm, ArticuloForm, CategoriaForm, EmpleadoForm,DocumentoCompraForm
 from app.utils import * #Importamos métodos útiles
 from app.constants import * #Importar las constantes
 import json
+#import locale
+#Idioma "es-ES" (código para el español de España)
+#locale.setlocale(locale.LC_ALL, 'es-ES')
 
 #Inicio
 @login_required
@@ -256,6 +259,7 @@ def buscar_productor_autocomplete(request):
             for i in prods:
                 item = i.toJSON()
                 item['text'] = i.nombres
+                item['value'] = i.nombres
                 data.append(item)  
         else:
             data['error'] = 'Ha ocurrido un error'
@@ -263,7 +267,7 @@ def buscar_productor_autocomplete(request):
         data['error'] = str(e)
     return JsonResponse(data, safe=False)           
 
-#crear un buscador autocomplete de productor
+#crear un buscador autocomplete de articulo
 @csrf_exempt
 def buscar_articulo_autocomplete(request):    
     data = {}
@@ -320,6 +324,43 @@ def buscar_ResponsableTransporte(request):
         data['error'] = str(e)
     return JsonResponse(data, safe=False)           
 
+#crear un buscador de proveedor autocomplete select2
+@csrf_exempt
+def buscar_proveedor_autocomplete(request):    
+    data = {}
+    try:
+        action = request.POST['action']
+        if action == 'autocomplete':
+            data = []
+            prods = Proveedor.objects.filter(razonSocial__icontains= request.POST['term'])[0:10]
+            for i in prods:
+                item = i.toJSON()
+                item['text'] = i.razonSocial 
+                data.append(item)  
+        else:
+            data['error'] = 'Ha ocurrido un error'
+    except Exception as e:
+        data['error'] = str(e)
+    return JsonResponse(data, safe=False)           
+
+#crear un buscador de empleado autocomplete select2
+@csrf_exempt
+def buscar_empleado_autocomplete(request):    
+    data = {}
+    try:
+        action = request.POST['action']
+        if action == 'autocomplete':
+            data = []
+            prods = Empleado.objects.filter(nombres__icontains= request.POST['term'])[0:10]
+            for i in prods:
+                item = i.toJSON()
+                item['text'] = i.nombres 
+                data.append(item)  
+        else:
+            data['error'] = 'Ha ocurrido un error'
+    except Exception as e:
+        data['error'] = str(e)
+    return JsonResponse(data, safe=False)
 
 @csrf_exempt
 def guardar_pesajes_venta(request):
@@ -425,15 +466,12 @@ def finalizar_venta(request):
     return HttpResponse('ok')
 
 #Vista de Proveedor
-def crear_proveedor(request, template_name='app/inventarios/proveedor/proveedor_crear.html'):
-    if request.method == 'POST':
-        proveedorform = ProveedorForm(request.POST)
-        if proveedorform.is_valid():
-           proveedorform.save()
-        return redirect('inventario_general')
-    else:
-        proveedorform = ProveedorForm()
-    return render(request, template_name,{'proveedorform':proveedorform}) 
+class CrearProveedor(CreateView):
+    model = Proveedor
+    template_name = "app/inventarios/proveedor/proveedor_crear.html"
+    form_class = ProveedorForm
+    success_url = reverse_lazy('listar_proveedor')
+
 
 @login_required
 def listar_proveedor(request, template_name='app/inventarios/proveedor/proveedor_listar.html'):
@@ -482,10 +520,10 @@ class EliminarInventario(DeleteView):
 def listarVentas(request, template_name='app/inventarios/listar_ventas.html'):
     inventario = Inventario.objects.all()
     return render(request, template_name, {'inventario':inventario})          
-
-   
+  
 @login_required
 def reportes_compras(request, template_name='app/inventarios/listar_compras.html'):
+    
     estado = -1 #Por defecto busca todas las compras
     nom_productor = ''
     
@@ -525,21 +563,22 @@ def imprimir_compras(request):
     compras = CompraMaiz.objects.filter(pk__in=pks_compras)
 
     date = datetime.now()
-    fecha = date.strftime('%d/%m/%Y')
-    hora = date.strftime('%H:%M:%S')
+    fecha = date    
+    fecha1 = date.strftime('%d-%m-%Y-%H-%M')
     
     #Código necesario para generar el reporte PDF
     #template_path = 'app/compras/reporte_pdf.html'
     template_path = 'app/reportes/reporte_compras_pdf.html'
-    context = {'compras': compras, 
-                'reporte' : {'empresa':'Centro de Acopio de Sabanilla',
-                'direccion':'Sabanilla-Loja-Ecuador',
-                'nombre':'Compras de maíz amarillo duro','fecha':fecha,'hora':hora}
-    }
-    
+    context = {
+        'compras': compras, 
+        'reporte' : {'empresa':'Centro de Acopio de Sabanilla',
+        'direccion':'Sabanilla-Loja-Ecuador',
+        'nombre':'Compras de maíz amarillo duro','fecha':fecha
+        }
+    }    
     # Create a Django response object, and specify content_type as pdf
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="reporte %s.pdf"' % (fecha)
+    response['Content-Disposition'] = 'attachment; filename="reporte compras %s.pdf"' % (fecha1)
     # find the template and render it.
     template = get_template(template_path)
     html = template.render(context)
@@ -549,9 +588,8 @@ def imprimir_compras(request):
 
     # if error then show some funy view
     if pisa_status.err:
-       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+       return HttpResponse('Tenemos los siguientes errores <pre>' + html + '</pre>')
     return response
-
 
 @login_required
 def reportes_ventas(request, template_name='app/inventarios/listar_ventas_prueba.html'):
@@ -597,22 +635,26 @@ def imprimir_ventas(request):
         
     ventas = VentaMaiz.objects.filter(pk__in=pks_ventas)
 
+    #fecha = date.strftime('%d/%m/%Y')
+    #hora = date.strftime('%H:%M:%S')
     date = datetime.now()
-    fecha = date.strftime('%d/%m/%Y')
-    hora = date.strftime('%H:%M:%S')
+    fecha = date    
+    fecha1 = date.strftime('%d-%m-%Y-%H-%M')
     
     #Código necesario para generar el reporte PDF
     #template_path = 'app/compras/reporte_pdf.html'
     template_path = 'app/reportes/reporte_ventas_pdf.html'
-    context = {'ventas': ventas, 
-                'reporte' : {'empresa':'Centro de Acopio de Sabanilla',
-                'direccion':'Sabanilla-Loja-Ecuador',
-                'nombre':'Ventas de maíz amarillo duro','fecha':fecha,'hora':hora}
+    context = {
+        'ventas': ventas, 
+        'reporte' : {'empresa':'Centro de Acopio de Sabanilla',
+        'direccion':'Sabanilla-Loja-Ecuador',
+        'nombre':'Ventas de maíz amarillo duro','fecha':fecha
+        }
     }
     
     # Create a Django response object, and specify content_type as pdf
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="reporte venta %s.pdf"' % (fecha)
+    response['Content-Disposition'] = 'attachment; filename="reporte venta %s.pdf"' % (fecha1)
     # find the template and render it.
     template = get_template(template_path)
     html = template.render(context)
@@ -629,64 +671,236 @@ def imprimir_ventas(request):
 def inventario_general(request, template_name='app/inventarios/inventario_general.html'):
     form = Articulo.objects.all()
     return render(request, template_name, {'form':form})
+
 # crear un  articulo
 @method_decorator(login_required, name='dispatch')
 class CrearArticulo(CreateView):
     model = Articulo
     template_name = 'app/inventarios/articulos/articulo_crear.html'
     form_class = ArticuloForm
-    success_url = reverse_lazy('inventario_general')
+    success_url = reverse_lazy('listar_articulo')
 
 @method_decorator(login_required, name='dispatch')
 class EditarArticulo(UpdateView):
     model = Articulo
     form_class = ArticuloForm
     template_name = 'app/inventarios/articulos/articulo_editar.html'
- 
+    success_url = reverse_lazy('listar_articulo')
+
+@login_required
+def listar_articulo(request, template_name='app/inventarios/articulos/articulo_listar.html'):
+    form = Articulo.objects.all()
+    return render(request, template_name, {'form':form})
 
 @method_decorator(login_required, name='dispatch')
 class CrearCategoria(CreateView):
     model = Categoria
     template_name = 'app/inventarios/categoria/categoria_crear.html'
     form_class = CategoriaForm
-    success_url = reverse_lazy('inventario_general')
+    success_url = reverse_lazy('listar_categoria')
 
 @login_required
 def listar_categoria(request, template_name='app/inventarios/categoria/categoria_listar.html'):
     form = Categoria.objects.all()
     return render(request, template_name, {'form':form})
 
+@method_decorator(login_required, name='dispatch')
+class EditarCategoria(UpdateView):
+    model = Categoria
+    form_class = CategoriaForm
+    template_name = 'app/inventarios/categoria/categoria_editar.html'
+    success_url = reverse_lazy('listar_categoria')
+
+class EliminarCategoria(DeleteView):
+    model = Categoria
+    template_name = 'app/inventarios/categoria/categoria_eliminar.html'
+    success_url = reverse_lazy('listar_categoria')
 
 @csrf_exempt
-def ingresar_articulo(request, template_name='app/inventarios/articulos/articulo_ingreso.html'):       
-    if request.method == 'POST':
-        form = DocumentoCompraForm(request.POST)
-        action = request.POST['action']
-        if action == 'autocomplete':
-            data = []
-            for i in Articulos.objects.filter(descripcion__icontains= request.POST['term'])[0:10]:
-                item = i.toJSON()
-                item['text'] = i.descripcion                
-                data.append(item)        
-        elif action == 'search_productor':
-                data = []
-                term = request.POST['term']
-                clients = Productor.objects.filter(nombres__icontains=term)[0:10]
-                for i in clients:
-                    item = i.toJSON()
-                    item['text'] = i.nombres
-                    data.append(item)
-        else:
-            data['error'] = 'No ha ingresado a ninguna opción'    
-        return JsonResponse(data, safe=False)           
-        if form.is_valid():
-            form.save()
-        return redirect('facturacompra1')
-        
-    else:
-        form = DocumentoCompraForm()
-    return render(request, template_name,{'form':form})
+def ingresar_articulo(request, template_name='app/inventarios/articulos/articulo_ingreso.html'):               
+   return render(request, template_name)
+    
+@csrf_exempt
+def salida_articulo(request, template_name='app/inventarios/articulos/articulo_salida.html'):                  
+    return render(request, template_name)
 
+@csrf_exempt
+def guardar_ingreso_articulos(request):
+    data = {}
+    ingresoArticulos = json.loads(request.POST['ingresoArticulos'])
+    ingreso = IngresoArticulo()
+    ingreso.idProveedor_id = ingresoArticulos['proveedor']
+    ingreso.save()
+    for i in ingresoArticulos['articulos']:
+        det = DetalleIngresoArticulos()
+        det.idArticulo_id = i['id']
+        det.cantidad = int(i['cantidad'])
+        det.idIngreso_id = ingreso.id
+        det.save()
+        art = Articulo.objects.get(pk=det.idArticulo_id)
+        art.stock =  art.stock + det.cantidad
+        art.save()
+    data = {'id': ingreso.id}
+    #return HttpResponse(json.dumps(respuesta, cls=DjangoJSONEncoder), content_type='application/json')
+    return JsonResponse(data, safe=False)
+
+#imprimir pesajes de compra
+class ImprimirPesajeCompraPdfView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            date = datetime.now()
+            fecha = date
+            fecha1 = date.strftime('%d-%m-%Y-%H-%M')
+            template = get_template('app/reportes/reporte_pes_compra_pdf.html')           
+            context = {
+                    'compra' : CompraMaiz.objects.get(pk=self.kwargs['pk']),
+                    'pesajes' : PesajeCompraMaiz.objects.filter(idCompraMaiz=self.kwargs['pk'], vigente=True),                     
+                    'reporte' : {
+                    'empresa':'Centro de Acopio de Sabanilla',
+                    'direccion':'Sabanilla - Loja - Ecuador',
+                    'nombre':'Pesajes de compra','fecha':fecha
+                    }
+                }
+            html = template.render(context)
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="ficha ingreso articulos %s.pdf"' % (fecha1) 
+            pisa_status = pisa.CreatePDF(
+                    html, dest=response)
+            if pisa_status.err:
+                return HttpResponse('Existen los siguientes errores <pre>' + html + '</pre>') 
+            return response
+        except:
+            pass
+        return response 
+
+#imprimir pesajes de venta
+class ImprimirPesajeVentaPdfView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            date = datetime.now()
+            fecha = date
+            fecha1 = date.strftime('%d-%m-%Y-%H-%M')
+            template = get_template('app/reportes/reporte_pes_venta_pdf.html')           
+            context = {
+                    'venta' : VentaMaiz.objects.get(pk=self.kwargs['pk']),
+                    'pesajes' : PesajeVentaMaiz.objects.filter(idVentaMaiz=self.kwargs['pk'], vigente=True),                     
+                    'reporte' : {
+                    'empresa':'Centro de Acopio de Sabanilla',
+                    'direccion':'Sabanilla - Loja - Ecuador',
+                    'nombre':'Pesajes de venta','fecha':fecha
+                    }
+                }
+            html = template.render(context)
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="ficha pesajes venta %s.pdf"' % (fecha1) 
+            pisa_status = pisa.CreatePDF(
+                    html, dest=response)
+            if pisa_status.err:
+                return HttpResponse('Existen los siguientes errores <pre>' + html + '</pre>') 
+            return response
+        except:
+            pass
+        return response 
+
+#imprimir inventario en pdf
+class ImprimirInventarioPdfView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            date = datetime.now()
+            fecha = date.strftime('%d-%m-%Y %H:%M')   
+            fecha1 = date.strftime('%d-%m-%Y-%H-%M')
+            template = get_template('app/reportes/reporte_inventario_pdf.html')           
+            context = { 
+                'inventario': Articulo.objects.all(),
+                'reporte' : {
+                    'empresa':'Centro de Acopio de Sabanilla',
+                    'direccion':'Sabanilla - Loja - Ecuador',
+                    'nombre':'Inventario General','fecha':fecha
+                    }
+                }
+            html = template.render(context)
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="Inventario %s.pdf"' % (fecha1) 
+            pisa_status = pisa.CreatePDF(
+                    html, dest=response)
+            if pisa_status.err:
+                return HttpResponse('Existen los siguientes errores <pre>' + html + '</pre>') 
+            return response
+        except:
+            pass
+        return response 
+
+class ImprimirIngresoPdfView(View):
+    def get(self, request, *args, **kwargs):           
+        try:
+            date = datetime.now()
+            fecha = date.strftime("%c")
+            template = get_template('app/reportes/reporte_ingreso_art_pdf.html') 
+            context = {
+                    'ingreso': IngresoArticulo.objects.get(pk=self.kwargs['pk']),
+                    'reporte' : {'empresa':'Centro de Acopio de Sabanilla',
+                    'direccion':'Sabanilla - Loja - Ecuador',
+                    'nombre':'Ingreso de Articulos'}
+                    }
+            html = template.render(context)
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="ficha ingreso articulos %s.pdf"' % (fecha)
+            pisa_status = pisa.CreatePDF(
+                    html, dest=response)
+            if pisa_status.err:
+                return HttpResponse('Existen los siguientes errores <pre>' + html + '</pre>') 
+            return response
+        except:
+            pass
+        return HttpResponseRedirect(reverse_lazy('ingresar_articulo'))
+
+class ImprimirSalidaPdfView(View):
+    def get(self, request, *args, **kwargs):
+        date = datetime.now()
+        fecha = date.strftime('%c') 
+        try:
+            template = get_template('app/reportes/reporte_salida_art_pdf.html') 
+            context = {
+                    'salida': SalidaArticulo.objects.get(pk=self.kwargs['pk']),
+                    'reporte' : {
+                        'empresa':'Centro de Acopio de Sabanilla',
+                        'direccion':'Sabanilla - Loja - Ecuador',
+                        'nombre':'Salida de Articulos',
+                        }
+                    }
+            html = template.render(context)
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="ficha salida articulos %s.pdf"' % (fecha)
+            pisa_status = pisa.CreatePDF(
+                    html, dest=response)
+            if pisa_status.err:
+                return HttpResponse('Existen los siguientes errores <pre>' + html + '</pre>') 
+            return response
+        except:
+            pass
+        return HttpResponseRedirect(reverse_lazy('ingresar_articulo'))
+
+@csrf_exempt
+def guardar_salida_articulos(request):
+    data = {}
+    salidaArticulos = json.loads(request.POST['salidaArticulos'])
+    salida = SalidaArticulo()
+    salida.idEmpleado_id = salidaArticulos['empleado']
+    salida.save()
+    #empleado = salidaArticulos['empleado']
+    for i in salidaArticulos['articulos']:
+        det = DetalleSalidaArticulos()
+        det.idArticulo_id = i['id']
+        det.cantidad = int(i['cantidad'])
+        det.idSalida_id = salida.id
+        det.save()
+        art = Articulo.objects.get(pk=det.idArticulo_id)
+        art.stock =  art.stock - det.cantidad
+        art.save()
+    data = {'id': salida.id}
+    #return HttpResponse(json.dumps(respuesta, cls=DjangoJSONEncoder), content_type='application/json')
+    #return HttpResponse('ok')
+    return JsonResponse(data, safe=False)
 
 #Vistas del CRUD de empleado
 @method_decorator(login_required, name='dispatch')
@@ -694,7 +908,7 @@ class CrearEmpleado(CreateView):
     model = Empleado
     template_name = 'app/inventarios/empleado/empleado_crear.html'
     form_class = EmpleadoForm
-    success_url = reverse_lazy('inventario_general')
+    success_url = reverse_lazy('listar_empleado')
 
 @login_required
 def listar_empleado(request, template_name='app/inventarios/empleado/empleado_listar.html'):
@@ -708,59 +922,15 @@ class EditarEmpleado(UpdateView):
     template_name = 'app/inventarios/empleado/empleado_editar.html'
     success_url = reverse_lazy('listar_empleado')
 
-
-def crear_inventario(request, template_name='app/inventarios/inventarioIE/inventario_crear.html'):
-    if request.method == 'POST':
-        inventarioform = CrearInventarioForm(request.POST)
-        if inventarioform.is_valid():
-           inventarioform.save()
-        return redirect('lista_implementos')
-    else:
-        inventarioform = CrearInventarioForm()
-    return render(request, template_name,{'inventarioform':inventarioform}) 
-
-def editar_inventario(request,inv):
-    #inventario = Inventario.objects.get(id=inv)
-    inventario = Inventario.objects.filter(id=inv).first()
-    inventarioform = CrearInventarioForm(instance=inventario)
-    return render(request,'app/inventarios/inventarioIE/inventario_editar.html', {'inventarioform':inventarioform, 'inventario':inventario} )
-
-def lista_insumos_e_implementos(request, template_name='app/inventarios/inventarioIE/lista_insumos_e_implementos.html'):
-    inventario = Inventario.objects.all()
-    return render(request, template_name, {'inventario':inventario})
-
-def productor_view(request):
-    if request.method == 'POST':
-        form = ProductorForm(request.POST)
-        if form.is_valid():
-            form.save()
-        return redirect('crear_compra')
-    else:
-        form = ProductorForm()
-    return render(request, 'app/productor_form.html',{'form':form})
-
-def lista_ventas(request, template_name='app/inventarios/inventarioVentas.html'):
-    return render(request, template_name)
-
-def nuevo_proveedor(request, template_name='app/inventarios/nuevoProveedor.html'):
-    return render(request, template_name)
-
-def registro_inventario(request, template_name='app/inventarios/registrarInventarioIE.html'):
-    return render(request, template_name)
-
-# Paginas de insumos e implementos
-
-def ajuste_inventario(request, template_name='app/inventarios/inventarioIE/ajustarInventarioIE.html'):
-    return render(request, template_name)
-
-def ingreso_inventario(request, template_name='app/inventarios/inventarioIE/ingresoInventarioIE.html'):
-    return render(request, template_name)
-
-def salida_inventario(request, template_name='app/inventarios/inventarioIE/egresoInventarioIE.html'):
-    return render(request, template_name)
-
-def editar_inventario(request, template_name='app/inventarios/inventarioIE/editarInventario.html'):
-    return render(request, template_name)
+#def crear_inventario(request, template_name='app/inventarios/inventarioIE/inventario_crear.html'):
+#    if request.method == 'POST':
+#        inventarioform = CrearInventarioForm(request.POST)
+#        if inventarioform.is_valid():
+#           inventarioform.save()
+#        return redirect('lista_implementos')
+#    else:
+#        inventarioform = CrearInventarioForm()
+#    return render(request, template_name,{'inventarioform':inventarioform}) 
 
 #Pagos
 def facturacion_compra(request, template_name='app/pagos/factura_crear_compras.html'):

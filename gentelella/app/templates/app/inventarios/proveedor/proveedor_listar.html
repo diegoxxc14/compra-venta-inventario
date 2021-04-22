@@ -27,15 +27,15 @@
                 <div class="form-group">
                   <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
                     <div>
-                      <a href="{% url 'crear_proveedor' %}" class="btn btn-success"><i class="fa fa-plus"></i> Nueva</a>
-                      <a href="{% url 'inventario_general' %}" class="btn btn-default"><i class="fa fa-orders"></i> Inventario General </a>
+                      <a href="{% url 'crear_proveedor' %}" class="btn btn-primary btn-flat"><i class="fa fa-plus"></i> Nuevo Proveedor</a>
+                      <a href="{% url 'inventario_general' %}" class="btn btn-primary btn-flat"><i class="fa fa-book"></i> Inventario General </a>
                     </div>
                   </div>
                 </div>    
               </form>
               <br>              
               <div class="x_content">
-                <table id="datatable" class="table table-striped jambo_table bulk_action">
+                <table id="tblProveedor" class="table table-striped jambo_table bulk_action">
                   <thead>
                     <tr class="headings">                      
                       <th class="column-title text-center">Nro</th>
@@ -83,6 +83,17 @@
   <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
   <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
   <script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+  <script>
+    $(function(){
+
+      $('#tblProveedor').DataTable( {
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+          }
+      } );
+
+    })
+  </script>
  {% endblock javascripts %}
 
 

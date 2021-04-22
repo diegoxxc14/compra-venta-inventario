@@ -11,8 +11,6 @@
   <div class="right_col" role="main">
     
     <div class="row">
-    <div class="clearfix"></div>
-
       <div class="col-md-12 col-sm-12 col-xs-12">
         <div class="x_panel">
           <div class="x_title">
@@ -27,8 +25,8 @@
                   <div class="form-group">
                       <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
                         <div>
-                          <a href="{% url 'venta_nueva_maiz' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Nueva</a>
-                          <a href="{% url 'reportes_ventas' %}" class="btn btn-primary"><i class="fa fa-print"></i> Reportes</a>
+                          <a href="{% url 'venta_nueva_maiz' %}" class="btn btn-success"><i class="fa fa-plus-square"></i> Nueva Venta</a>
+                          <a href="{% url 'reportes_ventas' %}" class="btn btn-success"><i class="fa fa-file-pdf-o"></i> Reportes de Ventas</a>
                         </div>
                       </div>
                   </div>    
@@ -43,7 +41,7 @@
                       <th class="column-title text-center">Razón Social Empresa</th>
                       <th class="column-title text-center">Estado</th>
                       <th class="column-title text-center">Total</th>
-                      <th class="column-title text-center"><span class="fa fa-flash"></span></th> 
+                      <th class="column-title text-center">Opciones</th> 
                     </tr>
                   </thead>
 
@@ -54,11 +52,12 @@
                         <td class="text-center">{{ venta.fechaVenta }}</td>
                         <td class="text-center">{{ venta.idEmpresa }}</td>
                         <td class="text-center">
-                          {% if venta.pendiente %} <span class="label label-primary">Pendiente</span>
-                          {% else %} <span class="label label-success">Finalizada</span> {% endif %}</td>
-                        <td class="text-center">{{ venta.total }}</td>
-                        <td class="a-center ">                          
-                          <a href="{% url 'editar_venta' venta.pk %}" class="btn btn-primary btn-xs" title="Gestionar venta"><i class="fa fa-wrench"></i></a>
+                          {% if venta.pendiente %} <span class="label label-info">Pendiente</span>
+                          {% else %} <span class="label label-danger">Finalizada</span> {% endif %}</td>
+                        <td class="text-center"> <span class="badge badge-default"> {{ venta.total }} </span></td>
+                        <td class="text-center ">                          
+                          <a href="{% url 'editar_venta' venta.pk %}" class="btn btn-info btn-xs" title="Gestionar venta"><i class="fa fa-wrench"></i></a>
+                          <a href=" {% url 'pesaje_venta_doc_pdf' venta.pk %} " class="btn btn-info btn-xs" title="Descargar Pesajes"><i class="fa fa-file-pdf-o"></i></a>
                           <button {% if not venta.pendiente %} disabled {% endif %} id="{{ venta.pk }}" class="btn btn-danger btn-xs btnAnularVenta" title="Anular venta"><i class="fa fa-ban"></i></button>
                         </td>
                       </tr>
@@ -82,11 +81,19 @@
   <!-- Datatables -->
   <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
   <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
 
   <!-- Sweet Alert -->
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script>
     $(function () {
+
+      $('#datatable').DataTable( {
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+          }
+      });
 
       $("#datatable tbody").on("click", ".btnAnularVenta",function () {
         swal({

@@ -1,6 +1,6 @@
 {% extends "app/base_site.html" %}
 
-{% block title %} Listado de Compras {% endblock title %}
+{% block title %} Ingresar Articulos {% endblock title %}
 
 {% block stylesheets %}
 {{ block.super }}
@@ -8,7 +8,9 @@
 <link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
 <link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
 <link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+
+<link href="/static/vendors/bootstrap-touchspin/jquery.bootstrap-touchspin.css" rel="stylesheet">
+
 
 <!--plugin autocompletado -->
 <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
@@ -31,43 +33,47 @@
           <h2>Ingreso de productor</h2>
           <div class="clearfix"></div>
         </div>
-
-        <div class="x_content">
-            
-          <form class="form-horizontal form-label-left" method="POST" action="{% url 'reportes_compras' %}">
-            {% csrf_token %}            
-            <div class="form-group">                
-                <label class="control-label col-md-4 col-sm-2 col-xs-12">Buscador de articulos: </label>
-                <div class="input-group col-md-5 col-sm-10 col-xs-12">
-                    <select class="form-control select2" style="width:100%;" name="articulo"></select>                    
+        <div class="x_content">            
+          <form id="frmIngreso" class="form-horizontal form-label-left" method="POST">
+            {% csrf_token %}                       
+            <input type="hidden" name="action" value="{{ action }}"> 
+            <div class="form-group">
+                <label class="control-label col-md-2 col-sm-3 col-xs-12">Proveedor: </label>                                
+                <div class="input-group col-md-4 col-sm-6 col-xs-12">
+                  <select class="form-control select2" style="width: 100%;" name="proveedor"></select>                    
+                </div>             
+            </div>
+            <div class="form-group">
+              <label class="control-label col-md-2 col-sm-3 col-xs-12">Articulos: </label>              
+                <div class="input-group col-md-4 col-sm-6 col-xs-12">
+                    <select class="form-control select2" style="width: 100%;" name="articulo"></select>                    
                 </div>                
             </div>
-            <hr>         
-          </form>   
-          <div class="table-responsive">
-            <table id="tabla_articulos" class="table table-striped jambo_table">
-              <thead>
-                <tr class="headings">
-                  <th class="column-title text-center">Eliminar</th>
-                  <th class="column-title text-center">Descripcion</th>
-                  <th class="column-title text-center">Stock</th>
-                  <th class="column-title text-center">Cantidad</th>
-                  <th class="column-title text-center">Unidad</th>
-                  <th class="column-title text-center">Proveedor</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-            <div class="row">
-              <form action="{% url 'imprimir_compras' %}" method="post" target="_blank">
-                {% csrf_token %}
-                <input id="pks_compras" hidden name="pks_compras" type="text" value="{% for c in compras %}{{ c.pk }} {% endfor %}" required><!--Siempre debe ir con un espacio. Ejem: '23 '-->
-                <div class="col-md-12 col-sm-6 col-xs-12 text-center">
-                  <button id="btnGenerarPDF" class="btn btn-primary"><i class="fa fa-file-pdf-o"></i> Generar PDF</button>
-                </div>
-              </form>
+            <br>  
+            <div class="table-responsive">
+              <table id="tabla_articulos" class="table table-striped jambo_table">
+                <thead>
+                  <tr class="headings">
+                    <th class="column-title text-center">Eliminar</th>
+                    <th class="column-title text-center">Descripcion</th>
+                    <th class="column-title text-center">Stock</th>
+                    <th class="column-title text-center">Cantidad</th>
+                    <th class="column-title text-center">Unidad</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>             
             </div>
-          </div>
+            <div class="card-footer">
+              <br>
+              <button type="submit" class="btn btn-primary ">
+                  <i class="fa fa-save"></i> Guardar registro
+              </button>
+              <a href="{% url 'inventario_general' %}" class="btn btn-danger btn-flat">
+                  <i class="fa fa-times"></i> Cancelar
+              </a>
+            </div>      
+          </form> 
         </div>
       </div>
     </div>
@@ -88,16 +94,26 @@
 
 <!-- plugin autocompletado -->
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<!-- select2 -->
+<!-- plugins select2 -->
 <script src="/static/vendors/select2/dist/js/select2.min.js"></script>
+<!-- plugins bootstrap-touchspin -->
+<script src="/static/vendors/bootstrap-touchspin/jquery.bootstrap-touchspin.js"></script>
 
 <script>
   $(function () {
+    var tblArticulos;
     $('.select2').select2({
         language: 'es'
     });
+    $('#tabla_articulos').DataTable( {
+      language: {
+          "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+        }
+    } );
+
     var ingresoArticulos = {
         items:{
+            proveedor: '',
             articulos:[]
         },
         add: function (item) {
@@ -105,7 +121,7 @@
         this.list();
         },
         list: function () {
-        tblProducts = $('#tabla_articulos').DataTable({
+        tblArticulos = $('#tabla_articulos').DataTable({
             responsive: true,
             autoWidth: false,
             destroy: true,
@@ -116,11 +132,10 @@
                 { "data": "stock" },
                 { "data": "cantidad" },
                 { "data": "unidadMedida" },
-                { "data": "idProveedor" }
             ],
             columnDefs: [
                 {
-                    targets: [-4],
+                    targets: [2],
                     class: 'text-center',
                     render: function (data, type, row) {
                         return '<span class="badge badge-secondary">' + data + '</span>';
@@ -131,11 +146,11 @@
                     class: 'text-center',
                     orderable: false,
                     render: function (data, type, row) {
-                        return '<a class="btn btn-danger btn-xs btn-flat" style="color: white;"><i class="fa fa-trash-o"></i></a>';
+                        return '<a rel="remove" class="btn btn-danger btn-xs btn-flat" style="color: white;"><i class="fa fa-trash-o"></i></a>';
                     }
                 },
                 {
-                    targets: [1,2,4,5],
+                    targets: [1,4],
                     class: 'text-center',
                     orderable: true,
                    
@@ -149,6 +164,17 @@
                     }
                 },                
             ],
+            language: {
+              "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+            },
+            rowCallback(row, data, displayNum, displayIndex, dataIndex) {
+              $(row).find('input[name="cantidad"]').TouchSpin({
+                  min: 1,
+                  max: 1000,//**data.stock,
+                  step: 1
+              });
+
+            },
             
             initComplete: function (settings, json) {
 
@@ -157,39 +183,7 @@
         },
     };
 
-    $("#btnGenerarPDF").on("click", function () {
-      if ($("#pks_compras").val() == "") {
-        swal("Oops", "No se puede generar el reporte.", "error");  
-      }
-    });
-
-    //** Declarar la tabla de Pesajes
-    var tablaPesaje = $('#tabla_articulos').DataTable({
-    data: [],
-    columnDefs: [
-    {
-        "targets": -1,
-        "data": null,
-        "defaultContent": "<div class='a-center'><button class='btn btn-warning btn-xs tbEditarPesaje' title='Editar Pesaje'>" +
-        "<i class='fa fa-pencil'></i></button><button class='btn btn-danger btn-xs tbEliminarPesaje' title='Eliminar Pesaje'>" +
-        "<i class='fa fa-trash-o'></i></button></div>"
-    }
-    ],
-    displayLength: 5,
-    columns: [
-        { "data": null }, //Contador de filas
-        { "data": "descripcion" },
-        { "data": "stock" },
-        { "data": "cantidad" },
-        { "data": "unidadMedida" },
-        { "data": "idProveedor" }
-    ],
-    language: {
-        "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-       }
-    });
-
-
+    
 
     //** autocompletado de los de articulos con ajax y select2
     $('select[name="articulo"]').select2({ 
@@ -226,12 +220,96 @@
             return false;
         }
         data.cantidad = 1;
-        ingresoArticulos.add(data);
-        console.log(ingresoArticulos)      
+        ingresoArticulos.add(data);     
         $(this).val('').trigger('change.select2');
     });
-    
+
+    //** autocompletado de los de proveedor con ajax y select2
+    $('select[name="proveedor"]').select2({ 
+        language: "es",
+        allowClear: true,
+        language: {
+            inputTooShort: function () {
+              return "Debe ingresar mas caracteres...";
+            }
+          },
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: "{% url 'buscar_proveedor_autocomplete' %}",
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    action: 'autocomplete'
+                }
+                return queryParameters;
+            },
+            processResults: function (data) {
+                return {                    
+                    results: data
+                };
+            },
+        },
+        placeholder: 'Ingrese una descripción',
+        minimumInputLength: 3,   
+    })
+              
+    //** Eliminar articulo de detalle
+    $('#tabla_articulos tbody')
+        .on('click', 'a[rel="remove"]', function () {
+            var tr = tblArticulos.cell($(this).closest('td, li')).index();
+            ingresoArticulos.items.articulos.splice(tr.row, 1);
+            ingresoArticulos.list();
+        })        
+        .on('change', 'input[name="cantidad"]', function () {            
+            var cant = parseInt($(this).val());
+            var tr = tblArticulos.cell($(this).closest('td, li')).index();
+            ingresoArticulos.items.articulos[tr.row].cantidad = cant;
+        });
+      
+    //*** submit para enviar archivos
+    $('#frmIngreso').on('submit', function (e) {
+        e.preventDefault();
+        ingresoArticulos.items.proveedor = $('select[name="proveedor"]').val();
+        if (ingresoArticulos.items.articulos.length === 0) {
+            swal("¡Error!", "Debe al menos tener un item en su ingreso de articulos", "error"); 
+            return false;
+        }
+        if (ingresoArticulos.items.proveedor == null){
+          swal("¡Error!", "Debe ingresar el proveedor de los articulos", "error"); 
+            return false;
+        }              
+        var ingreso = new FormData();
+        ingreso.append('ingresoArticulos', JSON.stringify(ingresoArticulos.items));        
+        $.ajax({             
+            url: "{% url 'guardar_ingreso_articulos' %}",
+            type: "POST",  
+            data : ingreso,  
+            processData: false,
+            contentType: false,
+            success: function (data) {
+              swal("Ingreso de Articulo", "¡Correctamente!", "success");
+              console.log(data.id);
+              window.open('ingreso_documento_pdf/'+ data.id + '/', '_blank');
+              limpiarCamposIngreso();
+            },
+            error: function () {
+              swal("¡Error!", "¡Ocurrió un problema!", "error");              
+            },
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert(textStatus + ': ' + errorThrown);
+          });
+    });
+
+     //** Limpiar todos los campos de ingreso Articulo
+     function limpiarCamposIngreso() {   
+        ingresoArticulos.items.articulos = [];
+        ingresoArticulos.list();           
+        $('select[name="proveedor"]').val('').trigger('change') ;
+      }
+
   });
+  
   //**funcion select para editar la respuesta del select2
     function formatRepo(repo) {
         if (repo.loading) {
@@ -258,6 +336,6 @@
         return option;
         }
 
-</script>
+ </script>
 {% endblock javascripts %}
 

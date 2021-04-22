@@ -132,6 +132,13 @@
 
 <script>
   $(function () {
+
+    $('#datatable').DataTable( {
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+          }
+      } );
+
     $("#btnGenerarPDF").on("click", function () {
       if ($("#pks_compras").val() == "") {
         swal("Oops", "No se puede generar el reporte.", "error");  

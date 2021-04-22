@@ -33,9 +33,9 @@
 
     .reporte {
        color: #669999;
-       font-size: large
+       font-size: larger;
+       
     }
- 
      
 
     #invoice thead tr th {
@@ -46,6 +46,13 @@
         border: 1px solid #abb2b9;
         padding-top: 4px;
     }
+    #invoice1 thead tr th {
+        text-align: center;
+        color:  #669999;
+        text-shadow: 1px 1px 1px black;
+        padding-top: 4px;
+    }
+
 
     #invoice thead tr {
         margin-bottom: 0;
@@ -54,10 +61,10 @@
     }
 
     #invoice tbody tr {        
-        border: 1px solid #abb2b9;
-        font-size: larger;        
+        border: 1px solid #abb2b9;        
         color: #669999;
         padding: 0;
+        font-size: larger;
     }
 
     .text-center{
@@ -71,9 +78,9 @@
         {{ reporte.direccion }} <br>
     </p>
     <p class="reporte">   
-        <b>REPORTE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;  </b> {{ reporte.nombre }} <br>
-        <b>FECHA &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  :  &nbsp;  </b> {{ reporte.fecha}} <br>
-                
+        <b>REPORTE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:   </b> {{ reporte.nombre }} <br>
+        <b>PROVEEDOR &nbsp; : </b> {{ ingreso.idProveedor}}  <br>
+        <b>FECHA &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  :    </b> {{ ingreso.fecha }} <br>            
     </p>
 
     <!-- Content for Static Frame 'footer_frame' -->
@@ -81,28 +88,39 @@
             de <pdf:pagecount>
     </div>   
     
-
     <table border="0.5" id="invoice">
         <thead>
-        <tr>
-            <th style="width: 30%;">FECHA</th>
-            <th style="width: 40%;">PRODUCTOR</th>
-            <th style="width: 15%;">ESTADO</th>
-            <th style="width: 15%;">TOTAL</th>
-        </tr>
+            <tr>
+                <th style="width: 30%;">DESCRIPCIÓN</th>
+                <th style="width: 30%;">CATEGORÍA</th>
+                <th style="width: 20%;">CANTIDAD</th>
+                <th style="width: 20%;">UNIDAD</th>
+            </tr>
         </thead>
-        <tbody>
-            {% for com in compras %}
+        <tbody>                     
+            {% for i in ingreso.detalleingresoarticulos_set.all %}
             <tr style="padding-top: 3px;">
-                <td class="text-center">{{ com.fechaCompra }}</td>
-                <td class="text-center">{{ com.idProductor.nombres }}</td>
-                <td class="text-center">
-                    {% if com.pendiente %} Pendiente {% else %} Finalizada {% endif %}
-                </td>
-                <td class="text-center">{{ com.total }}</td>
+                <td class="text-center">{{ i.idArticulo }}</td> 
+                <td class="text-center">{{ i.idArticulo.idCategoria }}</td>
+                <td class="text-center">{{ i.idArticulo.unidadMedida }}</td>          
+                <td class="text-center">{{ i.cantidad }}</td>     
+                     
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <table style="margin-top: 250px;"  id="invoice1">
+        <thead>
+            <tr>
+                <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FIRMA&nbsp:&nbsp __________________________________________________</th>
+            </tr>
+            <tr></tr>
+            <tr>
+                <th>NOMBRES&nbsp:&nbsp __________________________________________________</th>
+            </tr>            
+        </thead>
+    </table>
+
+
 </body>
 </html>

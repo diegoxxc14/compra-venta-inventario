@@ -27,8 +27,8 @@
             <div class="form-group">
               <div class="col-md-12 col-sm-12 col-xs-12 col-md-offset-0">                        
                 <div>
-                  <a href="{% url 'crear_productor' %}" class="btn btn-success"><i class="fa fa-plus"></i> Crear Empleado</a>
-                  <a href="{% url 'inventario_general' %}" class="btn btn-default"><i class="fa fa-book"></i> Inventario General</a>
+                  <a href="{% url 'crear_empleado' %}" class="btn btn-success"><i class="fa fa-plus"></i> Crear Empleado</a>
+                  <a href="{% url 'inventario_general' %}" class="btn btn-success"><i class="fa fa-book"></i> Inventario General</a>
                 </div>
               </div>
             </div>    
@@ -37,7 +37,8 @@
             <div class="x_content">           
                 <table id="datatable" class="table table-striped jambo_table bulk_action">
                   <thead>
-                    <tr class="headings">                                                             
+                    <tr class="headings">                                     
+                      <th class="column-title text-center">Nro </th>                        
                       <th class="column-title text-center">Identificación </th>
                       <th class="column-title text-center">Productor</th>                     
                       <th class="column-title text-center">Dirección </th>
@@ -48,7 +49,8 @@
                   </thead>
                   <tbody>
                     {% for empleado in form %}
-                    <tr class="even pointer">                                                              
+                    <tr class="even pointer">  
+                      <td class="text-center">{{forloop.counter}}</td>                                                            
                       <td class="text-center">{{empleado.identificacion}} </td>
                       <td class="text-center">{{empleado.nombres}} </td>
                       <td class="text-center"> {{empleado.direccion}} </td>

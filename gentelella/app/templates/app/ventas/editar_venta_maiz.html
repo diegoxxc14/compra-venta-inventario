@@ -5,10 +5,8 @@
 {% block stylesheets %}
 {{ block.super }}
 <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
 <link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+
 {% endblock stylesheets %}
 
 {% block content %}
@@ -119,15 +117,14 @@
           <div class="divider-dashed"></div>
           <div class="form-group">
             <div class="col-md-12 col-sm-12 col-xs-12 text-center">
-              <button id="btnGuardar" class="btn btn-warning" {% if not venta.pendiente %} disabled {% endif %}><span
-                  class="fa fa-edit"></span> Editar Venta</button>
+              <button id="btnGuardar" class="btn btn-primary" {% if not venta.pendiente %} disabled {% endif %}><span
+                  class="fa fa-check"></span> Editar Venta</button>
               <button id="btnFinalizar" class="btn btn-success" {% if not venta.pendiente %} disabled {% endif %}><span
-                  class="fa fa-check"></span> Finalizar Venta</button>
+                  class="fa fa-folder"></span> Finalizar Venta</button>
               <a class="btn btn-default" href="{% url 'gestion_ventas' %}"><span class="fa fa-undo"></span>
                 Regresar</a>
             </div>
           </div>
-
         </div>
         <br>
 
@@ -142,7 +139,7 @@
                 <th class="column-title text-center">Peso Neto </th>
                 <th class="column-title text-center">Factor Conversión </th>
                 <th class="column-title text-center">Peso Quintales </th>
-                <th class="column-title text-center"></th>
+                <th class="column-title text-center">Opciones </th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -175,20 +172,8 @@
 <!-- Datatables --> 
 <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-<!-- Datatables 
-<script src="/static/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-<script src="/static/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-<script src="/static/vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
-<script src="/static/vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
-<script src="/static/vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
-<script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-<script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
 <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
 <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-<script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
-<script src="/static/vendors/jszip/dist/jszip.min.js"></script>
-<script src="/static/vendors/pdfmake/build/pdfmake.min.js"></script>
-<script src="/static/vendors/pdfmake/build/vfs_fonts.js"></script>-->
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 {{ pesajes|json_script:"pesajes" }}
@@ -206,10 +191,21 @@
         {
           "targets": -1,
           "data": null,
-          "defaultContent": "<div class='a-center'><button {% if not venta.pendiente %} disabled {% endif %} class='btn btn-warning btn-xs tbEditarPesaje' title='Editar Pesaje'>" +
+          "defaultContent": "<div class='a-center'><button {% if not venta.pendiente %} disabled {% endif %} class='btn btn-info btn-xs tbEditarPesaje' title='Editar Pesaje'>" +
             "<i class='fa fa-pencil'></i></button><button {% if not venta.pendiente %} disabled {% endif %} class='btn btn-danger btn-xs tbEliminarPesaje' title='Eliminar Pesaje'>" +
             "<i class='fa fa-trash-o'></i></button></div>"
-        }
+        },
+        {
+          targets: [6],
+          class: 'text-center',
+          render: function (data, type, row) {
+            return '<span class="badge badge-default">' + data + '</span>';
+            }
+        },
+        {
+          targets: [0,1,2,3,4,5,7],
+          class: 'text-center',            
+        },
       ],
       displayLength: 5,
       columns: [

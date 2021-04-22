@@ -1,0 +1,346 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Salida Articulos {% endblock title %}
+
+{% block stylesheets %}
+{{ block.super }}
+<link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+
+<link href="/static/vendors/bootstrap-touchspin/jquery.bootstrap-touchspin.css" rel="stylesheet">
+
+
+<!--plugin autocompletado -->
+<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
+<!-- plugin select2 -->
+<link href="/static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block content %}
+
+<!-- Cambio de html -->
+<div class="right_col" role="main">
+
+  <div class="row">
+
+    <div class="clearfix"></div>
+
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Salida de Articulos</h2>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">            
+          <form id="frmIngreso" class="form-horizontal form-label-left" method="POST">
+            {% csrf_token %}                       
+            <input type="hidden" name="action" value="{{ action }}"> 
+            <div class="form-group">
+                <label class="control-label col-md-2 col-sm-3 col-xs-12">Empleado: </label>                                
+                <div class="input-group col-md-4 col-sm-6 col-xs-12">
+                  <select class="form-control select2" style="width: 100%;" name="empleado"></select>                    
+                </div>             
+            </div>
+            <div class="form-group">
+              <label class="control-label col-md-2 col-sm-3 col-xs-12">Articulos: </label>              
+                <div class="input-group col-md-4 col-sm-6 col-xs-12">
+                    <select class="form-control select2" style="width: 100%;" name="articulo"></select>                    
+                </div>                
+            </div>
+            <br>  
+            <div class="table-responsive">
+              <table id="tabla_articulos" class="table table-striped jambo_table">
+                <thead>
+                  <tr class="headings">
+                    <th class="column-title text-center">Eliminar</th>
+                    <th class="column-title text-center">Descripcion</th>
+                    <th class="column-title text-center">Stock</th>
+                    <th class="column-title text-center">Cantidad</th>
+                    <th class="column-title text-center">Unidad</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>             
+            </div>
+            <div class="card-footer">
+              <br>
+              <button type="submit" class="btn btn-primary ">
+                  <i class="fa fa-save"></i> Guardar registro
+              </button>
+              <a href="{% url 'inventario_general' %}" class="btn btn-danger btn-flat">
+                  <i class="fa fa-times"></i> Cancelar
+              </a>
+            </div>      
+          </form>          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascripts %}
+{{ block.super}}
+<!-- Datatables -->
+<script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+
+<!-- jquery.inputmask -->
+<script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<!-- plugin autocompletado -->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!-- plugins select2 -->
+<script src="/static/vendors/select2/dist/js/select2.min.js"></script>
+<!-- plugins bootstrap-touchspin -->
+<script src="/static/vendors/bootstrap-touchspin/jquery.bootstrap-touchspin.js"></script>
+
+<script>
+  $(function () {
+    var tblArticulos;
+    $('.select2').select2({
+        language: 'es'
+    });
+    $('#tabla_articulos').DataTable( {
+      language: {
+          "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+        }
+    } );
+
+    var salidaArticulos = {
+        items:{
+            empleado: '',
+            articulos:[]
+        },
+        add: function (item) {
+        this.items.articulos.push(item);
+        this.list();
+        },
+        list: function () {
+        tblArticulos = $('#tabla_articulos').DataTable({
+            responsive: true,
+            autoWidth: false,
+            destroy: true,
+            data: this.items.articulos,
+            columns: [                
+                { "data": null }, //Contador de filas
+                { "data": "descripcion" },
+                { "data": "stock" },
+                { "data": "cantidad" },
+                { "data": "unidadMedida" },
+            ],
+            columnDefs: [
+                {
+                    targets: [2],
+                    class: 'text-center',
+                    render: function (data, type, row) {
+                        return '<span class="badge badge-secondary">' + data + '</span>';
+                    }
+                },
+                {
+                    targets: [0],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<a rel="remove" class="btn btn-danger btn-xs btn-flat" style="color: white;"><i class="fa fa-trash-o"></i></a>';
+                    }
+                },
+                {
+                    targets: [1,4],
+                    class: 'text-center',
+                    orderable: true,
+                   
+                },
+                {
+                    targets: [3],
+                    class: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return '<input type="text" name="cantidad" class="form-control" value="' + row.cantidad + '">';
+                    }
+                },                
+            ],
+            language: {
+              "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+            },
+            rowCallback(row, data, displayNum, displayIndex, dataIndex) {
+              $(row).find('input[name="cantidad"]').TouchSpin({
+                  min: 1,
+                  max: data.stock,//**data.stock,
+                  step: 1
+              });
+
+            },
+            
+            initComplete: function (settings, json) {
+
+            }
+        });
+        },
+    };
+
+    $("#btnGenerarPDF").on("click", function () {
+      if ($("#pks_compras").val() == "") {
+        swal("¡Error!", "No se puede generar el reporte.", "error");  
+      }
+    });
+
+    //** autocompletado de los de articulos con ajax y select2
+    $('select[name="articulo"]').select2({ 
+        language: "es",
+        allowClear: true,
+        language: {
+            inputTooShort: function () {
+              return "Debe ingresar mas caracteres...";
+            }
+          },
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: "{% url 'buscar_articulo_autocomplete' %}",
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    action: 'autocomplete'
+                }
+                return queryParameters;
+            },
+            processResults: function (data) {
+                return {                    
+                    results: data
+                };
+            },
+        },
+        placeholder: 'Ingrese una descripción',
+        minimumInputLength: 3,        
+        templateResult: formatRepo,
+    }).on('select2:select', function (e) {        
+        var data = e.params.data;
+        if (!Number.isInteger(data.id)) {
+            return false;
+        }
+        data.cantidad = 1;
+        salidaArticulos.add(data);     
+        $(this).val('').trigger('change.select2');
+    });
+
+    //** autocompletado de los empleados con ajax y select2
+    $('select[name="empleado"]').select2({ 
+        language: "es",
+        allowClear: true,
+        language: {
+            inputTooShort: function () {
+              return "Debe ingresar mas caracteres...";
+            }
+          },
+        ajax: {
+            delay: 250,
+            type: 'POST',
+            url: "{% url 'buscar_empleado_autocomplete' %}",
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                    action: 'autocomplete'
+                }
+                return queryParameters;
+            },
+            processResults: function (data) {
+                return {                    
+                    results: data
+                };
+            },
+        },
+        placeholder: 'Ingrese una descripción',
+        minimumInputLength: 1,   
+    })
+              
+    //** Eliminar articulo de detalle
+    $('#tabla_articulos tbody')
+        .on('click', 'a[rel="remove"]', function () {
+            var tr = tblArticulos.cell($(this).closest('td, li')).index();
+            salidaArticulos.items.articulos.splice(tr.row, 1);
+            salidaArticulos.list();
+        })        
+        .on('change', 'input[name="cantidad"]', function () {            
+            var cant = parseInt($(this).val());
+            var tr = tblArticulos.cell($(this).closest('td, li')).index();
+            salidaArticulos.items.articulos[tr.row].cantidad = cant;
+        });
+    
+    //*** submit para enviar archivos
+    $('#frmIngreso').on('submit', function (e) {
+        e.preventDefault();
+        salidaArticulos.items.empleado = $('select[name="empleado"]').val();
+        if (salidaArticulos.items.articulos.length === 0) {
+            swal("¡Error!", "Debe al menos tener un item en su ingreso de articulos", "error"); 
+            return false;
+        }
+        if (salidaArticulos.items.empleado == null){
+          swal("¡Error!", "Debe ingresar el empleado para la salida de los articulos", "error"); 
+            return false;
+        }              
+        var salida = new FormData();
+        salida.append('salidaArticulos', JSON.stringify(salidaArticulos.items));        
+        $.ajax({             
+            url: "{% url 'guardar_salida_articulos' %}",
+            type: "POST",  
+            data : salida,  
+            processData: false,
+            contentType: false,
+            success: function (data) {
+              swal("Salida de Articulo", "¡Correctamente!", "success");
+              console.log(data);
+              console.log(data.id);
+              window.open('salida_documento_pdf/'+ data.id + '/', '_blank');
+              limpiarCamposSalida();
+            },
+            error: function () {
+              swal("¡Error!", "¡Ocurrió un problema!", "error");              
+            },
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                        alert(textStatus + ': ' + errorThrown);
+          });
+    });
+
+     //** Limpiar todos los campos de ingreso Articulo
+     function limpiarCamposSalida() {   
+        salidaArticulos.items.articulos = [];
+        salidaArticulos.list();           
+        $('select[name="empleado"]').val('').trigger('change') ;
+      }
+
+  });
+  
+  //**funcion select para editar la respuesta del select2
+    function formatRepo(repo) {
+        if (repo.loading) {
+            return repo.text;
+        }
+
+        if (!Number.isInteger(repo.id)) {
+            return repo.text;
+        }
+
+        var option = $(
+            '<div class="wrapper container">' +
+            '<div class="row">' +
+            '<div class="col-lg-11 text-left shadow-sm">' +
+            //'<br>' +
+            '<p style="margin-bottom: 0;">' +
+            '<b>Nombre:</b> ' + repo.descripcion + '<br>' +
+            '<b>Stock:</b> ' + repo.stock + '<br>' +
+            '</p>' +
+            '</div>' +
+            '</div>' +
+            '</div>');
+
+        return option;
+        }
+
+ </script>
+{% endblock javascripts %}
+

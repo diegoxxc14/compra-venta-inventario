@@ -35,6 +35,11 @@
        color: #669999;
        font-size: large
     }
+    .total{
+        color: #669999;
+        font-size: large;
+        text-align: right
+    }
  
      
 
@@ -71,8 +76,18 @@
         {{ reporte.direccion }}
     </p>
     <p class="reporte">   
-        <b>REPORTE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;  </b> {{ reporte.nombre }} <br>
-        <b>FECHA &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  :  &nbsp;  </b> {{ reporte.fecha}} <br>                
+        <b>REPORTE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp; {{ reporte.nombre }} </b> <br>
+        <b>FECHA &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :  &nbsp;  </b> {{ reporte.fecha}} <br>
+        
+        <b>EMPRESA &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :</b>
+            &nbsp;&nbsp;{{venta.idEmpresa}} 
+        <b>&nbsp;&nbsp;ESTADO DE VENTA &nbsp;&nbsp;  :</b>&nbsp;&nbsp;
+            {% if not venta.pendiente %} 
+                Finalizada 
+            {% else%}
+                 Pendiente de Pago 
+            {% endif %}<br>
+        <b>TRANSPORTISTA &nbsp;&nbsp; :</b>&nbsp;&nbsp;{{venta.idResponsableTransporte}} <br>          
     </p>
 
     <!-- Content for Static Frame 'footer_frame' -->
@@ -84,24 +99,27 @@
     <table border="0.5" id="invoice">
         <thead>
         <tr>
-            <th style="width: 30%;">FECHA</th>
-            <th style="width: 40%;">EMPRESA</th>
-            <th style="width: 15%;">ESTADO</th>
-            <th style="width: 15%;">TOTAL</th>
+            <th style="width: 25%;">FECHA</th>
+            <th style="width: 15%;">PESO BRUTO</th>
+            <th style="width: 15%;">PESO TARA</th>
+            <th style="width: 15%;">PESO NETO</th>
+            <th style="width: 15%;">CONVERSIÓN</th>
+            <th style="width: 15%;">TOTAL QQ</th>
         </tr>
         </thead>
         <tbody>
-            {% for ven in ventas %}
+            {% for i in pesajes %} 
             <tr style="padding-top: 3px;">
-                <td class="text-center">{{ ven.fechaVenta }}</td>
-                <td class="text-center">{{ ven.idEmpresa.razonSocial }}</td>
-                <td class="text-center">
-                    {% if ven.pendiente %} Pendiente {% else %} Finalizada {% endif %}
-                </td>
-                <td class="text-center">{{ ven.total }}</td>
+                <td class="text-center">{{ i.fechaPesaje }}</td>
+                <td class="text-center">{{ i.pesoBruto }}</td>
+                <td class="text-center">{{ i.pesoTara }}</td>
+                <td class="text-center">{{ i.pesoNeto }}</td>
+                <td class="text-center">{{ i.factorConversion }}</td>
+                <td class="text-center">{{ i.pesoQuintales }}</td>
             </tr>
             {% endfor %}
-        </tbody>
+          </tbody>
     </table>
+    <p class="total"><b>TOTAL</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {{venta.total}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp &nbsp;&nbsp; </p>
 </body>
 </html>

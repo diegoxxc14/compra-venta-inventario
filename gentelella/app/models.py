@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from datetime import datetime
 from django.db import models
 from django.forms import model_to_dict#agregamos la nueva forms
 
@@ -74,6 +75,14 @@ class CompraMaiz(models.Model): #Datos de la Compra
     class Meta:
         ordering = ['-pk']
 
+    def __str__(self):
+        return self.idProductor
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['pes'] = [i.toJSON() for i in self.pesajecompramaiz_set.get(vigente=True)]#get(vigente=true)#set.all()
+        return item
+
 class DocumentoCompra(models.Model):
     tipoDocumento = models.CharField(max_length=25)
     numeroDocumento = models.IntegerField()
@@ -103,8 +112,10 @@ class PesajeCompraMaiz(models.Model): #Los Pesajes correspondientes a una Compra
     
     def __str__(self):
         return self.pesoQuintales
+        
     def toJSON(self):
         item = model_to_dict(self)
+        item['idCompraMaiz'] = self.idCompraMaiz.toJSON()
         return item
 
 class PesajeVentaMaiz(models.Model):
@@ -211,27 +222,7 @@ class Categoria(models.Model):
 class Articulo(models.Model):
     idCategoria = models.ForeignKey('Categoria', on_delete = models.CASCADE)
     descripcion = models.CharField(max_length=100,unique=True)
-    stock = models.IntegerField(blank = False, null = False)
-    estado = models.CharField(max_length=25,blank=True, null=True)
-    unidadMedida = models.CharField(max_length=100, choices=UNIDAD)
-
-    class Meta:
-        verbose_name = 'Articulo'
-        verbose_name_plural = 'Articulos'
-        ordering = ['descripcion']
-
-    def __str__(self):
-        return self.descripcion        
-    
-    def toJSON(self):
-        item = model_to_dict(self)
-        return item
-#cambiamos la tabla revisar
-class Articulos(models.Model):
-    idCategoria = models.ForeignKey('Categoria', on_delete = models.CASCADE)
-    descripcion = models.CharField(max_length=100,unique=True)
-    stock = models.IntegerField(blank = False, null = False)
-    estado = models.CharField(max_length=25,blank=True, null=True)
+    stock = models.IntegerField(default=0, verbose_name='Stock')#default=0, verbose_name='Stock'
     unidadMedida = models.CharField(max_length=100, choices=UNIDAD)
 
     class Meta:
@@ -246,6 +237,58 @@ class Articulos(models.Model):
         item = model_to_dict(self)
         return item
 
+#cambiamos base de datos
+class IngresoArticulo(models.Model):
+    idProveedor = models.ForeignKey('Proveedor', on_delete = models.CASCADE)    
+    fecha = models.DateField(default=datetime.now)
+
+    def __str__(self):
+        return self.idProveedor.razonSocial        
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['det'] = [i.toJSON() for i in self.detalleingresoarticulos_set.all()]
+        return item
+    
+class DetalleIngresoArticulos(models.Model):
+    idIngreso = models.ForeignKey('IngresoArticulo', on_delete = models.CASCADE) 
+    idArticulo = models.ForeignKey('Articulo', on_delete = models.CASCADE)
+    cantidad = models.IntegerField(blank = False, null = False)
+
+    def __str__(self):
+        return self.idArticulo.descripcion        
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['idArticulo'] = self.idArticulo.toJSON()
+        item['cantidad'] = self.cantidad
+        return item
+
+class SalidaArticulo(models.Model):
+    idEmpleado = models.ForeignKey('Empleado', on_delete = models.CASCADE)
+    fecha = models.DateField(default=datetime.now)
+
+    def __str__(self):
+        return self.idEmpleado.nombres        
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['det'] = [i.toJSON() for i in self.detallesalidaarticulos_set.all()]
+        return item
+
+class DetalleSalidaArticulos(models.Model):
+    idSalida = models.ForeignKey('SalidaArticulo', on_delete = models.CASCADE) 
+    idArticulo = models.ForeignKey('Articulo', on_delete = models.CASCADE)
+    cantidad = models.IntegerField(blank = False, null = False)
+
+    def __str__(self):
+        return self.idArticulo.descripcion        
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['idArticulo'] = self.idArticulo.toJSON()
+        item['cantidad'] = self.cantidad
+        return item
 
 class Proveedor(models.Model):
     ruc = models.CharField(max_length=13,unique=True, blank=False, null=False)
@@ -260,12 +303,10 @@ class Proveedor(models.Model):
     
     def __str__(self):
       return self.razonSocial
-
-#class SalidaArticulo(models.Model):
-#    cantidad = models.IntegerField()
-#    fecha = models.DateTimeField(auto_now=True)
-#    idArticulo = models.ForeignKey('Articulo', on_delete = models.CASCADE) 
-#    idEmpleado = models.ForeignKey('Empleado', on_delete = models.CASCADE)
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
 
 class Empleado(models.Model):
     identificacion = models.CharField(max_length=10,unique=True, blank=False, null=False)
@@ -273,3 +314,10 @@ class Empleado(models.Model):
     direccion = models.CharField(max_length=100)
     telefono = models.CharField(max_length=100)
     correo = models.EmailField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+      return self.nombres
+    
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item

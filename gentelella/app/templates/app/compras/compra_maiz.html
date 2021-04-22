@@ -1,6 +1,6 @@
 {% extends "app/base_site.html" %}
 
-{% block title %} Nueva Compra {% endblock title %}
+{% block title %} Pesaje Compra {% endblock title %}
 
 {% block stylesheets %}
   {{ block.super }}
@@ -9,6 +9,8 @@
   <link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
   <link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
   <link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+  <!--plugin autocompletado -->
+  <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
 {% endblock stylesheets %}
 
 {% block content %}
@@ -25,9 +27,49 @@
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
+            <!-- form para el ingreso de los datos de una nueva compra 
+            <div class="form-horizontal form-label-left ">
+              <div class="form-group">
+                <label class="control-label col-md-1 col-sm-1 col-xs-12">Productor:</label>
+                <div class="col-md-3 col-sm-3 col-xs-12">
+                <div class="input-group">
+                  <input type="text" name="productor" id="productor" class="form-control" 
+                   value="{{ productor}}">
+                  <span class="input-group-btn">
+                    <button id="btnLimpiarE" type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>
+                  </span>
+                </div>                   
+              </div>
+
+              </div>
+              
+            </div>-->
+            
+             <!-- form para el ingreso de los datos de una nueva compra -->
+             <div class="form-horizontal form-label-left ">
+              <div class="form-group">
+                <label class="control-label col-md-2 col-sm-1 col-xs-12">Productor:</label>
+                <div class="col-md-4 col-sm-4 col-xs-12">
+                  <div class="input-group">
+                    <input type="text" name="productor" id="productor" class="form-control" value="{{ productor }}">
+                    <span class="input-group-btn">
+                      <button id="btnLimpiarP" type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>
+                    </span>
+                  </div>                  
+                </div>
+
+                <div class="form-group">
+                  <label class="control-label col-md-2 col-sm-2 col-xs-12">Observación:</label>
+                  <div class="col-md-4 col-sm-5 col-xs-12">
+                    <textarea id="observacion" class="form-control" rows="2" placeholder="..."></textarea>
+                  </div>
+                </div>
+              </div>                      
+            </div>
+             <!-- form para el ingreso de los datos de una nueva compra 
             <div class="form-horizontal form-label-left">
               <div class="form-group">
-                <label class="control-label col-md-2 col-sm-4 col-xs-3">Identificación:</label>
+                <label class="control-label col-md-2 col-sm-4 col-xs-3">Identificación1:</label>
                 <div class="col-md-4 col-sm-6 col-xs-12 ">
                   <div class="input-group">
                     <input id="nro_cedula" type="text" class="form-control" data-inputmask="'mask' : '9999999999'">
@@ -53,6 +95,9 @@
                 </div>
               </div>
             </div>
+            -->
+
+
             <div class="divider-dashed"></div>
           </div>
 
@@ -93,7 +138,7 @@
               <div class="col-md-2 col-sm-5 col-xs-12">
                 <input id="peso_quintales" type="number" class="form-control" readonly="readonly" value="0.00">
               </div>
-              <div class="col-md-4 col-sm-6 col-xs-12">
+              <div class="col-md-4 col-sm-12 col-xs-12">
                 <div class="btn-group btn-group-justified">
                   <div class="btn-group" role="group">
                     <button id="btnCalcular" class="btn btn-primary"><span class="fa fa-calculator"></span>
@@ -112,7 +157,7 @@
             </div>
             <div class="divider-dashed"></div>
             <div class="form-group">
-              <div class="col-md-12 col-sm-6 col-xs-12 text-center">
+              <div class="col-md-12 col-sm-12 col-xs-12 text-center">
                 <button id="btnGuardar" class="btn btn-success"><span class="fa fa-save"></span> Guardar Compra</button>
                 <a class="btn btn-default" href="{% url 'gestion_compras' %}"><span class="fa fa-undo"></span>
                   Regresar</a>
@@ -125,15 +170,15 @@
           <div class="table-responsive">
             <table id="tabla_pesaje" class="table table-striped jambo_table bulk_action">
               <thead>
-                <tr class="headings">
-                  <th class="column-title">Nro.</th>
-                  <th class="column-title text-center">Fecha </th>
-                  <th class="column-title text-center">Peso Bruto </th>
-                  <th class="column-title text-center">Peso Tara </th>
-                  <th class="column-title text-center">Peso Neto </th>
-                  <th class="column-title text-center">Factor Conversión </th>
-                  <th class="column-title text-center">Peso Quintales </th>
-                  <th class="column-title text-center"></th>
+                <tr class="headings"> <!-- --> 
+                  <th class="column-title" scope="col" style="width: 7%;">Nro.</th> 
+                  <th class="column-title text-center" scope="col" style="width: 18%;">Fecha </th>
+                  <th class="column-title text-center"scope="col" style="width: 12.5%;">Peso Bruto </th>
+                  <th class="column-title text-center"scope="col" style="width: 12.5%;">Peso Tara </th>
+                  <th class="column-title text-center"scope="col" style="width: 12.5%;">Peso Neto </th>
+                  <th class="column-title text-center"scope="col" style="width: 12.5%;">F. Conversión </th>
+                  <th class="column-title text-center"scope="col" style="width: 12.5%;">Peso Quintales </th>
+                  <th class="column-title text-center"scope="col" style="width: 12.5%;">Opciones</th>
                 </tr>
               </thead>
 
@@ -143,10 +188,10 @@
           </div>
 
           <div class="form-group">
-            <div class="col-md-9 col-md-offset-3">
-              <label class="control-label col-md-3 col-sm-3 col-xs-3 ">Total:</label>
+            <div class="col-md-9 col-md-offset-3 col-sm-offset-3 col-xs-offset-3">
+              <label class="control-label col-md-1 col-sm-1 col-xs-1 ">Total</label>
               <div class="col-md-9 col-sm-9 col-xs-9">
-                <label id="totalPesajes" class="control-label col-md-3 col-sm-3 col-xs-3 has-feedback-left">0.00</label>
+                <label id="totalPesajes" class="control-label col-md-3 col-sm-3 col-xs-8">0.00</label>
               </div>
             </div>
           </div>
@@ -181,6 +226,8 @@
   <script src="/static/vendors/jszip/dist/jszip.min.js"></script>
   <script src="/static/vendors/pdfmake/build/pdfmake.min.js"></script>
   <script src="/static/vendors/pdfmake/build/vfs_fonts.js"></script>
+  <!-- plugin autocompletado -->
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script>
@@ -196,10 +243,22 @@
           {
             "targets": -1,
             "data": null,
-            "defaultContent": "<div class='a-center'><button class='btn btn-warning btn-xs tbEditarPesaje' title='Editar Pesaje'>" +
+            "defaultContent": "<div class='a-center'><button class='btn btn-info btn-xs tbEditarPesaje' title='Editar Pesaje'>" +
               "<i class='fa fa-pencil'></i></button><button class='btn btn-danger btn-xs tbEliminarPesaje' title='Eliminar Pesaje'>" +
               "<i class='fa fa-trash-o'></i></button></div>"
-          }
+          },
+          {
+            targets: [6],
+            class: 'text-center',
+            render: function (data, type, row) {
+              return '<span class="badge badge-default">' + data + '</span>';
+              }
+          },
+          {
+            targets: [1,2,3,4,5,7],
+            class: 'text-center',
+            
+          },
         ],
         displayLength: 5,
         columns: [
@@ -224,36 +283,42 @@
         });
       }).draw();
 
-      //** Calcular el Pesaje
+      
+      //** Calcular el Pesaje 
       $("#btnCalcular").on('click', function () {
-        if ($('#factor_conversion').val() != null && $('#peso_bruto').val() != null
-          && $('#peso_tara').val() != null) { // Si no se selecciona un factor
+        if ($('#factor_conversion').val() != null &&  $('#peso_bruto').val().length != 0  &&  $('#peso_tara').val().length != 0 ) { // Si no se selecciona un factor
           let pesoNeto = calcularPesoNeto();
-          $('#peso_neto').val(pesoNeto);
-          $('#peso_quintales').val(calcularPesoQuintales(pesoNeto));
-
-          //Controlar si todo va bien habilitar btnAgregarPesaje
-          if (pesaje_editar != null) { //Si es una edición de Pesaje
-            $("#btnEditarPesaje").attr("disabled", false);    
-          } else {
+          if(pesoNeto < 0){
+            $("#btnAgregarPesaje").attr("disabled", true);
+            swal("Warning", "¡Datos ingresado para el calculo de suma incorrecto!", "warning"); 
+          } else if (pesaje_editar != null) { //Si es una edición de Pesaje
+            $("#btnEditarPesaje").attr("disabled", false);
+            $('#peso_neto').val(pesoNeto);
+            $('#peso_quintales').val(calcularPesoQuintales(pesoNeto));     
+          } else if(pesoNeto > 0 ){
             $("#btnAgregarPesaje").attr("disabled", false);
-          }
-        } else {
-          swal("Warning", "¡Debe ingresar todos los campos!", "warning");
+            $('#peso_neto').val(pesoNeto);
+            $('#peso_quintales').val(calcularPesoQuintales(pesoNeto));     
+          }          
+        } else {          
+          swal("Warning", "¡Debe ingresar todos los campos de pesaje!", "warning");
         }
       });
-      
+
       //** Agregar un nuevo Pesaje a la tabla
       $('#btnAgregarPesaje').on('click', function () {
-        let pesajeNuevo = convertPesajeToJson(new Date().toLocaleString(), $('#peso_bruto').val(), $("#peso_tara").val(),
+        if($('#peso_neto').val() > 0  &&  $('#peso_bruto').val() > 0 && $('#peso_tara').val() > 0 ){
+          let pesajeNuevo = convertPesajeToJson(new Date().toLocaleString(), $('#peso_bruto').val(), $("#peso_tara").val(),
           $('#peso_neto').val(), $('#factor_conversion').val(), $('#peso_quintales').val());
-        tablaPesaje.rows.add(pesajeNuevo).draw(false);
-        
-        $(this).attr("disabled", true);
-        $("#totalPesajes").text(calcularTotalPesaje());
-        limpiarCamposCalculo();
+          tablaPesaje.rows.add(pesajeNuevo).draw(false);
+          $(this).attr("disabled", true);
+          $("#totalPesajes").text(calcularTotalPesaje());
+          limpiarCamposCalculo();
+        }else {
+          swal("Warning", "¡Valores ingresados son incorrectos2!", "warning");
+        } 
       });
-
+      
       //** Editar un Pesaje de la tabla
       $('#btnEditarPesaje').on('click', function () {
         pesaje_editar.remove().draw(false);
@@ -270,6 +335,32 @@
         swal("Success", "¡Pesaje editado correctamente!", "success");
       });
 
+      //** autocompletado de los productores
+      $("#productor").autocomplete({
+        source: function(request,response){
+          $.ajax({         
+            url: "{% url 'buscar_productor_autocomplete' %}",
+            type: "POST",
+            data: { 
+              'action': 'autocomplete',
+              'term': request.term
+            },
+            success: function (data) {
+              response(data);
+            },
+            error: function () {
+              console.log("Hubo un problema.");
+            }
+          });
+        },
+        delay: 500,
+        minLength: 3,
+        select: function( event, ui ) {
+          productor = ui.item
+          console.log(productor) 
+        }    
+      });
+    
       //** Buscar y cargar Productor
       $("#btnBuscar").on('click', function () {
         $.ajax({
@@ -324,7 +415,7 @@
         if (calcularTotalPesaje() > 0 && productor != null) { //Si hay Pesajes en la tabla y productor
           let datos_tabla = tablaPesaje.rows().data();
           let pesajes = $.makeArray();
-          let pk_productor = productor.pk;
+          let pk_productor = productor.id;
 
           for (let i = 0; i < datos_tabla.length; i++) {
             pesajes.push(datos_tabla[i]);
@@ -349,6 +440,11 @@
           swal("Warning", "No ha ingresado todos los datos.", "warning");
         }
       });
+
+      //Limpiar campo de busqueda de responsable de transporte
+      $('#btnLimpiarP').on('click', function () {
+        $("#productor").val("");
+        });
 
       function calcularPesoNeto() {
         let pesoBruto = parseInt($('#peso_bruto').val());
@@ -384,6 +480,7 @@
       function limpiarCamposCompra() {
         $('#nro_cedula').val("");
         $("#nom_productor").val("");
+        $("#productor").val("");
         productor = null;
         limpiarCamposCalculo();
         $("#totalPesajes").text("0.00");

@@ -24,20 +24,21 @@
             <h2>Listado de Categorias</h2>            
             <div class="clearfix"></div>
           </div>                        
-              <div class="x_content">
+          <div class="x_content">
                 <form class="form-horizontal form-label-left">                   
                     <div class="form-group">
                       <div class="col-md-12 col-sm-12 col-xs-12 col-md-offset-0">                        
                         <div>
-                          <a href="{% url 'crear_categoria' %}" class="btn btn-success"><i class="fa fa-plus"></i> Nueva</a>                                       
-                          <a href="{% url 'inventario_general' %}" class="btn btn-default"><i class="fa fa-orders"></i> Inventario General</a>
+                          <a href="{% url 'crear_categoria' %}" class="btn btn-primary btn-flat"><i class="fa fa-plus"></i> Nueva Categoria</a>                                       
+                          <a href="{% url 'inventario_general' %}" class="btn btn-primary btn-flat"><i class="fa fa-book"></i> Inventario General</a>
                         </div>
                       </div>
                     </div>    
                   </form>
                   <br>                
                 <div class="clearfix"></div>
-                <table id="datatable" class="table table-striped jambo_table bulk_action">
+                <div class="x_content">
+                <table id="tblCategoria" class="table table-striped jambo_table bulk_action">
                   <thead>
                     <tr class="headings">                                                           
                       <th class="column-title text-center">Nro</th>
@@ -47,13 +48,13 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {% for articulo in form %}
+                    {% for cat in form %}
                     <tr class="even pointer">
                       <td class="text-center">{{ forloop.counter }}</td>                                                             
-                      <td class="text-center">{{articulo.nombre}} </td> 
-                      <td class="text-center">{{articulo.descripcion}} </td>
+                      <td class="text-center">{{cat.nombre}} </td> 
+                      <td class="text-center">{{cat.descripcion}} </td>
                       <td class="text-center ">
-                        <a href="" class="btn btn-info btn-xs" title="Gestionar articulos"><i class="fa fa-pencil"></i></a> 
+                        <a href=" {% url 'editar_categoria' cat.id %} " class="btn btn-info btn-xs" title="Editar Categorias"><i class="fa fa-pencil"></i></a> 
                       </td>                        
                     </tr>
                     {% endfor %}                   
@@ -61,6 +62,7 @@
                 </table>
                                     
           </div>
+        </div>
           </div>
         </div>
       </div>
@@ -79,6 +81,17 @@
   <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
   <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
   <script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+  <script>
+    $(function(){
+
+      $('#tblCategoria').DataTable( {
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+          }
+      } );
+
+    })
+  </script>
  {% endblock javascripts %}
 
 

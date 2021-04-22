@@ -1,0 +1,161 @@
+{% extends "app/base_site.html" %}
+
+{% block title %} Listado Articulo {% endblock title %}
+
+{% block stylesheets %}
+{{ block.super }}
+<link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+{% endblock stylesheets %}
+
+{% block content %}
+  <div class="right_col" role="main">    
+    <div class="row">         
+        <div class="col-md-12 col-sm-12 col-xs-12">
+        <div class="x_panel">
+          <div class="x_title">
+            <h2>Listado de Articulos</h2>            
+            <div class="clearfix"></div>
+          </div>
+          <div class="x_content">
+              <form class="form-horizontal form-label-left">                   
+                <div class="form-group">
+                  <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
+                    <!-- Split button Articulo 
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-primary">Articulo</button>
+                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href=" {% url 'crear_articulo' %}">Crear Articulo</a>
+                        </li>
+                        <li><a href=" {% url 'ingresar_articulo' %}">Ingreso Articulo</a>
+                        </li>
+                        <li><a href="{% url 'salida_articulo' %}">Salida Articulo</a>
+                        </li>
+                      </ul>
+                    </div>-->
+                    <!-- Split button Proveedor 
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-primary">Proveedor</button>
+                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href=" {% url 'crear_proveedor' %}">Crear Proveedor</a>
+                        </li>
+                        <li><a href=" {% url 'listar_proveedor' %}">Listar Proveedor</a>
+                        </li>
+                      </ul>
+                    </div>-->
+                    <!-- Split button Empleado 
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-primary">Empleado</button>
+                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href=" {% url 'crear_empleado' %}">Crear Empleado</a>
+                        </li>
+                        <li><a href="{% url 'listar_empleado' %}">Listar Empleado</a>
+                        </li>
+                      </ul>
+                    </div> --> 
+                    <!-- Split button Categoria 
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-primary">Categoria</button>
+                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href=" {% url 'crear_categoria' %}">Crear Categoria</a>
+                        </li>
+                        <li><a href="{% url 'listar_categoria' %}">Listar Categoria</a>
+                        </li>
+                      </ul>
+                    </div>-->
+                    
+                    <div class="btn-group">
+                        <a href="{% url 'crear_articulo' %}" class="btn btn-primary btn-flat">
+                            <i class="fa fa-plus"></i> Nuevo Articulo
+                        </a> 
+                    </div>
+                    <div class="btn-group">                                                             
+                        <a href="{% url 'inventario_general' %}" class="btn btn-primary btn-flat">
+                            <i class="fa fa-book"></i> Inventario General
+                        </a>
+                    </div>
+                    <br>
+                  </div>
+                </div>    
+              </form>
+              <br>              
+              <div class="x_content">
+                <table id="tblInventario" class="table table-striped jambo_table bulk_action">
+                  <thead>
+                    <tr class="headings">                                                           
+                      <th class="column-title text-center">Nro</th>
+                      <th class="column-title text-center">Descripción</th>
+                      <th class="column-title text-center">Categoria</th>
+                      <th class="column-title text-center">Stock</th>   
+                      <th class="column-title text-center">Unidad</th> 
+                      <th class="column-title text-center">Opciones</th>   
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for articulo in form %}
+                    <tr class="even pointer">
+                      <td class="text-center">{{ forloop.counter }}</td>                                                             
+                      <td class="text-center">{{articulo.descripcion}} </td>                       
+                      <td class="text-center">{{articulo.idCategoria}}</td>                      
+                      <td class="text-center"><span class="badge badge-default"> {{articulo.stock}} </span></td>
+                      <td class="text-center"> {{articulo.unidadMedida}} </td>
+                      <td class="text-center ">
+                        <a href=" {% url 'editar_articulo' articulo.id %} " class="btn btn-info btn-xs" title="Editar Articulo"><i class="fa fa-pencil"></i></a>
+                      </td>                        
+                    </tr>
+                    {% endfor %}                   
+                  </tbody>
+                </table>                                    
+            </div>
+            </div>          
+          </div>
+        </div>
+      </div>
+  </div>
+{% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+    <!-- Datatables -->
+  <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+
+  <script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+  <script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+  <script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+  
+  <script>
+    $(function(){
+
+      $('#tblInventario').DataTable( {
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+          }
+      });
+
+    })
+  </script>
+ {% endblock javascripts %}
+
+
