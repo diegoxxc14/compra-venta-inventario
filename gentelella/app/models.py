@@ -80,6 +80,8 @@ class CompraMaiz(models.Model): #Datos de la Compra
 
     def toJSON(self):
         item = model_to_dict(self)
+        item['total'] = format(self.total, '.2f')
+        item['fechaCompra'] = self.fechaCompra.strftime('%Y-%m-%d')
         item['pes'] = [i.toJSON() for i in self.pesajecompramaiz_set.get(vigente=True)]#get(vigente=true)#set.all()
         return item
 

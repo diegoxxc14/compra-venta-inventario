@@ -4,7 +4,9 @@ from app import views
 
 urlpatterns = [
     #Página principal (index)
-    path('', views.inicio, name='inicio'),
+    #path('', views.inicio, name='inicio'),
+
+    path('',views.DashboardView.as_view(), name='inicio'),
 
     #Compras Maíz
     path('crear_compra/', views.crear_compra, name='crear_compra'),

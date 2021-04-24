@@ -2,11 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView, View
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, View, TemplateView
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template
+from django.db.models.functions import Coalesce
+from django.db.models import Sum
 from datetime import date, datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -16,6 +18,7 @@ from app.models import Articulo,IngresoArticulo,DetalleIngresoArticulos,DetalleS
 from app.forms import ProductorForm, InventarioForm, EmpresaForm, ResponsableTransporteForm, ProveedorForm, CrearInventarioForm, ArticuloForm, CategoriaForm, EmpleadoForm,DocumentoCompraForm
 from app.utils import * #Importamos métodos útiles
 from app.constants import * #Importar las constantes
+
 import json
 #import locale
 #Idioma "es-ES" (código para el español de España)
@@ -990,6 +993,168 @@ def buscar_PesajesCompra(request):
         data['error'] = str(e)
     return JsonResponse(data, safe=False)
 
+
+
+class DashboardView(TemplateView):
+    template_name = 'app/index2.html'
+
+    def get_total_compras(self):
+        cant = 0
+        try:
+            for i in CompraMaiz.objects.all():
+              cant += float(i.total)               
+        except:
+            pass
+        return round(cant,2)
+
+    def get_total_ventas(self):
+        cant = 0
+        try:
+            for i in VentaMaiz.objects.all():
+               cant += float(i.total )       
+        except:
+            pass
+        return round(cant,2)
+
+    def get_nro_productores(self):
+        cant = 0
+        try:
+            for i in Productor.objects.all():
+                cant = cant + 1
+        except:
+            pass
+        return cant
+        
+    def get_nro_empresas(self):
+        cant = 0
+        try:
+            for i in Empresa.objects.all():
+                cant += 1
+        except:
+            pass
+        return cant
+
+    def get_compras_mes(self):
+        data = []
+       
+        try:
+            y =  datetime.now().year 
+            m =  datetime.now().month
+            for m in range(1, 13):
+                total = CompraMaiz.objects.filter(fechaCompra__year=y, fechaCompra__month=m).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
+                data.append(float(total))        
+        except:
+            pass          
+        return data
+    
+    def get_ventas_mes(self):
+        data = []
+       
+        try:
+            y =  datetime.now().year 
+            m =  datetime.now().month
+            for m in range(1, 13):
+                total = VentaMaiz.objects.filter(fechaVenta__year=y, fechaVenta__month=m).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
+                data.append(float(total))        
+        except:
+            pass          
+        return data
+
+    def get_ventas_dia(self):
+        data = []       
+        try:
+            y =  datetime.now().year 
+            m =  datetime.now().month
+            d =  datetime.now().day 
+            for i in range(1, 31):
+                total = VentaMaiz.objects.filter(fechaModificacion__year=y, fechaModificacion__month=m, fechaModificacion__day=i).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
+                data.append(float(total))        
+        except:
+            pass          
+        return data
+
+    def get_compras_dia(self):
+        data = []       
+        try:
+            y =  datetime.now().year 
+            m =  datetime.now().month
+            d =  datetime.now().day 
+            for i in range(1, 31):
+                total = CompraMaiz.objects.filter(fechaModificacion__year=y, fechaModificacion__month=m, fechaModificacion__day=i).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
+                data.append(float(total))        
+        except:
+            pass          
+        return data
+
+    method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        data = {}
+        try:
+            data = []
+            for i in  CompraMaiz.objects.filter(valida=True):
+                data.append(i.toJSON())
+        except Exception as e:
+            data['error'] = str(e)
+        return JsonResponse(data, safe=False)
+
+    def get_compras_diario(self):
+        data = []  
+        try:
+                #Compras de los últimos 7 días
+            fechaHasta = datetime.now()        
+            fechaDesde = fechaHasta - timedelta(days=7) #Desde 6 días atrás        
+            for i in range(1, 8):       
+                total = CompraMaiz.objects.filter(valida=True, fechaCompra__range=(fechaDesde + timedelta(days=i-1),fechaDesde + timedelta(days=i))).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
+                data.append(float(total)) 
+        except:
+            pass
+        return data
+  
+    def get_ventas_diario(self):
+        data = []  
+        try:
+                #Compras de los últimos 7 días
+            fechaHasta = datetime.now()        
+            fechaDesde = fechaHasta - timedelta(days=7) #Desde 6 días atrás   
+            for i in range(1, 8):       
+                total = VentaMaiz.objects.filter(valida=True, fechaVenta__range=(fechaDesde + timedelta(days=i-1),fechaDesde + timedelta(days=i))).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
+                data.append(float(total)) 
+        except:
+            pass
+        return data  
+
+    #obtener ultimos 7 dias de la casa
+    def get_dias_semana(self):
+        data = []    
+        #Compras de los últimos 7 días
+        fechaHasta = datetime.now()        
+        fechaDesde = fechaHasta - timedelta(days=6) #Desde 6 días atrás        
+        for i in range(1, 8):       
+            dia= (fechaDesde + timedelta(days=i))
+            dia1=dia.strftime('%A')
+            data.append(dia1) 
+        return data
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['panel'] = 'Panel de administrador'
+        context['get_nro_productores'] =  self.get_nro_productores()
+        context['get_nro_empresas'] =  self.get_nro_empresas()
+        context['get_total_compras'] =  self.get_total_compras()
+        context['get_total_ventas'] =  self.get_total_ventas()
+        context['get_compras_mes'] =  self.get_compras_mes()
+        context['get_ventas_mes'] =  self.get_ventas_mes()
+        context['get_ventas_dia'] =  self.get_ventas_dia()
+        context['get_compras_dia'] =  self.get_compras_dia()
+        context['get_compras_diario'] =  self.get_compras_diario()
+        context['get_ventas_diario'] =  self.get_ventas_diario()
+        context['get_dias_semana'] =  self.get_dias_semana()
+        
+        
+        return context
 
 def gentella_html(request):
     context = {}
