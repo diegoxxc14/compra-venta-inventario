@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin#seguridad de login
 from django.urls import reverse_lazy
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, View, TemplateView
@@ -8,7 +9,7 @@ from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template
 from django.db.models.functions import Coalesce
-from django.db.models import Sum
+from django.db.models import Sum,Count
 from datetime import date, datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -25,9 +26,9 @@ import json
 #locale.setlocale(locale.LC_ALL, 'es-ES')
 
 #Inicio
-@login_required
-def inicio(request, template_name='app/index2.html'):
-    return render(request, template_name)
+#@login_required
+#def inicio(request, template_name='app/index2.html'):
+#    return render(request, template_name)
 
 #Paginas de la sección de COMPRAS
 @login_required
@@ -157,10 +158,29 @@ class EditarProductor(UpdateView):
     template_name = 'app/compras/productor_editar.html'
     success_url = reverse_lazy('listar_productores')
 
+@method_decorator(login_required, name='dispatch')
 class EliminarProductor(DeleteView):
     model = Productor
     template_name = "app/compras/productor_eliminar.html"
     success_url = reverse_lazy('listar_productores')
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        if self.object.Productor.count() > 0:
+            messages.add_message(request, messages.ERROR, "Can't be deleted, has childern")
+            return redirect('listar_productor')
+        return super().delete(request, *args, **kwargs)
+        #try:
+        #    self.object.delete()
+        #    return HttpResponseRedirect(success_url)
+        #except ProtectedError:
+        #    messages.add_message(request, messages.ERROR, "No se puede eliminar Categoria %s, tiene Articulos vinculados" %self.object.nombre)
+       #     return redirect(success_url)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
 @login_required
 def listar_productores(request, template_name='app/compras/productor_listar.html'):
@@ -190,45 +210,28 @@ class EditarEmpresa(UpdateView):
         messages.add_message(self.request, messages.WARNING, 'Hubo problemas para editar esta Empresa.')
         return super().form_invalid(form)
 
-class EliminarEmpresa(DeleteView):
-    model = Empresa
-    template_name = 'app/ventas/empresa_eliminar.html'
-    success_url = reverse_lazy('listar_empresas')
 
 @login_required
 def listar_empresas(request, template_name='app/ventas/empresa_listar.html'):
     form = Empresa.objects.all()
     return render(request, template_name, {'form':form})
 
-def crear_responsable_transporte(request, template_name='app/ventas/transportista_crear.html'):
-    if request.method == 'POST':
-        responsable_transporteform = CrearResponsableTransporteForm(request.POST)
-        if responsable_transporteform.is_valid():
-            responsable_transporteform.save()
-        return redirect('crear_responsable_transporte')
-    else:
-        responsable_transporteform = CrearResponsableTransporteForm()
-    return render(request, template_name,{'responsable_transporteform':responsable_transporteform})
-
 #Vistas del CRUD de ResponsableTransporte
+@method_decorator(login_required, name='dispatch')
 class CrearResponsableTransporte(CreateView):
     model = ResponsableTransporte
     template_name = 'app/ventas/transportista_crear.html'
     form_class = ResponsableTransporteForm
     success_url = reverse_lazy('listar_responsableTransporte')
 
+@method_decorator(login_required, name='dispatch')
 class EditarResponsableTransporte(UpdateView):
     model = ResponsableTransporte
     form_class = ResponsableTransporteForm
     template_name = 'app/ventas/transportista_editar.html'
     success_url = reverse_lazy('listar_responsableTransporte')
-    
 
-class EliminarResponsableTransporte(DeleteView):
-    model = ResponsableTransporte
-    template_name = 'app/ventas/transportista_eliminar.html'
-    success_url = reverse_lazy('listar_responsableTransporte')
-
+@login_required
 def listarResponsableTransporte(request, template_name='app/ventas/transportista_listar.html'):
     form = ResponsableTransporte.objects.all()
     return render(request, template_name, {'form':form})
@@ -236,11 +239,13 @@ def listarResponsableTransporte(request, template_name='app/ventas/transportista
 #PAGINAS DE LA SECCION VENTAS
 
 #Vista de gestion de ventas
+@login_required
 def gestion_ventas(request, template_name='app/ventas/gestion_ventas.html'):
     ventas = VentaMaiz.objects.filter(valida=True)
     return render(request, template_name, {'ventas':ventas})
 
 #Vista de venta nueva
+@login_required
 def venta_nueva_maiz(request, template_name='app/ventas/venta_nueva_maiz.html'):
     return render(request, template_name)
 
@@ -469,6 +474,7 @@ def finalizar_venta(request):
     return HttpResponse('ok')
 
 #Vista de Proveedor
+@method_decorator(login_required, name='dispatch')
 class CrearProveedor(CreateView):
     model = Proveedor
     template_name = "app/inventarios/proveedor/proveedor_crear.html"
@@ -488,38 +494,7 @@ class EditarProveedor(UpdateView):
     template_name = 'app/inventarios/proveedor/proveedor_editar.html'
     success_url = reverse_lazy('listar_proveedor')
 
-
-#views del Inventario
-class CrearInventario(CreateView):
-    model = Inventario
-    template_name = "app/inventarios/inventarioIE/inventario_crear.html"
-    form_class = InventarioForm
-    success_url = reverse_lazy('listar_inventario')
-
-class ListarInventario(ListView):
-    model = Inventario
-    template_name = 'app/inventarios/inventarioIE/inventario_listar.html'
-    queryset = inventarios = Inventario.objects.all()
-
-class EditarInventario(UpdateView):
-    model = Inventario
-    form_class = InventarioForm
-    template_name = 'app/inventarios/inventarioIE/inventario_editar.html'
-    success_url = reverse_lazy('lista_implementos')
-
-    def form_valid(self, form):
-        messages.add_message(self.request, messages.SUCCESS, 'Inventario editado correctamente.')
-        return super().form_valid(form)
-
-    def form_invalid(self, form):
-        messages.add_message(self.request, messages.WARNING, 'Hubo problemas para editar esta inventario.')
-        return super().form_invalid(form)
-
-class EliminarInventario(DeleteView):
-    model = Inventario
-    template_name = "app/inventarios/inventarioIE/inventario_eliminar.html"
-    success_url = reverse_lazy('listar_inventario')
-
+@login_required
 def listarVentas(request, template_name='app/inventarios/listar_ventas.html'):
     inventario = Inventario.objects.all()
     return render(request, template_name, {'inventario':inventario})          
@@ -714,11 +689,32 @@ class EditarCategoria(UpdateView):
     template_name = 'app/inventarios/categoria/categoria_editar.html'
     success_url = reverse_lazy('listar_categoria')
 
+from django.db.models import ProtectedError
+@method_decorator(login_required, name='dispatch') 
 class EliminarCategoria(DeleteView):
     model = Categoria
-    template_name = 'app/inventarios/categoria/categoria_eliminar.html'
-    success_url = reverse_lazy('listar_categoria')
+    template_name = "app/inventarios/categoria/categoria_eliminar.html"
+    success_url = reverse_lazy('listar_categoria')    
+        #if self.object.count() > 0:
+        #   messages.add_message(request, messages.ERROR, "Can't be deleted, has childern")
+        #   return redirect('listar_categoria')
 
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        try:
+            self.object.delete()
+            return HttpResponseRedirect(success_url)
+        except ProtectedError:
+            messages.add_message(request, messages.ERROR, "No se puede eliminar Categoria %s, tiene Articulos vinculados" %self.object.nombre)
+            return redirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+   
 @csrf_exempt
 def ingresar_articulo(request, template_name='app/inventarios/articulos/articulo_ingreso.html'):               
    return render(request, template_name)
@@ -918,22 +914,12 @@ def listar_empleado(request, template_name='app/inventarios/empleado/empleado_li
     form = Empleado.objects.all()
     return render(request, template_name, {'form':form})
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name='dispatch') 
 class EditarEmpleado(UpdateView):
     model = Empleado
     form_class = EmpleadoForm
     template_name = 'app/inventarios/empleado/empleado_editar.html'
     success_url = reverse_lazy('listar_empleado')
-
-#def crear_inventario(request, template_name='app/inventarios/inventarioIE/inventario_crear.html'):
-#    if request.method == 'POST':
-#        inventarioform = CrearInventarioForm(request.POST)
-#        if inventarioform.is_valid():
-#           inventarioform.save()
-#        return redirect('lista_implementos')
-#    else:
-#        inventarioform = CrearInventarioForm()
-#    return render(request, template_name,{'inventarioform':inventarioform}) 
 
 #Pagos
 def facturacion_compra(request, template_name='app/pagos/factura_crear_compras.html'):
@@ -942,7 +928,8 @@ def facturacion_compra(request, template_name='app/pagos/factura_crear_compras.h
     }
     return render(request, template_name, context)
 
-@csrf_exempt
+
+@login_required
 def CrearDocumentoCompra1(request, template_name='app/pagos/factura_crear_compras.html'):       
     if request.method == 'POST':
         form = DocumentoCompraForm(request.POST)
@@ -972,12 +959,14 @@ def CrearDocumentoCompra1(request, template_name='app/pagos/factura_crear_compra
         form = DocumentoCompraForm()
     return render(request, template_name,{'form':form})
 
-#vistas de facturacion 
+#vistas de facturacion
+@method_decorator(login_required, name='dispatch')  
 class CrearDocumentoCompra(CreateView):
     model = DocumentoCompra
     template_name = "app/pagos/factura_crear_compras.html"
     form_class = DocumentoCompraForm
     success_url = 'lista_implementos' 
+
 @csrf_exempt
 def buscar_PesajesCompra(request):
     data = {}
@@ -993,11 +982,10 @@ def buscar_PesajesCompra(request):
         data['error'] = str(e)
     return JsonResponse(data, safe=False)
 
-
-
-class DashboardView(TemplateView):
-    template_name = 'app/index2.html'
-
+#Pagina del Dashboard 
+class DashboardView(LoginRequiredMixin, TemplateView):
+    template_name = 'app/dashboard.html'
+    #Obtenemos el total de compras
     def get_total_compras(self):
         cant = 0
         try:
@@ -1006,7 +994,7 @@ class DashboardView(TemplateView):
         except:
             pass
         return round(cant,2)
-
+    #Obtenemos el total de ventas
     def get_total_ventas(self):
         cant = 0
         try:
@@ -1015,7 +1003,7 @@ class DashboardView(TemplateView):
         except:
             pass
         return round(cant,2)
-
+    #Obtenemos el numero de productores
     def get_nro_productores(self):
         cant = 0
         try:
@@ -1024,7 +1012,7 @@ class DashboardView(TemplateView):
         except:
             pass
         return cant
-        
+    #Obtenemos el numero de empresas asociadas
     def get_nro_empresas(self):
         cant = 0
         try:
@@ -1047,113 +1035,44 @@ class DashboardView(TemplateView):
             pass          
         return data
     
-    def get_ventas_mes(self):
-        data = []
-       
-        try:
-            y =  datetime.now().year 
-            m =  datetime.now().month
-            for m in range(1, 13):
-                total = VentaMaiz.objects.filter(fechaVenta__year=y, fechaVenta__month=m).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
-                data.append(float(total))        
-        except:
-            pass          
-        return data
-
-    def get_ventas_dia(self):
-        data = []       
-        try:
-            y =  datetime.now().year 
-            m =  datetime.now().month
-            d =  datetime.now().day 
-            for i in range(1, 31):
-                total = VentaMaiz.objects.filter(fechaModificacion__year=y, fechaModificacion__month=m, fechaModificacion__day=i).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
-                data.append(float(total))        
-        except:
-            pass          
-        return data
-
-    def get_compras_dia(self):
-        data = []       
-        try:
-            y =  datetime.now().year 
-            m =  datetime.now().month
-            d =  datetime.now().day 
-            for i in range(1, 31):
-                total = CompraMaiz.objects.filter(fechaModificacion__year=y, fechaModificacion__month=m, fechaModificacion__day=i).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
-                data.append(float(total))        
-        except:
-            pass          
-        return data
-
-    method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        data = {}
-        try:
-            data = []
-            for i in  CompraMaiz.objects.filter(valida=True):
-                data.append(i.toJSON())
-        except Exception as e:
-            data['error'] = str(e)
-        return JsonResponse(data, safe=False)
-
     def get_compras_diario(self):
-        data = []  
+        data = [] 
         try:
-                #Compras de los últimos 7 días
-            fechaHasta = datetime.now()        
-            fechaDesde = fechaHasta - timedelta(days=7) #Desde 6 días atrás        
-            for i in range(1, 8):       
-                total = CompraMaiz.objects.filter(valida=True, fechaCompra__range=(fechaDesde + timedelta(days=i-1),fechaDesde + timedelta(days=i))).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
-                data.append(float(total)) 
+            fechaInicial = datetime.now() - timedelta(days=7) 
+            for i in range(1, 8):
+                fechaDesde = fechaInicial + timedelta(days=i)
+                dia = fechaDesde.day
+                mes = fechaDesde.month
+                año = fechaDesde.year
+                total = CompraMaiz.objects.filter(valida=True, fechaCompra__year=año,fechaCompra__month=mes, fechaCompra__day=dia ).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
+                data.append(float(total))   
         except:
             pass
-        return data
-  
+        return data 
+
     def get_ventas_diario(self):
-        data = []  
+        data = [] 
         try:
-                #Compras de los últimos 7 días
-            fechaHasta = datetime.now()        
-            fechaDesde = fechaHasta - timedelta(days=7) #Desde 6 días atrás   
-            for i in range(1, 8):       
-                total = VentaMaiz.objects.filter(valida=True, fechaVenta__range=(fechaDesde + timedelta(days=i-1),fechaDesde + timedelta(days=i))).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
-                data.append(float(total)) 
+            fechaInicial = datetime.now() - timedelta(days=7) 
+            for i in range(1, 8):
+                fechaDesde = fechaInicial + timedelta(days=i)
+                dia = fechaDesde.day
+                mes = fechaDesde.month
+                año = fechaDesde.year
+                total = VentaMaiz.objects.filter(valida=True, fechaVenta__year=año,fechaVenta__month=mes, fechaVenta__day=dia ).aggregate(r=Coalesce(Sum('total'), 0)).get('r')
+                data.append(float(total))   
         except:
             pass
         return data  
 
-    #obtener ultimos 7 dias de la casa
-    def get_dias_semana(self):
-        data = []    
-        #Compras de los últimos 7 días
-        fechaHasta = datetime.now()        
-        fechaDesde = fechaHasta - timedelta(days=6) #Desde 6 días atrás        
-        for i in range(1, 8):       
-            dia= (fechaDesde + timedelta(days=i))
-            dia1=dia.strftime('%A')
-            data.append(dia1) 
-        return data
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['panel'] = 'Panel de administrador'
         context['get_nro_productores'] =  self.get_nro_productores()
         context['get_nro_empresas'] =  self.get_nro_empresas()
         context['get_total_compras'] =  self.get_total_compras()
         context['get_total_ventas'] =  self.get_total_ventas()
-        context['get_compras_mes'] =  self.get_compras_mes()
-        context['get_ventas_mes'] =  self.get_ventas_mes()
-        context['get_ventas_dia'] =  self.get_ventas_dia()
-        context['get_compras_dia'] =  self.get_compras_dia()
         context['get_compras_diario'] =  self.get_compras_diario()
-        context['get_ventas_diario'] =  self.get_ventas_diario()
-        context['get_dias_semana'] =  self.get_dias_semana()
-        
-        
+        context['get_ventas_diario'] =  self.get_ventas_diario()      
         return context
 
 def gentella_html(request):

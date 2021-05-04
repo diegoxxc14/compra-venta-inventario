@@ -24,15 +24,25 @@
             </div>
             <div class="x_content">
               <br />
-               
               <form method="POST"  class="form-horizontal form-label-left input_mask">
                 {% csrf_token %}
+                {% if form.errors %}
+                    <div class="alert alert-danger alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <h5><i class="icon fas fa-ban"></i> Ha ocurrido un error al querer guardar el registro</h5>
+                        <ul>
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
                 <p><strong>¿Desea eliminar el registro de {{object.nombre}} ?</strong></p>
                 <button type="submit" class="btn btn-danger">Confirmar</button>
-                
                   </div>
-                </div>
-                          
+                </div>          
               </form>
             </div>
           </div>
@@ -48,4 +58,26 @@
   
     <!-- jquery.inputmask -->
   <script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+    <!-- Sweet Alert -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script>
+    $(function(){
+      $('form').on('submit', function (e) {
+          $.ajax({         
+            url: window.location.pathname,
+            type: "POST",
+            data: {},
+            dataType: 'json',
+            processData: false,
+            contentType: false,
+            success: function (data) {
+              swal("Ingreso de Articulo", "¡Correctamente!", "success");
+            },
+            error: function (data) {       
+            },
+          });
+      });     
+
+    })
+  </script>
  {% endblock javascripts %}

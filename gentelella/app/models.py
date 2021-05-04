@@ -222,7 +222,7 @@ class Categoria(models.Model):
         ordering = ['nombre']
 
 class Articulo(models.Model):
-    idCategoria = models.ForeignKey('Categoria', on_delete = models.CASCADE)
+    idCategoria = models.ForeignKey('Categoria',null=True, blank=True, on_delete=models.PROTECT) # , on_delete = models.CASCADE
     descripcion = models.CharField(max_length=100,unique=True)
     stock = models.IntegerField(default=0, verbose_name='Stock')#default=0, verbose_name='Stock'
     unidadMedida = models.CharField(max_length=100, choices=UNIDAD)

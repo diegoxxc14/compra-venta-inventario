@@ -25,6 +25,15 @@
             <div class="clearfix"></div>
           </div>                        
           <div class="x_content">
+            <!-- Presentación de mensajes  -->
+            {% if messages %}
+            {% for message in messages %}  
+            <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible"{% endif %} role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>¡{{ message.tags|upper }}!</strong> {{ message }}
+            </div>
+            {% endfor %}
+          {% endif %}
                 <form class="form-horizontal form-label-left">                   
                     <div class="form-group">
                       <div class="col-md-12 col-sm-12 col-xs-12 col-md-offset-0">                        
@@ -54,7 +63,8 @@
                       <td class="text-center">{{cat.nombre}} </td> 
                       <td class="text-center">{{cat.descripcion}} </td>
                       <td class="text-center ">
-                        <a href=" {% url 'editar_categoria' cat.id %} " class="btn btn-info btn-xs" title="Editar Categorias"><i class="fa fa-pencil"></i></a> 
+                        <a href=" {% url 'editar_categoria' cat.id %} " class="btn btn-info btn-xs" title="Editar Categorias"><i class="fa fa-pencil"></i></a>
+                        <a href=" {% url 'eliminar_categoria' cat.id %} " class="btn btn-danger btn-xs btnEliminar" title="Eliminar Categorias"><i class="fa fa-trash"></i></a> 
                       </td>                        
                     </tr>
                     {% endfor %}                   
@@ -92,6 +102,20 @@
 
     })
   </script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+ 
+  <script>
+    {% if messageas %}
+      var errors = '';
+      {% for message in messages %}  
+           {% if message.tags %}
+           errors += '{{ message }}\n' 
+           {% endif %}          
+      {% endfor %}
+      swal("Error", errors, "error");
+    {% endif %}
+  </script>
+
  {% endblock javascripts %}
 
 

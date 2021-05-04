@@ -28,7 +28,6 @@ urlpatterns = [
     path('crear_empresa/',views.CrearEmpresa.as_view(), name='crear_empresa'),
     path('listar_empresas/', views.listar_empresas, name= 'listar_empresas'),
     path('editar_empresa/<int:pk>/', views.EditarEmpresa.as_view(), name = 'editar_empresa'),
-    path('eliminar_empresa/<int:pk>/',views.EliminarEmpresa.as_view(), name = 'eliminar_empresa'),
 
     #URLs de la sección Ventas    
     path('gestion_ventas/',views.gestion_ventas, name='gestion_ventas'),
@@ -52,13 +51,6 @@ urlpatterns = [
     path('crear_responsableTransporte/',views.CrearResponsableTransporte.as_view(), name='crear_responsableTransporte'),
     path('listar_responsableTransporte/', views.listarResponsableTransporte, name= 'listar_responsableTransporte'),
     path('editar_responsableTransporte/<int:pk>/', views.EditarResponsableTransporte.as_view(), name = 'editar_responsableTransporte'),
-    path('eliminar_responsableTransporte/<int:pk>/',views.EliminarResponsableTransporte.as_view(), name = 'eliminar_responsableTransporte'),
-    
-    #URLs de la sección inventarios insumos    
-    path('crear_inventario/',views.CrearInventario.as_view(), name = 'crear_inventario'),    
-    path('editar_inventario/<int:pk>/', views.EditarInventario.as_view(), name = 'editar_inventario'),
-    path('eliminar_inventario/<int:pk>/',views.EliminarInventario.as_view(), name = 'eliminar_inventario'),
-    path('listar_inventario/', views.ListarInventario.as_view(), name= 'listar_inventario'),
 
     #URLs para la generación de reportes
     path('reportes_compras/', views.reportes_compras, name='reportes_compras'),
@@ -91,18 +83,21 @@ urlpatterns = [
     path('crear_categoria/',views.CrearCategoria.as_view(), name='crear_categoria'),    
     path('listar_categoria/',views.listar_categoria, name='listar_categoria'),        
     path('editar_categoria/<int:pk>/', views.EditarCategoria.as_view(), name = 'editar_categoria'),
+    path('eliminar_categoria/<int:pk>/', views.EliminarCategoria.as_view(), name = 'eliminar_categoria'),
+    #path('eliminar_categoria/<int:pk>/', views.EliminarCategoria, name = 'eliminar_categoria'),
 
     #URLs para la sección de proveedor
     path('crear_proveedor/',views.CrearProveedor.as_view(), name='crear_proveedor'),
     path('listar_proveedor/',views.listar_proveedor, name='listar_proveedor'),
     path('editar_proveedor/<int:pk>/', views.EditarProveedor.as_view(), name = 'editar_proveedor'),
     
+    
     #URLs para la seccion de empleado
     path('crear_empleado/',views.CrearEmpleado.as_view(), name='crear_empleado'),    
     path('listar_empleado/',views.listar_empleado, name='listar_empleado'),
     path('editar_empleado/<int:pk>/', views.EditarEmpleado.as_view(), name = 'editar_empleado'),
     
-    #pagos
+    #pagos Aun por editar factura
     path('crear_facturacion/',views.facturacion_compra, name='facturacion_compra'),
     path('crear_facturacion1/',views.CrearDocumentoCompra1, name='facturacion_compra1'),
     path('buscar_pesaje_compra/',views.buscar_PesajesCompra, name='buscar_pesaje_compra'),
