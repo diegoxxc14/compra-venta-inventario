@@ -101,6 +101,8 @@ urlpatterns = [
     path('crear_facturacion/',views.facturacion_compra, name='facturacion_compra'),
     path('crear_facturacion1/',views.CrearDocumentoCompra1, name='facturacion_compra1'),
     path('buscar_pesaje_compra/',views.buscar_PesajesCompra, name='buscar_pesaje_compra'),
+    path('obtener_compras/',views.obtener_compras_pendientes, name='obtener_compras'),
+    path('guardar_documento/',views.guardar_documento, name='guardar_documento'),
 
     re_path(r'^.*\.html', views.gentella_html, name='gentella'),
 

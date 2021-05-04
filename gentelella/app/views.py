@@ -923,10 +923,49 @@ class EditarEmpleado(UpdateView):
 
 #Pagos
 def facturacion_compra(request, template_name='app/pagos/factura_crear_compras.html'):
-    context = {
-        'tiposDocumento': TIPO_DOCUMENTO, 'tiposPago': TIPO_PAGO
-    }
-    return render(request, template_name, context)
+    #Productores que tienen compras válidas y pendientes
+    productores = Productor.objects.filter(pk__in=CompraMaiz.objects.filter(valida=True, pendiente=True).values_list('idProductor'))
+    return render(request, template_name, {
+        'tiposDocumento': TIPO_DOCUMENTO, 'tiposPago': TIPO_PAGO, 'productores': productores
+    })
+
+@csrf_exempt
+def obtener_compras_pendientes(request):
+    pk_productor = request.POST['pk_productor']
+    compras = CompraMaiz.objects.filter(idProductor__pk=pk_productor, valida=True, pendiente=True).values('pk', 'fechaCompra', 'total')
+    data=json.dumps(list(compras), cls=DjangoJSONEncoder)
+    return HttpResponse(data, content_type='application/json')
+    #return HttpResponse(serializers.serialize("json", compras), content_type='application/json')
+
+@csrf_exempt
+def guardar_documento(request):
+    pk_productor = int(request.POST['pk_productor'])
+    pks_compras = json.loads(request.POST['pks_compras'])
+    tipo_documento = int(request.POST['tipo_documento']) #código
+    nro_documento = int(request.POST['nro_documento'])
+    fecha_compra = datetime.strptime(request.POST['fecha_compra'], '%Y-%m-%d')
+    cantidad = Decimal(request.POST['cantidad'])
+    precio_unitario = Decimal(request.POST['precio_unitario'])
+    total = Decimal(request.POST['total'])
+    tipo_pago = int(request.POST['tipo_pago']) #código
+
+    productor=Productor.objects.get(pk=pk_productor)
+
+    documento_compra = DocumentoCompra(tipoDocumento=TIPO_DOCUMENTO[tipo_documento],
+        numeroDocumento=nro_documento, fechaEmision=fecha_compra, cantidad=cantidad,
+        preciounitario=precio_unitario, precioTotal=total, tipoPago=TIPO_PAGO[tipo_pago],
+        idProductor=productor)
+    
+    documento_compra.save()
+    
+    #Actualizar las compras afectadas
+    for pk_compra in pks_compras:
+        compra=CompraMaiz.objects.get(pk=pk_compra)
+        compra.pendiente = False
+        compra.idDocumentoCompra = documento_compra
+        compra.save()
+    
+    return HttpResponse('ok')
 
 
 @login_required
