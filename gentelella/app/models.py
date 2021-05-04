@@ -71,6 +71,7 @@ class CompraMaiz(models.Model): #Datos de la Compra
     pendiente = models.BooleanField(default=True) #Si la compra estará pendiente o no
     total = models.DecimalField(max_digits=7, decimal_places=2)
     idProductor = models.ForeignKey('Productor', on_delete=models.CASCADE)
+    idDocumentoCompra = models.ForeignKey('DocumentoCompra', on_delete = models.CASCADE, null=True)
     
     class Meta:
         ordering = ['-pk']
@@ -92,10 +93,8 @@ class DocumentoCompra(models.Model):
     cantidad = models.DecimalField(max_digits=7,decimal_places=2)
     preciounitario = models.DecimalField(max_digits=4,decimal_places=2)
     precioTotal = models.DecimalField(max_digits=8,decimal_places=2)
-    estado = models.CharField(max_length=25)
     tipoPago = models.CharField(max_length=25)
     idProductor = models.ForeignKey('Productor', on_delete=models.CASCADE)#para probar
-    idCompraMaiz = models.ForeignKey('CompraMaiz', on_delete = models.CASCADE)
 
 class PesajeCompraMaiz(models.Model): #Los Pesajes correspondientes a una Compra
     fechaPesaje = models.DateTimeField() #No es "auto_now_add" porque la fecha se toma antes de guardar

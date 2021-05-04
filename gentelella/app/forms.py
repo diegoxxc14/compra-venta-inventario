@@ -118,7 +118,7 @@ class EmpleadoForm(forms.ModelForm):
 class DocumentoCompraForm(forms.ModelForm):
     class Meta:
         model = DocumentoCompra
-        fields = ['tipoDocumento','numeroDocumento','fechaEmision','cantidad','preciounitario','precioTotal','tipoPago','idCompraMaiz','idProductor']
+        fields = ['tipoDocumento','numeroDocumento','fechaEmision','cantidad','preciounitario','precioTotal','tipoPago','idProductor']
         widgets = {
          'tipoDocumento' : forms.Select(attrs= {'class': 'form-control'}),         
          'numeroDocumento' : forms.TextInput(attrs={'class': 'form-control','data-inputmask':"'mask' : '009-009-9999'"}),
