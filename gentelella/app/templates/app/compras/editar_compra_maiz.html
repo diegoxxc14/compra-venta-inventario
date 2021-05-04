@@ -112,8 +112,6 @@
             <div class="col-md-12 col-sm-6 col-xs-12 text-center">
               <button id="btnGuardar" class="btn btn-primary" {% if not compra.pendiente %} disabled {% endif %}><span
                   class="fa fa-check"></span> Actualizar Compra</button>
-              <button id="btnFinalizar" class="btn btn-success" {% if not compra.pendiente %} disabled {% endif %}><span
-                  class="fa fa-folder"></span> Finalizar Compra</button>
               <a class="btn btn-default" href="{% url 'gestion_compras' %}"><span class="fa fa-undo"></span>
                 Regresar</a>
             </div>

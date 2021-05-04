@@ -1,20 +1,20 @@
 {% extends "app/base_site.html" %}
 {% block stylesheets %}
-  {{ block.super }}
-  <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-  <link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
-  <link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
-  <link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-  <link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+{{ block.super }}
+<link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
 
-  
 
-  <!-- plugin de seleccion -->
-  <link href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css" rel="stylesheet">
-  <!-- plugin select2 -->
-  <link href="/static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
-  
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<!-- plugin de seleccion -->
+<link href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css" rel="stylesheet">
+<!-- plugin select2 -->
+<link href="/static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 {% endblock stylesheets %}
 
 
@@ -22,495 +22,327 @@
 
 
 {% block content %}
-  <div class="right_col" role="main">
-    <div class="page-title">
-      <div class="title_left">
-        <h4>Pago Factura de Compras</h4>
-      </div>       
+<div class="right_col" role="main">
+  <div class="page-title">
+    <div class="title_left">
+      <h4>Pago Factura de Compras</h4>
     </div>
-    
-    <!-- /Form para empresa nueva -->
-    <div class="row">
-      <div class="col-md-8 col-xs-12">
-          <div class="x_panel">
-            <div class="x_title">
-              <h2>Compras Pendientes</h2>              
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
-              <div class="form-group">
-                <label class="control-label">Buscador de Productores:</label>
-                <div class="input-group">
-                  <input type="text" id="productor" class="form-control">
-                  <span class="input-group-btn">
-                    <button id="btnLimpiarProductor" type="button" class="btn btn-danger"><i
-                    class="fa fa-times"></i></button>
-                  </span>
-                  </div>                
-              </div>
+  </div>
 
-              <hr>
-                          
-              <div class="clearfix"></div>
+  <!-- /Form para empresa nueva -->
+  <div class="row">
+    <div class="col-md-8 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Compras Pendientes</h2>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+          <div class="form-group">
+            <label class="control-label">Buscador de Productores:</label>
+            <select id="nombres_productor" class="form-control" name="state">
+              <option></option>
+              {% for pro in productores %}
+              <option value="{{ pro.pk }}">{{ pro.nombres }}</option>
+              {% endfor %}
+            </select>
+          </div>
 
-              <!-- /Form para empresa nueva table-striped jambo_table bulk_action  -->             
-              <div class="table-responsive">                 
-                <table id="tabla_facturacion_compras" class=" table table-striped jambo_table" width="100%">
-                  <thead>
-                    <tr>
-                      <th class="text-center"><input type="checkbox" id="select_all" name="select_invoice"></th>                      
-                      <th >Fecha</th>
-                      <th >Precio Unitario</th>
-                      <th>Peso Neto (Kg)</th>
-                      <th >Peso Neto (qq) </th>                      
-                      <th>Fecha</th>
-                      <th>Subtotal</th>                     
-                    </tr>
-                    
-                  </thead>
+          <hr>
 
-                  <tbody>
-                  </tbody>
-                </table> 
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                  <div class="btn-group  btn-group-center">
-                    <div class="btn-group" role="group">
-                      <button id="btnAgregarCompra" class="btn btn-success"><span class="fa fa-plus"></span>
-                        Agregar Compra</button>
-                    </div>
-                  </div>
+          <div class="clearfix"></div>
+
+          <!-- /Form para empresa nueva table-striped jambo_table bulk_action  -->
+          <div class="table-responsive">
+            <table id="tabla_facturacion" class=" table table-striped jambo_table" width="100%">
+              <thead>
+                <tr>
+                  <th>Nro.</th>
+                  <th>Fecha</th>
+                  <th>Peso Neto (Kg)</th>
+                  <th>Peso Neto (q) </th>
+                </tr>
+
+              </thead>
+
+              <tbody>
+              </tbody>
+            </table>
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="btn-group  btn-group-center">
+                <div class="btn-group" role="group">
+                  <button id="btnGuardarDocumento" class="btn btn-success" disabled><span class="fa fa-plus"></span>
+                    Guardar Documento</button>
                 </div>
               </div>
-                                
-              <div class="ln_solid"></div>
-            
             </div>
           </div>
 
+          <div class="ln_solid"></div>
+
         </div>
-        <div class="col-md-4 col-xs-12">
-          <div class="x_panel">
-            <div class="x_title">
-              <h2>Facturación Compras</h2>
-              
-              <div class="clearfix"></div>
-            </div>
-            <div class="x_content">
+      </div>
 
-              <div class="form-group">
-                <label>Tipo de Documento:</label>
-                  {{form.tipoDocumento}}
-              </div>    
-              <div class="form-group">
-                <label>Número de Documento:</label>
-                  {{form.numeroDocumento}}
-              </div>
-              <div class="form-group">
-                <label>Fecha de compra:</label>
-                  {{form.fechaEmision}}
-              </div>
-              <div class="form-group">
-                <label>Productor:</label>
-                  {{form.idProductor}}
-              </div>              
-              <div class="form-group">
-                <label>SubTotal:</label>
-                  {{form.cantidad}}
-              </div>                           
-              <div class="form-group">
-                <label>SubTotal:</label>
-                  {{form.preciounitario}}
-              </div>
-              <div class="form-group">
-                <label>Total a Pagar:</label>
-                  {{form.precioTotal}}
-              </div>
-              <div class="form-group">
-                <label>Tipo de Pago:</label>
-                  {{form.tipoPago}}
-              </div>  
+    </div>
+    <div class="col-md-4 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Facturación Compras</h2>
 
-                   
-                <div class="ln_solid"></div>                
-              </div>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+          <div class="form-group">
+            <label>Tipo de Documento:</label>
+            <select name="tipo_documento" id="tipo_documento" class="form-control">
+              {% for clave, valor in tiposDocumento.items %}
+              <option value="{{ clave }}" {% if forloop.first %} selected {% endif %}>{{ valor }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Número de Documento:</label>
+            <input type="number" name="" id="nro_documento" class="form-control">
+          </div>
 
-            </div>
-          </div>        
-        </div>               
+          <div class="form-group">
+            <label>Fecha de compra:</label>
+            <input id="fecha_compra" type="date" name="fecha" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label>Productor:</label>
+            <input id="productor" type="text" class="form-control" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Cantidad (qq):</label>
+            <input id="cantidad" type="number" class="form-control" value="0.00" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Precio Unitario ($):</label>
+            <input id="precio_unitario" type="number" class="form-control" min="0" step="0.01" required>
+          </div>
+
+          <div class="form-group">
+            <label>Total a Pagar ($):</label>
+            <input id="total" type="number" class="form-control" value="0.00" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Tipo de Pago:</label>
+            <select name="tipo_pago" id="tipo_pago" class="form-control">
+              {% for clave, valor in tiposPago.items %}
+              <option value="{{ clave }}" {% if forloop.first %} selected {% endif %}>{{ valor }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="ln_solid"></div>
+        </div>
+
+      </div>
+    </div>
   </div>
-  
+</div>
+
 {% endblock content %}
 
 {% block javascripts %}
-  {{ block.super}}
-    <!-- jquery.inputmask -->
-  <script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
-  <!-- datatables -->
-  <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
-  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-  <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-  <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>  
-  <script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>  
-  <script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script> 
+{{ block.super}}
+<!-- jquery.inputmask -->
+<script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+<!-- datatables -->
+<script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+<script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+<script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
 
-  <script src="/static/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-  <script src="/static/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-  <script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
- 
-  <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
-  <!-- select2 -->
-  <script src="/static/vendors/select2/dist/js/select2.min.js"></script>
-    
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="/static/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+<script src="/static/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+<script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
 
-  <script>
-    $(function() {
-      $("#nom_productor").val("");
-      var tablaFacturaCompras;      
-      listadoPesajesCompra();
-      $('.select2').select2({
-        language: 'es'
-    });
-      //intanciacion de la tabla 
-      function creartabla(){
-        tablaFacturaCompras = $('#tabla_facturacion_compras').DataTable({
-        //responsive: true,
-        destroy: true,
-        deferRender: true,
-        ajax: {
-          url: "/buscar_pesaje_compra",
-          type: "POST",
-          data: {
-              'action':'buscar_pesaje_compra'
-          },
-        },
-        scrollY:        300,
-        scrollX:        true,
-        scrollCollapse: true,
-        paging:         false,
-        fixedColumns:   {
-            leftColumns: 2
-        },
+<script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+<!-- select2 -->
+<script src="/static/vendors/select2/dist/js/select2.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-        columns: [          
-            { "data": null }, //Contador de filas id,fechaPesaje,pesoBruto, PesoTara, pesoQuintales, pesoTotal, idCompra_id
-            { "data": "fechaPesaje" },
-            { "data": "pesoBruto" },
-            { "data": "pesoNeto" },
-            { "data": "pesoTara" },
-            { "data": "pesoQuintales" },
-            { "data": "pesoTotal" },
-            { "data": null }, //Botones editar y eliminar
-        ],
-        columnDefs: [
-          {
-            "targets": -1,
-            "data": null,
-            "defaultContent": 
-              "<i class='fa fa-trash-o'></i></button></div>"
-            }],
-            select: {
-            style: multi,
-            selector: 'td:first-child'
-          },
-        initComplete: function (settings, json) {
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+  $(function () {
+    var pk_productor = null;
+    var comprasSeleccionadas = null;
+    var PRECIO_UNITARIO = "14.00"; //Constante en caso de cambio del precio unitario
 
+    //** Declarar la tabla de Pesajes
+    var tablaFacturacion = $('#tabla_facturacion').DataTable({
+      data: [],
+      columnDefs: [
+        {
+          "targets": -1,
+          "data": null,
+          "defaultContent": "<div class='a-center'><button class='btn btn-warning btn-xs tbEditarPesaje' title='Editar Pesaje'>" +
+            "<i class='fa fa-pencil'></i></button><button class='btn btn-danger btn-xs tbEliminarPesaje' title='Eliminar Pesaje'>" +
+            "<i class='fa fa-trash-o'></i></button></div>"
         }
-    });
-
-    $('#tabla_facturacion_compras tbody')
-        var tr = tablaFacturaCompras.cell($(this).closest('td, li')).index();
-        var data = tablaFacturaCompras.row(tr.row).data();
-        console.log(data);
-      }
-    //Funcionalidad de autocompletado de los productores
-    $("#productor").autocomplete({
-      source: function(request,response){
-        $.ajax({
-          data: {
-            'action': 'autocomplete',
-            'term': request.term
-          },
-          url: window.location.pathname,
-          type: "POST",
-          success: function (data) {
-            response(data);
-          },
-          error: function () {
-            console.log("Hubo un problema.");
-          }
-        });
+      ],
+      displayLength: 5,
+      columns: [
+        { "data": null }, //Contador de filas
+        { "data": "fechaCompra", "render": function (data) {
+            return moment(data).format("DD-MM-YYYY");
+          } 
+        },
+        { "data": "total" },
+        { "data": "total" },
+      ],
+      select: {
+        "style": "multi",
       },
-      delay: 500,
-      minLength: 3,
-      select: function( event, ui ) {
-        console.log(ui.item.nombres)
-        $("#nom_productor").val(ui.item.nombres);
-        $("#id_idProductor").select()
-        .val(ui.item.nombres);
-      }    
+      language: {
+        "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json",
+        "select": {
+          "rows": {
+            _: "<span style='font-weight: bold;'>%d compras seleccionadas</span>",
+            0: "<span style='font-weight: bold;'>0 compras seleccionadas</span>",
+            1: "<span style='font-weight: bold;'>1 compra seleccionada</span>"
+          }
+        }    
+      }
     });
-    
-    
-    
-    // Autocompletado de productor con ajax y select2
-     $('#id_idProductor').select2({   
-        language: "es",
-        allowClear: true,
-        language: {
-            inputTooShort: function () {
-              return "Debe ingresar mas caracteres...";
-            }
-          },
-        ajax: {
-            delay: 250,
-            type: 'POST',
-            url: "{% url 'buscar_productor_autocomplete' %}",
-            data: function (params) {
-                var queryParameters = {
-                    term: params.term,
-                    action: 'autocomplete'
-                }
-                return queryParameters;
-            },
-            processResults: function (data) {
-                return {                    
-                    results: data
-                };
-            },
-        },
-        placeholder: 'Ingrese una descripción',
-        minimumInputLength: 3,
-    });
-   
-    //Limpiar campos de busqueda de productores
-    $('#btnLimpiarProductor').on('click', function () {
-      $("#nom_productor").val("");
-      $("#productor").val("");
+
+    //** Contador de Pesajes
+    tablaFacturacion.on('order.dt search.dt', function () {
+      tablaFacturacion.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+        cell.innerHTML = i + 1;
       });
+    }).draw();
 
-      
-      function listadoPesajesCompra2(){        
-      tablaFacturaCompras = $('#tabla_facturacion_compras').DataTable({
-          responsive: true,
-          processing: true,
-          pageLength: 10,
-          deferRender: true,   
-          
-         ajax:{
-            url: "{% url 'buscar_pesaje_compra' %}",
-            type: "POST",
-            data: {
-              'action': 'buscar_pesaje_compra',
-            },
-            dataSrc: ""
-         },
-          columnDefs: [ {
-            targets: 0,
-            data: "select",
-            searchable: false,
-            orderable: false,
-            className: 'select-checkbox',
-            width: "3%"
-          },
-          {targets: [1],class: 'text-center'},
-          {targets: [2],class: 'text-center'},
-          {targets: [3],class: 'text-center'},
-          {targets: [4],class: 'text-center'},
-          {targets: [5],class: 'text-center'},
-          {targets: [6],class: 'text-center'},
-          ],                            
-         columns: [  
-            { "data": null, defaultContent:'' },        
-            { "data": "fechaPesaje" },
-            { "data": "pesoBruto" },
-            { "data": "pesoNeto" },
-            { "data": "pesoTara" },
-            { "data": "pesoQuintales" },
-            { "data": "pesoTotal" },
-          ],
-          language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json",
-            select:{
-              rows:{
-                _: "%d filas seleccionadas",
-                0: "",
-                1: "1 fila seleccionada"
-              }
-            },
-          },
-          select: {
-            style:    'multi',
-            selector: 'td:first-child'
-          },          
-          order: [[ 1,'asc' ]],
-          initComplete: function (settings, json) {
-          },
-       });
-       
-       
+    $("#tabla_facturacion tbody").on("mouseover", "tr", function () {
+      $(this).css("cursor", "pointer");
+    });
 
-       $("#cantidad_total").text(calcularTotalPesaje());
-       
-       $('#tabla_facturacion_compras').on('click', '#select_all', function(){
-         if($('#select_all:checked').val() === 'on'){
-          tablaFacturaCompras.rows().select();
-         }
-         else{
-          tablaFacturaCompras.rows().deselect();
-         }
-       })        
+    $("#fecha_compra").val(moment().format('YYYY-MM-DD'));    
 
+    $("#precio_unitario").val(PRECIO_UNITARIO);
 
+    $("#nombres_productor").select2({
+      placeholder: "Seleccione un productor",
+      allowClear: true,
+    });
 
-    }
-    
-    function listadoPesajesCompra1(){
+    //Seleccionar Productor y Cargar compras
+    $("#nombres_productor").on("select2:select", function (e) {
+      let datosProductor = e.params.data;
+      pk_productor = $(this).val();
+      //Obtener compras
       $.ajax({
-        url: "/buscar_pesaje_compra",
-        type: "get",
-        dataType: 'json',        
-        success: function(response){
-          console.log(response);
-          if($.fn.DataTable.isDataTable('#tabla_facturacion_compras')){
-            console.log("entro");
-            $('#tabla_facturacion_compras').DataTable().destroy();
-          }
-          
-          $('#tabla_facturacion_compras tbody').html("");
-          for(let i=0;i<response.length;i++){
-            let fila = '<tr>';                   
-            fila += '<td>' + response[i]["fields"]['fechaPesaje'] + '</td>';
-            fila += '<td>' + response[i]["fields"]['fechaPesaje'] + '</td>';
-            fila += '<td>' + response[i]["fields"]['pesoBruto'] + '</td>';            
-            fila += '<td>' + response[i]["fields"]['pesoNeto'] + '</td>';
-            fila += '<td>' + response[i]["fields"]['pesoTara'] + '</td>';
-            fila += '<td>' + response[i]["fields"]['pesoQuintales'] + '</td>';
-            fila += '<td>' + response[i]["fields"]['pesoTotal'] + '</td>';
-            fila += '</tr>';
-            $('#tabla_facturacion_compras tbody').append(fila);
-            console.log(fila)
-          }
-                 
-        
+        data: {
+          "pk_productor": pk_productor
         },
-        error: function(error){
-          console.log(error)
-        } 
-
-      });
-    } 
-    
-    function listadoPesajesCompra(){        
-      tablaFacturaCompras = $('#tabla_facturacion_compras').DataTable({    
-        destroy: true,
-        deferRender: true,     
-         ajax:{
-            url: "{% url 'buscar_pesaje_compra' %}",
-            type: "POST",
-            data: {
-              'action': 'buscar_pesaje_compra',
-            },
-            dataSrc: ""
-         },
-         columnDefs: [
-          {
-            data: "select",
-            searchable: false,
-            orderable: false,
-            className: 'select-checkbox',
-            orderable: false,
-            targets: 0,            
-            width: "3%"
-          },
-          {targets: [1],class: 'text-center'},
-          {targets: [2],class: 'text-center'},
-          {targets: [3],class: 'text-center'},
-          {targets: [4],class: 'text-center'},
-          {targets: [5],class: 'text-center'},
-          {targets: [6],class: 'text-center'},
-          ],                  
-         columns: [  
-            { "data": null, defaultContent:'' },        
-            { "data": "fechaPesaje" },
-            { "data": "pesoBruto" },
-            { "data": "pesoNeto" },
-            { "data": "pesoTara" },
-            { "data": "pesoQuintales" },
-            { "data": "pesoTotal" },
-          ],
-          language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json",
-            select:{
-              rows:{
-                _: "%d filas seleccionadas",
-                0: "",
-                1: "1 fila seleccionada"
-              }
-            },
-          },
-          select: {
-            style:    'multi',
-            selector: 'td:first-child'
-          },                   
-          order: [[ 1,'asc' ]],
-          initComplete: function (settings, json) {
-          },
-       });
-       
-       
-
-       $("#cantidad_total").text(calcularTotalPesaje());
-       
-       $('#tabla_facturacion_compras').on('click', '#select_all', function(){
-         if($('#select_all:checked').val() === 'on'){
-          tablaFacturaCompras.rows().select();
-         }
-         else{
-          tablaFacturaCompras.rows().deselect();
-         }
-       })        
-
-
-
-    }
-    
-     //** Calcular el Pesaje
-    $("#btnAgregarCompra").on('click', function () {
-      $('#cantidad').val(calcularTotalPesaje1());
-      });
-      
-    
-  //** Calcular Total de Pesajes  let rows_selected = tablaFacturaCompras.column(0).checkboxes. selected();
-  function calcularTotalPesaje1() {
-    let suma = 0;                
-    $.each(tablaFacturaCompras.rows('.selected').nodes(), function(i, item){
-      var data = tablaFacturaCompras.row(this).data();
-      suma += parseFloat(data['pesoQuintales']);
-    });       
-    return suma.toFixed(2);
-  }
-
-
-
-
-   //** Calcular Total de Pesajes
-   function calcularTotalPesaje() {
-        let cantidadTotal = tablaFacturaCompras.rows().data();
-        let suma = 0;
-        for (let i = 0; i < cantidadTotal.length; i++) {
-          suma += parseFloat(cantidadTotal[i].pesoQuintales);
+        url: "{% url 'obtener_compras' %}",
+        type: "POST",
+        success: function (data) {
+          tablaFacturacion.rows().remove().draw(false);
+          tablaFacturacion.rows.add(data).draw(false);
+          $("#productor").val(datosProductor.text);
+          $("#btnGuardarDocumento").attr("disabled",false);
+        },
+        error: function () {
+          console.log("Hubo un problema.");
         }
-        return suma.toFixed(2);
-      } 
+      });
+    });
 
-    
+    //Seleccionar compras
+    $('#tabla_facturacion tbody').on('click', 'tr', function () {
+      $(this).toggleClass('selected');
+      realizarCalculos();
+      console.log(comprasSeleccionadas);
+    });
 
-   })
+    $("#btnGuardarDocumento").on("click", function () {
+      if (comprasSeleccionadas.length > 0) { //Verificar si seleccionó compras.
+        if (validarCampos()) {
+          let pks_compras = $.makeArray();
+          for (var i = 0; i < comprasSeleccionadas.length; i++) {//Guardo los pk en un arreglo para pasarlos por AJAX
+            pks_compras.push(comprasSeleccionadas[i].pk);
+          }
+          $.ajax({
+            data: {
+              "pk_productor": pk_productor, "pks_compras": JSON.stringify(pks_compras), "tipo_documento": $("#tipo_documento").val(),
+              "nro_documento": $("#nro_documento").val(), "fecha_compra":$("#fecha_compra").val(), "cantidad":$("#cantidad").val(),
+              "precio_unitario": $("#precio_unitario").val(), "total": $("#total").val(), "tipo_pago": $("#tipo_pago").val()
+            },
+            url: "{% url 'guardar_documento' %}",
+            type: "POST",
+            success: function (data) {
+              tablaFacturacion.rows().remove().draw(false);
+              swal("Correcto","Documento guardado correctamente","success");
+              limpiarCampos();
+            },
+            error: function () {
+              console.log("Hubo un problema.");
+            }
+          });
+        } else {
+          swal("Campos vacíos","Debe ingresar todos los campos requeridos","error");  
+        }
+      } else {
+        swal("Sin compras","Debe seleccionar al menos una compra","error");
+      }
+    });
 
-   
-  
+    //Si hay un cambio en el Select2
+    $('#nombres_productor').on('change.select2', function(){
+      tablaFacturacion.rows().remove().draw(false);
+      $("#productor").val("");
+      $("#btnGuardarDocumento").attr("disabled",true);
+      realizarCalculos();
+    }); 
 
-  </script>
- 
- {% endblock javascripts %}
+    $("#precio_unitario").on("change keyup", function () {
+      realizarCalculos();
+    });
+
+    function validarCampos() {
+      return $("#nro_documento").val()!="" && $("#precio_unitario").val()!="";
+    }
+
+    function realizarCalculos() {
+      comprasSeleccionadas = tablaFacturacion.rows('.selected').data();
+      if (comprasSeleccionadas.length > 0) {
+        calcularDocCompra(comprasSeleccionadas);        
+      } else {
+        $("#cantidad").val("0.00");
+        $("#total").val("0.00");
+      }
+    }
+
+    function calcularDocCompra(data) {
+      let suma=0;
+      let precioUnitario = parseFloat($("#precio_unitario").val());
+      for (let i = 0; i < data.length; i++) {
+        suma+=parseFloat(data[i].total);
+      }
+      let subtotal = suma * precioUnitario;
+      $("#cantidad").val(suma);
+      $("#total").val(subtotal.toFixed(2));
+    }
+
+    function limpiarCampos() {
+      $("#tipo_documento").val(1); 
+      $("#nro_documento").val("");
+      $("#fecha_compra").val(moment().format('YYYY-MM-DD')); 
+      $("#productor").val("");
+      $("#cantidad").val("0.00");
+      $("#precio_unitario").val(PRECIO_UNITARIO);
+      $("#total").val("0.00");
+      $("#tipo_pago").val(1); 
+    }
+  });
+</script>
+{% endblock javascripts %}

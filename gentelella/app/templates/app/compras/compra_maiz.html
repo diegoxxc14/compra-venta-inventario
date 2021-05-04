@@ -376,7 +376,7 @@
             } else {
               $("#nom_productor").val(""); //Borrar nombre del productor
               productor = null;
-              console.log("Productor no existe.");
+              swal("Productor no existe", "Intente nuevamente con otra cédula.", "error");
             }
           },
           error: function () {
