@@ -15,20 +15,14 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from decimal import Decimal
 from xhtml2pdf import pisa
-from app.models import Articulo,IngresoArticulo,DetalleIngresoArticulos,DetalleSalidaArticulos,SalidaArticulo,Categoria, Inventario, Productor, Empresa, Proveedor, ResponsableTransporte, PesajeCompraMaiz,PesajeVentaMaiz, CompraMaiz, VentaMaiz, BodegaMaiz, Empleado, DocumentoCompra
+from app.models import Articulo,IngresoArticulo,DetalleIngresoArticulos,DetalleSalidaArticulos,SalidaArticulo,Categoria, Inventario, Productor, Empresa, Proveedor, ResponsableTransporte, PesajeCompraMaiz,PesajeVentaMaiz, CompraMaiz, VentaMaiz, BodegaMaiz, Empleado, DocumentoCompra,FacturaVenta
+from app.models import FacturaTransporte
 from app.forms import ProductorForm, InventarioForm, EmpresaForm, ResponsableTransporteForm, ProveedorForm, CrearInventarioForm, ArticuloForm, CategoriaForm, EmpleadoForm,DocumentoCompraForm
 from app.utils import * #Importamos métodos útiles
 from app.constants import * #Importar las constantes
 
 import json
-#import locale
-#Idioma "es-ES" (código para el español de España)
-#locale.setlocale(locale.LC_ALL, 'es-ES')
 
-#Inicio
-#@login_required
-#def inicio(request, template_name='app/index2.html'):
-#    return render(request, template_name)
 
 #Paginas de la sección de COMPRAS
 @login_required
@@ -143,7 +137,7 @@ def gestion_compras(request, template_name='app/compras/gestion_compras.html'):
     compras = CompraMaiz.objects.filter(valida=True)
     return render(request, template_name, {'compras':compras})
 
-#Vistas del CRUD de Productor
+#Vistas del Productor
 @method_decorator(login_required, name='dispatch')
 class CrearProductor(CreateView):
     model = Productor
@@ -235,8 +229,6 @@ class EditarResponsableTransporte(UpdateView):
 def listarResponsableTransporte(request, template_name='app/ventas/transportista_listar.html'):
     form = ResponsableTransporte.objects.all()
     return render(request, template_name, {'form':form})
-
-#PAGINAS DE LA SECCION VENTAS
 
 #Vista de gestion de ventas
 @login_required
@@ -570,7 +562,7 @@ def imprimir_compras(request):
     return response
 
 @login_required
-def reportes_ventas(request, template_name='app/inventarios/listar_ventas_prueba.html'):
+def reportes_ventas(request, template_name='app/inventarios/listar_ventas.html'):
     estado = -1 #Por defecto busca todas las ventas 'app/inventarios/listar_ventas.html'
     #nro_ruc = ''
     nom_empresa = ''#agreamos para la busqueda por empresa
@@ -645,6 +637,205 @@ def imprimir_ventas(request):
        return HttpResponse('We had some errors <pre>' + html + '</pre>')
     return response
 
+###################
+@login_required
+def reportes_facturacion_compras(request, template_name='app/facturacion/listar_facturacion_compras.html'):
+    tipoDocumento = "Todas" #Por defecto busca todas las compras
+    nom_productor = ''
+    
+    if request.POST:
+        rango_fechas = request.POST['rango_fechas'].split(' - ')
+        tipoDocumento = request.POST['tipoDocumento']
+        nom_productor = request.POST['nom_productor']
+        
+        fechaDesde = convertir_fecha(rango_fechas[0])
+        fechaHasta = convertir_fecha(rango_fechas[1])
+
+    else:
+        #Compras de los últimos 7 días
+        fechaHasta = date.today() #Hasta hoy
+        fechaDesde = fechaHasta - timedelta(days=6) #Desde 6 días atrás        
+    
+    #"Todas" las compras
+    compras = DocumentoCompra.objects.filter(fechaEmision__range=(fechaDesde, fechaHasta + timedelta(days=1))) #Sumo 1 día ya que no incluye la fechaHasta
+    
+    if tipoDocumento != 'Todas': #"Pendiente" o "Finalizada"
+        compras = compras.filter(tipoDocumento = tipoDocumento)#tipoDocumento=bool(tipoDocumento)
+    
+    if nom_productor != '': #Si se envía un nombre para buscar
+        compras = compras.filter(idProductor__nombres=nom_productor)
+
+    return render(request, template_name, {'compras':compras, 'tipoDocumento':tipoDocumento, 'nom_productor':nom_productor,
+        'fechaDesde':fechaDesde, 'fechaHasta':fechaHasta, 'pk_compras':serializers.serialize("json", compras, fields=['pk'])})
+
+@login_required
+def imprimir_facturacion_compras(request):
+    pks_input = request.POST['pks_compras'] #pks de la etiqueta input
+    pks_compras = pks_input[0:-1].split(' ') #Considerando que llega tipo: '23 '
+
+    for i, value in enumerate(pks_compras): #Convertir pks de 'str' a 'int'
+        pks_compras[i]=int(value)
+        
+    compras = DocumentoCompra.objects.filter(pk__in=pks_compras)
+
+    date = datetime.now()
+    fecha = date    
+    fecha1 = date.strftime('%d-%m-%Y-%H-%M')
+    
+    #Código necesario para generar el reporte PDF
+    #template_path = 'app/compras/reporte_pdf.html'
+    template_path = 'app/reportes/facturacion_compras_pdf.html'
+    context = {
+        'compras': compras, 
+        'reporte' : {'empresa':'Centro de Acopio de Sabanilla',
+        'direccion':'Sabanilla-Loja-Ecuador',
+        'nombre':'Facturacion de Compras de maíz amarillo duro','fecha':fecha
+        }
+    }    
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="factura de compras %s.pdf"' % (fecha1)
+    # find the template and render it.
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create a pdf
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+
+    # if error then show some funy view
+    if pisa_status.err:
+       return HttpResponse('Tenemos los siguientes errores <pre>' + html + '</pre>')
+    return response
+
+@login_required
+def reportes_facturacion_ventas(request, template_name='app/facturacion/listar_facturacion_ventas.html'):
+    empresa = '' #Por defecto todas las cventas
+    
+    if request.POST:
+        rango_fechas = request.POST['rango_fechas'].split(' - ')
+        empresa = request.POST['empresa']
+        
+        fechaDesde = convertir_fecha(rango_fechas[0])
+        fechaHasta = convertir_fecha(rango_fechas[1])
+
+    else:
+        #ventas de los últimos 7 días
+        fechaHasta = date.today() #Hasta hoy
+        fechaDesde = fechaHasta - timedelta(days=6) #Desde 6 días atrás        
+    
+    #"Todas" las ventas #productores = VentaMaiz.objects.filter(pk__in=Factura.objects.filter(valida=True, pendiente=True).values_list('idProductor'))
+    ventas = FacturaVenta.objects.filter(fechaEmision__range=(fechaDesde, fechaHasta + timedelta(days=1))) #Sumo 1 día ya que no incluye la fechaHasta
+    
+    if empresa != '': #Si se envía un nombre para buscar
+        ventas = ventas.filter(idEmpresa__razonSocial=empresa)
+
+    return render(request, template_name, {'ventas':ventas, 'empresa':empresa,
+        'fechaDesde':fechaDesde, 'fechaHasta':fechaHasta, 'pk_ventas':serializers.serialize("json", ventas, fields=['pk'])})
+
+@login_required
+def imprimir_facturacion_ventas(request):
+    pks_input = request.POST['pks_ventas'] #pks de la etiqueta input
+    pks_ventas = pks_input[0:-1].split(' ') #Considerando que llega tipo: '23 '
+
+    for i, value in enumerate(pks_ventas): #Convertir pks de 'str' a 'int'
+        pks_ventas[i]=int(value)
+        
+    ventas = FacturaVenta.objects.filter(pk__in=pks_ventas)
+
+    date = datetime.now()
+    fecha = date    
+    fecha1 = date.strftime('%d-%m-%Y-%H-%M')
+    
+    #Código necesario para generar el reporte PDF
+    #template_path = 'app/compras/reporte_pdf.html'
+    template_path = 'app/reportes/facturacion_ventas_pdf.html'
+    context = {
+        'ventas': ventas, 
+        'reporte' : {'empresa':'Centro de Acopio de Sabanilla',
+        'direccion':'Sabanilla-Loja-Ecuador',
+        'nombre':'Facturacion de Ventas de maíz amarillo duro','fecha':fecha
+        }
+    }    
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="factura ventas %s.pdf"' % (fecha1)
+    # find the template and render it.
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create a pdf
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+
+    # if error then show some funy view
+    if pisa_status.err:
+       return HttpResponse('Tenemos los siguientes errores <pre>' + html + '</pre>')
+    return response
+
+@login_required
+def reportes_facturacion_transporte(request, template_name='app/facturacion/listar_facturacion_transporte.html'):
+    transportista = '' #Por defecto todas las cventas
+    
+    if request.POST:
+        rango_fechas = request.POST['rango_fechas'].split(' - ')
+        transportista = request.POST['transportista']
+        
+        fechaDesde = convertir_fecha(rango_fechas[0])
+        fechaHasta = convertir_fecha(rango_fechas[1])
+
+    else:
+        #ventas de los últimos 7 días
+        fechaHasta = date.today() #Hasta hoy
+        fechaDesde = fechaHasta - timedelta(days=6) #Desde 6 días atrás        
+    
+    #"Todas" las ventas #productores = VentaMaiz.objects.filter(pk__in=Factura.objects.filter(valida=True, pendiente=True).values_list('idProductor'))
+    ventas = FacturaTransporte.objects.filter(fechaEmision__range=(fechaDesde, fechaHasta + timedelta(days=1))) #Sumo 1 día ya que no incluye la fechaHasta
+    
+    if transportista != '': #Si se envía un nombre para buscar
+        ventas = ventas.filter(idResponsableTransporte__nombre=transportista)
+
+    return render(request, template_name, {'ventas':ventas, 'transportista':transportista,
+        'fechaDesde':fechaDesde, 'fechaHasta':fechaHasta, 'pk_ventas':serializers.serialize("json", ventas, fields=['pk'])})
+
+@login_required
+def imprimir_facturacion_transporte(request):
+    pks_input = request.POST['pks_ventas'] #pks de la etiqueta input
+    pks_ventas = pks_input[0:-1].split(' ') #Considerando que llega tipo: '23 '
+
+    for i, value in enumerate(pks_ventas): #Convertir pks de 'str' a 'int'
+        pks_ventas[i]=int(value)
+        
+    ventas = FacturaTransporte.objects.filter(pk__in=pks_ventas)
+
+    date = datetime.now()
+    fecha = date    
+    fecha1 = date.strftime('%d-%m-%Y-%H-%M')
+    
+    #Código necesario para generar el reporte PDF
+    #template_path = 'app/compras/reporte_pdf.html'
+    template_path = 'app/reportes/facturacion_transporte_pdf.html'
+    context = {
+        'ventas': ventas, 
+        'reporte' : {'empresa':'Centro de Acopio de Sabanilla',
+        'direccion':'Sabanilla-Loja-Ecuador',
+        'nombre':'Facturacion de Transporte de maíz amarillo duro','fecha':fecha
+        }
+    }    
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    #response['Content-Disposition'] = 'attachment; filename="factura transporte %s.pdf"' % (fecha1)
+    # find the template and render it.
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create a pdf
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+
+    # if error then show some funy view
+    if pisa_status.err:
+       return HttpResponse('Tenemos los siguientes errores <pre>' + html + '</pre>')
+    return response
+
+###################
 @login_required
 def inventario_general(request, template_name='app/inventarios/inventario_general.html'):
     form = Articulo.objects.all()
@@ -657,14 +848,14 @@ class CrearArticulo(CreateView):
     template_name = 'app/inventarios/articulos/articulo_crear.html'
     form_class = ArticuloForm
     success_url = reverse_lazy('listar_articulo')
-
+#editar un articulo
 @method_decorator(login_required, name='dispatch')
 class EditarArticulo(UpdateView):
     model = Articulo
     form_class = ArticuloForm
     template_name = 'app/inventarios/articulos/articulo_editar.html'
     success_url = reverse_lazy('listar_articulo')
-
+#listar articulos
 @login_required
 def listar_articulo(request, template_name='app/inventarios/articulos/articulo_listar.html'):
     form = Articulo.objects.all()
@@ -712,8 +903,6 @@ class EliminarCategoria(DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
-
-
    
 @csrf_exempt
 def ingresar_articulo(request, template_name='app/inventarios/articulos/articulo_ingreso.html'):               
@@ -921,8 +1110,8 @@ class EditarEmpleado(UpdateView):
     template_name = 'app/inventarios/empleado/empleado_editar.html'
     success_url = reverse_lazy('listar_empleado')
 
-#Pagos
-def facturacion_compra(request, template_name='app/pagos/factura_crear_compras.html'):
+#Facturación Compras
+def facturacion_compra(request, template_name='app/facturacion/facturacion_compras.html'):
     #Productores que tienen compras válidas y pendientes
     productores = Productor.objects.filter(pk__in=CompraMaiz.objects.filter(valida=True, pendiente=True).values_list('idProductor'))
     return render(request, template_name, {
@@ -967,44 +1156,89 @@ def guardar_documento(request):
     
     return HttpResponse('ok')
 
+#Facturación de Ventas
+@login_required   
+def facturacion_venta(request, template_name='app/facturacion/facturacion_ventas.html'):
+    #Productores que tienen compras válidas y pendientes
+    productores = Empresa.objects.filter(pk__in=VentaMaiz.objects.filter(valida=True, pendiente=True).values_list('idEmpresa_id'))
+    return render(request, template_name, { 'productores': productores})
 
+@csrf_exempt
+def obtener_ventas_pendientes(request):
+    pk_empresa = request.POST['pk_empresa']
+    ventas = VentaMaiz.objects.filter(idEmpresa__pk=pk_empresa, valida=True, pendiente=True).values('pk', 'fechaVenta', 'total')
+    data=json.dumps(list(ventas), cls=DjangoJSONEncoder)
+    return HttpResponse(data, content_type='application/json')
+    #return HttpResponse(serializers.serialize("json", compras), content_type='application/json')
+
+@csrf_exempt
+def guardar_documento_venta(request):
+    pk_empresa = int(request.POST['pk_empresa'])
+    pks_ventas = json.loads(request.POST['pks_ventas'])
+    nro_factura = int(request.POST['nro_factura'])
+    fecha_venta = datetime.strptime(request.POST['fecha_venta'], '%Y-%m-%d')
+    cantidad = Decimal(request.POST['cantidad'])
+    precio_unitario = Decimal(request.POST['precio_unitario'])
+    total = Decimal(request.POST['total'])
+
+    empresa = Empresa.objects.get(pk=pk_empresa)
+
+    factura_venta = FacturaVenta(numeroFactura=nro_factura, 
+        fechaEmision=fecha_venta, cantidad=cantidad,preciounitario=precio_unitario, 
+        precioTotal=total,idEmpresa=empresa)
+    
+    factura_venta.save()
+    
+    #Actualizar las ventas afectadas
+    for pk_venta in pks_ventas:
+        venta=VentaMaiz.objects.get(pk=pk_venta)
+        venta.pendiente = False
+        venta.idFacturaVenta = factura_venta
+        venta.save()
+    
+    return HttpResponse('ok')
+
+#Facturación de Transporte
 @login_required
-def CrearDocumentoCompra1(request, template_name='app/pagos/factura_crear_compras.html'):       
-    if request.method == 'POST':
-        form = DocumentoCompraForm(request.POST)
-        action = request.POST['action']
-        if action == 'autocomplete':
-            data = []
-            for i in Productor.objects.filter(nombres__icontains= request.POST['term'])[0:10]:
-                item = i.toJSON()
-                item['value'] = i.nombres 
-                data.append(item)        
-        elif action == 'search_productor':
-                data = []
-                term = request.POST['term']
-                clients = Productor.objects.filter(nombres__icontains=term)[0:10]
-                for i in clients:
-                    item = i.toJSON()
-                    item['text'] = i.nombres
-                    data.append(item)
-        else:
-            data['error'] = 'No ha ingresado a ninguna opción'    
-        return JsonResponse(data, safe=False)           
-        if form.is_valid():
-            form.save()
-        return redirect('facturacompra1')
-        
-    else:
-        form = DocumentoCompraForm()
-    return render(request, template_name,{'form':form})
+def facturacion_transporte(request, template_name='app/facturacion/facturacion_transporte.html'):
+    #Transportistas que tienen compras válidas y pendientes
+    transportista = ResponsableTransporte.objects.filter(pk__in=VentaMaiz.objects.filter(statusFactura=True).values_list('idResponsableTransporte_id'))
+    return render(request, template_name, { 'transportista': transportista})
 
-#vistas de facturacion
-@method_decorator(login_required, name='dispatch')  
-class CrearDocumentoCompra(CreateView):
-    model = DocumentoCompra
-    template_name = "app/pagos/factura_crear_compras.html"
-    form_class = DocumentoCompraForm
-    success_url = 'lista_implementos' 
+@csrf_exempt
+def obtener_ventas_pendientes_facturacion(request):
+    pk_transportista = request.POST['pk_transportista']
+    ventas = VentaMaiz.objects.filter(idResponsableTransporte__pk=pk_transportista, valida=True, pendiente=False, statusFactura=True).values('pk', 'idEmpresa__razonSocial', 'fechaVenta', 'total')
+    data=json.dumps(list(ventas), cls=DjangoJSONEncoder)
+    return HttpResponse(data, content_type='application/json')
+    #return HttpResponse(serializers.serialize("json", ventas), content_type='application/json')
+
+@csrf_exempt
+def guardar_documento_transporte(request):
+    pk_transportista = int(request.POST['pk_transportista'])
+    pks_ventas = json.loads(request.POST['pks_compras'])
+    nro_factura = int(request.POST['nro_factura'])
+    fecha_venta = datetime.strptime(request.POST['fecha_compra'], '%Y-%m-%d')
+    cantidad = Decimal(request.POST['cantidad'])
+    precio_unitario = Decimal(request.POST['precio_unitario'])
+    total = Decimal(request.POST['total'])
+   
+    transportista = ResponsableTransporte.objects.get(pk=pk_transportista)
+    
+    factura_transporte = FacturaTransporte(numerofactura=nro_factura, 
+        fechaEmision=fecha_venta, cantidad=cantidad,preciounitario=precio_unitario, 
+        precioTotal=total , idResponsableTransporte=transportista)
+    
+    factura_transporte.save()
+    
+    #Actualizar las ventas afectadas
+    for pk_venta in pks_ventas:
+        venta=VentaMaiz.objects.get(pk=pk_venta)
+        venta.statusFactura = False
+        venta.idFacturaTransporte = factura_transporte
+        venta.save()
+    
+    return HttpResponse('ok')
 
 @csrf_exempt
 def buscar_PesajesCompra(request):

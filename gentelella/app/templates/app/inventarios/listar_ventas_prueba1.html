@@ -1,16 +1,10 @@
 {% extends "app/base_site.html" %}
 
-{% block title %} Listado de Ventas Prueba {% endblock title %}
+{% block title %} Listado de Ventas {% endblock title %}
 
 {% block stylesheets %}
 {{ block.super }}
 <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
-<!-- plugin autocompletado -->
-<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
 {% endblock stylesheets %}
  
 {% block content %}
@@ -23,7 +17,7 @@
     <div class="col-md-12 col-sm-12 col-xs-12">
       <div class="x_panel">
         <div class="x_title">
-          <h2>Listado de Ventas de Maíz Amarillo Duro</h2>
+          <h2>Listado de ventas de Maíz Amarillo Duro</h2>
           <div class="clearfix"></div>
         </div>
 
@@ -33,18 +27,30 @@
           <form class="form-horizontal form-label-left" method="POST" action="{% url 'reportes_ventas' %}">
             {% csrf_token %}
             <div class="form-group">
-              <label class="control-label col-md-1 col-sm-1 col-xs12">Empresa:</label>
-              <div class="col-md-3 col-sm-3 col-xs-12">
-                <div class="input-group">
-                  <input type="text" name="nom_empresa" id="nom_empresa" class="form-control" 
-                   value="{{ nom_empresa }}">
-                  <span class="input-group-btn">
-                    <button id="btnLimpiarE" type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>
-                  </span>
-                </div>       
+              <label class="control-label col-md-2 col-sm-4 col-xs-3">Identificación:</label>
+              <div class="col-md-4 col-sm-6 col-xs-12 ">
+                <input name="nro_ruc" type="text" class="form-control" data-inputmask="'mask' : '9999999999999'" value="{{ nro_ruc }}">
+                <span class="fa fa-list-alt form-control-feedback right"></span>
               </div>
-              <label class="control-label col-md-1 col-sm-1 col-xs-12">Fechas:</label>
-              <div class="col-md-4 col-sm-4 col-xs-12">
+            
+              <label class="control-label col-md-2 col-sm-4 col-xs-3">Empresa:</label>
+              <div class="col-md-4 col-sm-6 col-xs-12">
+                <input readonly type="text" class="form-control" placeholder="Nombre de la Empresa">
+                <span class="fa fa-user form-control-feedback right" aria-hidden="true"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-md-2 col-sm-4 col-xs-12">Estado:</label>
+              <div class="col-md-4 col-sm-6 col-xs-12">
+                <select name="estado" class="form-control">
+                  <option value="-1" {% if estado == -1 %} selected {% endif %}>Todas</option>
+                  <option value="1" {% if estado == 1 %} selected {% endif %}>Pendiente</option>
+                  <option value="0" {% if estado == 0 %} selected {% endif %}>Finalizada</option>
+                </select>
+              </div>
+              <label class="control-label col-md-2 col-sm-4 col-xs-12">Rango de fechas:</label>
+              <div class="col-md-4 col-sm-6 col-xs-12">
                 <div id="reportrange" class="pull-right input-prepend input-group">
                   <input style="cursor: pointer;" type="text" name="rango_fechas" class="form-control"
                     value='{{ fechaDesde|date:"F j, Y"}} - {{ fechaHasta|date:"F j, Y" }}' readonly>
@@ -52,23 +58,16 @@
                       class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
                 </div>
               </div>
-              <label class="control-label col-md-1 col-sm-1 col-xs-12">Estado:</label>
-              <div class="col-md-2 col-sm-2 col-xs-12">
-                <select name="estado" class="form-control">
-                  <option value="-1" {% if estado == -1 %} selected {% endif %}>Todas</option>
-                  <option value="1" {% if estado == 1 %} selected {% endif %}>Pendiente</option>
-                  <option value="0" {% if estado == 0 %} selected {% endif %}>Finalizada</option>
-                </select>
-              </div>
-            </div>
+            </div> 
+            <div class="divider-dashed"></div>
             <div class="form-group">
-              <div class="col-md-12 col-sm-12 col-xs-12 text-right">
+              <div class="col-md-12 col-sm-6 col-xs-12 text-center">
                 <button id="btnBuscar" class="btn btn-success"><span class="fa fa-search"></span> Buscar</button>
                 <a class="btn btn-primary" href="{% url 'reportes_ventas' %}"><span class="fa fa-refresh"></span> Restablecer</a>
               </div>
-            </div>             
-            <div class="ln_solid"></div>            
+            </div>
           </form>
+
           
             <table id="datatable" class="table table-striped jambo_table bulk_action">
               <thead>
@@ -91,7 +90,7 @@
                   <td class="text-center">
                     {% if venta.pendiente %} <span class="label label-primary">Pendiente</span>
                     {% else %} <span class="label label-success">Finalizada</span> {% endif %}</td>
-                  <td class="text-center"><span class="badge badge-default">{{ venta.total }}</span></td>
+                  <td class="text-center">{{ venta.total }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -100,11 +99,12 @@
               <form action="{% url 'imprimir_ventas' %}" method="post" target="_blank">
                 {% csrf_token %}
                 <input id="pks_ventas" hidden name="pks_ventas" type="text" value="{% for v in ventas %}{{ v.pk }} {% endfor %}" required><!--Siempre debe ir con un espacio. Ejem: '23 '-->
-                <div class="col-md-12 col-sm-12 col-xs-12 text-center">
+                <div class="col-md-12 col-sm-6 col-xs-12 text-center">
                   <button id="btnGenerarPDF" class="btn btn-primary"><i class="fa fa-file-pdf-o"></i> Generar PDF</button>
                 </div>
               </form>
             </div>
+          
         </div>
       </div>
     </div>
@@ -121,11 +121,9 @@
 <!-- jquery.inputmask -->
 <script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-<!-- plugin autocompletado -->
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
   $(function () {
+    
     $('#datatable').DataTable( {
       "searching": false,
       "lengthChange": false,
@@ -133,46 +131,13 @@
       language: {
         "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
         }
-    });
+      });
 
     $("#btnGenerarPDF").on("click", function () {
       if ($("#pks_ventas").val() == "") {
         swal("Oops", "No se puede generar el reporte.", "error");  
       }
     });
-        //** autocompletado de los reponsables de transporte
-        $("#nom_empresa").autocomplete({
-        source: function(request,response){
-          $.ajax({         
-            url: "{% url 'buscar_empresa_autocomplete' %}",
-            type: "POST",
-            data: { 
-              'action': 'autocomplete',
-              'term': request.term
-            },
-            success: function (data) {
-              response(data);
-            },
-            error: function () {
-              console.log("Hubo un problema.");
-            }
-          });
-        },
-        delay: 500,
-        minLength: 3,
-        select: function( event, ui ) {
-          empresa = ui.item
-          $("#ruc").val(empresa.ruc);
-          console.log(empresa) 
-        }    
-      });
-    
-      //Limpiar campo de busqueda de responsable de transporte
-      $('#btnLimpiarE').on('click', function () {
-        $("#nom_empresa").val("");
-        });
-
-
   });
 </script>
 {% endblock javascripts %}

@@ -1,6 +1,6 @@
 {% extends "app/base_site.html" %}
 
-{% block title %} Listado de Compras {% endblock title %}
+{% block title %} Listado de Facturación Compras {% endblock title %}
 
 {% block stylesheets %}
 {{ block.super }}
@@ -24,14 +24,14 @@
     <div class="col-md-12 col-sm-12 col-xs-12">
       <div class="x_panel">
         <div class="x_title">
-          <h2>Listado de Compras de Maíz Amarillo Duro</h2>
+          <h2>Listado de Facturación de Compras</h2>
           <div class="clearfix"></div>
         </div>
 
         <div class="x_content">
 
 
-          <form class="form-horizontal form-label-left" method="POST" action="{% url 'reportes_compras' %}">
+          <form class="form-horizontal form-label-left" method="POST" action="{% url 'reporte_facturacion_compras' %}">
             {% csrf_token %}
             <div class="form-group">
               <label class="control-label col-md-1 col-sm-1 col-xs-12">Productor:</label>
@@ -53,62 +53,67 @@
                       class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
                 </div>
               </div> 
-              <label class="control-label col-md-1 col-sm-1 col-xs-12">Estado:</label>
+              <label class="control-label col-md-1 col-sm-1 col-xs-12">Documento:</label>
               <div class="col-md-2 col-sm-2 col-xs-12">
-                <select name="estado" class="form-control">
-                  <option value="-1" {% if estado == -1 %} selected {% endif %}>Todas</option>
-                  <option value="1" {% if estado == 1 %} selected {% endif %}>Pendiente</option>
-                  <option value="0" {% if estado == 0 %} selected {% endif %}>Finalizada</option>
+                <select name="tipoDocumento" class="form-control">
+                  <option value="Todas" {% if tipoDocumento == "Todas" %} selected {% endif %}>Todas</option>
+                  <option value="Nota de venta" {% if tipoDocumento == "Nota de venta" %} selected {% endif %}>Nota de venta</option>
+                  <option value="Factura" {% if tipoDocumento == "Factura" %} selected {% endif %}>Factura</option>
                 </select>
               </div>                           
             </div>           
             <div class="form-group">
               <div class="col-md-12 col-sm-12 col-xs-12 text-right">
                 <button id="btnBuscar" class="btn btn-success"><span class="fa fa-search"></span> Buscar</button>
-                <a class="btn btn-primary" href="{% url 'reportes_compras' %}"><span class="fa fa-refresh"></span> Restablecer</a>
+                <a class="btn btn-primary" href="{% url 'reporte_facturacion_compras' %}"><span class="fa fa-refresh"></span> Restablecer</a>
               </div>
             </div>            
             <div class="ln_solid"></div>          
           </form>         
           
-
-        
-            <table id="datatable" class="table table-striped jambo_table">
+            <table id="facturacion_compras" class="table table-striped jambo_table">
               <thead>
                 <tr class="headings">
                   <th class="column-title text-center">Nro.</th>
                   <th class="column-title text-center">Fecha</th>
-                  <th class="column-title text-center">Identificación</th>
                   <th class="column-title text-center">Productor</th>
-                  <th class="column-title text-center">Estado</th>
-                  <th class="column-title text-center">Peso QQ</th>
+                  <th class="column-title text-center">Documento</th>
+                  <th class="column-title text-center">Número</th>
+                  <th class="column-title text-center">Cantidad</th>
+                  <th class="column-title text-center">Precio U.</th>
+                  <th class="column-title text-center">Precio T.</th>
                 </tr>
               </thead>
               <tbody>
                 {% for compra in compras %}
                 <tr class="even pointer">
                   <td class="text-center">{{ forloop.counter }}</td>
-                  <td class="text-center">{{ compra.fechaCompra }}</td>
-                  <td class="text-center">{{ compra.idProductor.identificacion }}</td>
+                  <td class="text-center">{{ compra.fechaEmision }}</td>
                   <td class="text-center">{{ compra.idProductor }}</td>
+                  <td class="text-center">{{ compra.tipoDocumento }}</td>
+                  <td class="text-center">{{ compra.numeroDocumento }}</td>
                   <td class="text-center">
-                    {% if compra.pendiente %} <span class="label label-primary">Pendiente</span>
-                    {% else %} <span class="label label-success">Finalizada</span> {% endif %}</td>
-                  <td class="text-center"><span class="badge badge-default">{{ compra.total }}</span></td>
+                    <span class="badge badge-default">{{ compra.cantidad }}</span>
+                 </td>
+                 <td class="text-center">{{ compra.preciounitario }}</td>
+                 <td class="text-center">
+                    <span class="badge badge-default">{{ compra.precioTotal }}</span>
+                 </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
-            <div class="row">
-              <form action="{% url 'imprimir_compras' %}" method="post" target="_blank">
-                {% csrf_token %}
-                <input id="pks_compras" hidden name="pks_compras" type="text" value="{% for c in compras %}{{ c.pk }} {% endfor %}" required><!--Siempre debe ir con un espacio. Ejem: '23 '-->
-                <div class="col-md-12 col-sm-6 col-xs-12 text-center">
-                  <button id="btnGenerarPDF" class="btn btn-primary"><i class="fa fa-file-pdf-o"></i> Generar PDF</button>
-                </div>
-              </form>
-            </div>
-          
+            
+          <!---->
+          <div class="row">
+            <form action="{% url 'imprimir_facturacion_compras' %}" method="post" target="_blank">
+              {% csrf_token %}
+              <input id="pks_compras" hidden name="pks_compras" type="text" value="{% for c in compras %}{{ c.pk }} {% endfor %}" required><!--Siempre debe ir con un espacio. Ejem: '23 '-->
+              <div class="col-md-12 col-sm-6 col-xs-12 text-center">
+                <button id="btnGenerarPDF" class="btn btn-primary"><i class="fa fa-file-pdf-o"></i> Generar PDF</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -118,6 +123,7 @@
 
 {% block javascripts %}
 {{ block.super}}
+
 <!-- Datatables -->
 <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -133,14 +139,14 @@
 <script>
   $(function () {
 
-    $('#datatable').DataTable( {
+    $('#facturacion_compras').DataTable( {
       "searching": false,
       "lengthChange": false,
       displayLength: 10,
       language: {
         "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-        }
-      });
+      }
+    });
 
     $("#btnGenerarPDF").on("click", function () {
       if ($("#pks_compras").val() == "") {

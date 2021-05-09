@@ -35,7 +35,7 @@
                   value="{{ compra.idProductor.nombres }}"
                   readonly>
                   <span class="input-group-btn">
-                    <button id="btnLimpiarE" type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>
+                    <button id="btnLimpiarE" type="button" class="btn btn-danger" {% if not compra.pendiente %} disabled {% endif %}><i class="fa fa-times"></i></button>
                   </span>
                 </div>                  
               </div>

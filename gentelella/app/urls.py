@@ -57,6 +57,13 @@ urlpatterns = [
     path('imprimir_compras/', views.imprimir_compras, name='imprimir_compras'),
     path('reportes_ventas/', views.reportes_ventas, name='reportes_ventas'),
     path('imprimir_ventas/', views.imprimir_ventas, name='imprimir_ventas'),
+    path('reporte_facturacion_compras/', views.reportes_facturacion_compras, name='reporte_facturacion_compras'),
+    path('imprimir_facturacion_compras/', views.imprimir_facturacion_compras, name='imprimir_facturacion_compras'),
+    path('reporte_facturacion_ventas/', views.reportes_facturacion_ventas, name='reporte_facturacion_ventas'),
+    path('imprimir_facturacion_ventas/', views.imprimir_facturacion_ventas, name='imprimir_facturacion_ventas'),
+    path('reporte_facturacion_transporte/', views.reportes_facturacion_transporte, name='reporte_facturacion_transporte'),
+    path('imprimir_facturacion_transporte/', views.imprimir_facturacion_transporte, name='imprimir_facturacion_transporte'),
+
     #path('imprimir_ingreso_pdf/', views.imprimir_ingreso_pdf, name='imprimir_ingreso_pdf'),
     #URLs 
     path('ingresar_articulo/ingreso_documento_pdf/<int:pk>/', views.ImprimirIngresoPdfView.as_view(), name='ingreso_documento_pdf'),
@@ -99,10 +106,19 @@ urlpatterns = [
     
     #pagos Aun por editar factura
     path('crear_facturacion/',views.facturacion_compra, name='facturacion_compra'),
-    path('crear_facturacion1/',views.CrearDocumentoCompra1, name='facturacion_compra1'),
     path('buscar_pesaje_compra/',views.buscar_PesajesCompra, name='buscar_pesaje_compra'),
     path('obtener_compras/',views.obtener_compras_pendientes, name='obtener_compras'),
     path('guardar_documento/',views.guardar_documento, name='guardar_documento'),
+    #facturacion ventas
+    path('crear_facturacion_ventas/',views.facturacion_venta, name='facturacion_venta'),
+    path('obtener_ventas/',views.obtener_ventas_pendientes, name='obtener_ventas'),
+    path('guardar_factura_venta/',views.guardar_documento_venta, name='guardar_factura_venta'),
+    #facturación transporte
+    path('crear_facturacion_transporte/',views.facturacion_transporte, name='facturacion_transporte'),
+    path('obtener_ventas_facturacion/',views.obtener_ventas_pendientes_facturacion, name='obtener_ventas_facturacion'),
+    path('guardar_factura_transporte/',views.guardar_documento_transporte, name='guardar_factura_transporte'),
+
+
 
     re_path(r'^.*\.html', views.gentella_html, name='gentella'),
 

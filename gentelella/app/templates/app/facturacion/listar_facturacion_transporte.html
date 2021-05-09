@@ -1,6 +1,6 @@
 {% extends "app/base_site.html" %}
 
-{% block title %} Listado de Compras {% endblock title %}
+{% block title %} Facturación de Transporte {% endblock title %}
 
 {% block stylesheets %}
 {{ block.super }}
@@ -24,91 +24,86 @@
     <div class="col-md-12 col-sm-12 col-xs-12">
       <div class="x_panel">
         <div class="x_title">
-          <h2>Listado de Compras de Maíz Amarillo Duro</h2>
+          <h2>Reporte de Facturación de Transporte</h2>
           <div class="clearfix"></div>
         </div>
 
         <div class="x_content">
 
 
-          <form class="form-horizontal form-label-left" method="POST" action="{% url 'reportes_compras' %}">
+          <form class="form-horizontal form-label-left" method="POST" action="{% url 'reporte_facturacion_transporte' %}">
             {% csrf_token %}
             <div class="form-group">
-              <label class="control-label col-md-1 col-sm-1 col-xs-12">Productor:</label>
-              <div class="col-md-3 col-sm-3 col-xs-12">
+              <label class="control-label col-md-2 col-sm-1 col-xs-12">Transportista:</label>
+              <div class="col-md-4 col-sm-3 col-xs-12">
                 <div class="input-group">
-                  <input type="text" name="nom_productor" id="nom_productor" class="form-control" 
-                   value="{{ nom_productor}}">
+                  <input type="text" name="transportista" id="transportista" class="form-control" 
+                   value="{{ transportista}}">
                   <span class="input-group-btn">
                     <button id="btnLimpiarE" type="button" class="btn btn-danger"><i class="fa fa-times"></i></button>
                   </span>
                 </div>                   
               </div>
               <label class="control-label col-md-1 col-sm-1 col-xs-12">Fechas:</label>
-              <div class="col-md-4 col-sm-4 col-xs-12">
+              <div class="col-md-5 col-sm-4 col-xs-12">
                 <div id="reportrange" class="pull-right input-prepend input-group">
                   <input style="cursor: pointer;" type="text" name="rango_fechas" class="form-control"
                     value='{{ fechaDesde|date:"F j, Y"}} - {{ fechaHasta|date:"F j, Y" }}' readonly>
                   <span class="add-on input-group-addon" style="cursor: pointer;"><i
                       class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
                 </div>
-              </div> 
-              <label class="control-label col-md-1 col-sm-1 col-xs-12">Estado:</label>
-              <div class="col-md-2 col-sm-2 col-xs-12">
-                <select name="estado" class="form-control">
-                  <option value="-1" {% if estado == -1 %} selected {% endif %}>Todas</option>
-                  <option value="1" {% if estado == 1 %} selected {% endif %}>Pendiente</option>
-                  <option value="0" {% if estado == 0 %} selected {% endif %}>Finalizada</option>
-                </select>
-              </div>                           
+              </div>                            
             </div>           
             <div class="form-group">
               <div class="col-md-12 col-sm-12 col-xs-12 text-right">
                 <button id="btnBuscar" class="btn btn-success"><span class="fa fa-search"></span> Buscar</button>
-                <a class="btn btn-primary" href="{% url 'reportes_compras' %}"><span class="fa fa-refresh"></span> Restablecer</a>
+                <a class="btn btn-primary" href="{% url 'reporte_facturacion_transporte' %}"><span class="fa fa-refresh"></span> Restablecer</a>
               </div>
             </div>            
             <div class="ln_solid"></div>          
           </form>         
           
-
-        
-            <table id="datatable" class="table table-striped jambo_table">
+            <table id="facturacion_compras" class="table table-striped jambo_table">
               <thead>
                 <tr class="headings">
                   <th class="column-title text-center">Nro.</th>
                   <th class="column-title text-center">Fecha</th>
-                  <th class="column-title text-center">Identificación</th>
-                  <th class="column-title text-center">Productor</th>
-                  <th class="column-title text-center">Estado</th>
-                  <th class="column-title text-center">Peso QQ</th>
+                  <th class="column-title text-center">Transportista</th>
+                  <th class="column-title text-center">Número</th>
+                  <th class="column-title text-center">Cantidad</th>
+                  <th class="column-title text-center">Precio U.</th>
+                  <th class="column-title text-center">Precio T.</th>
                 </tr>
               </thead>
               <tbody>
-                {% for compra in compras %}
+                {% for venta in ventas %}
                 <tr class="even pointer">
                   <td class="text-center">{{ forloop.counter }}</td>
-                  <td class="text-center">{{ compra.fechaCompra }}</td>
-                  <td class="text-center">{{ compra.idProductor.identificacion }}</td>
-                  <td class="text-center">{{ compra.idProductor }}</td>
+                  <td class="text-center">{{ venta.fechaEmision}}</td>
+                  <td class="text-center">{{ venta.idResponsableTransporte}}</td>
+                  <td class="text-center">{{ venta.numerofactura }}</td>
                   <td class="text-center">
-                    {% if compra.pendiente %} <span class="label label-primary">Pendiente</span>
-                    {% else %} <span class="label label-success">Finalizada</span> {% endif %}</td>
-                  <td class="text-center"><span class="badge badge-default">{{ compra.total }}</span></td>
+                    <span class="badge badge-default">{{ venta.cantidad }}</span>
+                  </td>
+                  <td class="text-center">{{ venta.preciounitario }}</td>
+                  <td class="text-center">
+                    <span class="badge badge-default">{{ venta.precioTotal }}</span>
+                 </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
-            <div class="row">
-              <form action="{% url 'imprimir_compras' %}" method="post" target="_blank">
-                {% csrf_token %}
-                <input id="pks_compras" hidden name="pks_compras" type="text" value="{% for c in compras %}{{ c.pk }} {% endfor %}" required><!--Siempre debe ir con un espacio. Ejem: '23 '-->
-                <div class="col-md-12 col-sm-6 col-xs-12 text-center">
-                  <button id="btnGenerarPDF" class="btn btn-primary"><i class="fa fa-file-pdf-o"></i> Generar PDF</button>
-                </div>
-              </form>
-            </div>
-          
+            
+          <!---->
+          <div class="row">
+            <form action="{% url 'imprimir_facturacion_transporte' %}" method="post" target="_blank">
+              {% csrf_token %}
+              <input id="pks_ventas" hidden name="pks_ventas" type="text" value="{% for v in ventas %}{{ v.pk }} {% endfor %}" required><!--Siempre debe ir con un espacio. Ejem: '23 '-->
+              <div class="col-md-12 col-sm-6 col-xs-12 text-center">
+                <button id="btnGenerarPDF" class="btn btn-primary"><i class="fa fa-file-pdf-o"></i> Generar PDF</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -118,6 +113,7 @@
 
 {% block javascripts %}
 {{ block.super}}
+
 <!-- Datatables -->
 <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -133,26 +129,26 @@
 <script>
   $(function () {
 
-    $('#datatable').DataTable( {
+    $('#facturacion_compras').DataTable( {
       "searching": false,
       "lengthChange": false,
       displayLength: 10,
-      language: {
-        "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-        }
-      });
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+          }
+    });
 
     $("#btnGenerarPDF").on("click", function () {
-      if ($("#pks_compras").val() == "") {
+      if ($("#pks_ventas").val() == "") {
         swal("Oops", "No se puede generar el reporte.", "error");  
       }
     });
 
     //** autocompletado de los reponsables de transporte
-    $("#nom_productor").autocomplete({
+    $("#transportista").autocomplete({
         source: function(request,response){
           $.ajax({         
-            url: "{% url 'buscar_productor_autocomplete' %}",
+            url: "{% url 'buscar_responsable_transporte' %}",
             type: "POST",
             data: { 
               'action': 'autocomplete',
@@ -167,7 +163,7 @@
           });
         },
         delay: 500,
-        minLength: 3,
+        minLength: 2,
         select: function( event, ui ) {
           empresa = ui.item
           console.log(empresa) 
@@ -176,7 +172,7 @@
     
       //Limpiar campo de busqueda de responsable de transporte
       $('#btnLimpiarE').on('click', function () {
-        $("#nom_productor").val("");
+        $("#transportista").val("");
         });
   });
 </script>

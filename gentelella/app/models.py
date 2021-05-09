@@ -88,7 +88,7 @@ class CompraMaiz(models.Model): #Datos de la Compra
 
 class DocumentoCompra(models.Model):
     tipoDocumento = models.CharField(max_length=25)
-    numeroDocumento = models.IntegerField()
+    numeroDocumento = models.CharField(max_length=12, null=False) 
     fechaEmision = models.DateField()
     cantidad = models.DecimalField(max_digits=7,decimal_places=2)
     preciounitario = models.DecimalField(max_digits=4,decimal_places=2)
@@ -129,6 +129,19 @@ class PesajeVentaMaiz(models.Model):
     vigente = models.BooleanField(default=True) #Si cada pesaje está vigente en la compra   
     idVentaMaiz = models.ForeignKey('VentaMaiz', on_delete = models.CASCADE)
 
+    class Meta:
+        verbose_name = 'PesajeVentaMaiz'
+        verbose_name_plural = 'PesajeVentaMaiz'
+        ordering = ['fechaPesaje']
+    
+    def __str__(self):
+        return self.pesoQuintales
+        
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['idVentaMaiz'] = self.idVentaMaiz.toJSON()
+        return item
+
 class Empresa(models.Model):
     ruc = models.CharField(max_length=13,unique=True, blank=False, null=False) 
     razonSocial = models.CharField(max_length=150)
@@ -154,33 +167,69 @@ class VentaMaiz(models.Model):
     humedad = models.IntegerField() #Dato constante
     impureza = models.IntegerField() #Dato constante
     valida = models.BooleanField(default=True) #Si la venta es válida, no eliminada
-    pendiente = models.BooleanField(default=True) #Si la venta estará pendiente o no
+    pendiente = models.BooleanField(default=True) #Si la venta estará pendiente de facturacion o no
+    statusFactura = models.BooleanField(default=True) #Estado de facturacion True pendiente de facturacion###########################
     total = models.DecimalField(max_digits=7, decimal_places=2)
     idEmpresa = models.ForeignKey('Empresa', on_delete = models.CASCADE)
     idResponsableTransporte = models.ForeignKey('ResponsableTransporte', on_delete = models.CASCADE)
+    idFacturaVenta = models.ForeignKey('FacturaVenta', on_delete = models.CASCADE, null=True)
+    idFacturaTransporte = models.ForeignKey('FacturaTransporte', on_delete = models.CASCADE, null=True)
 
-    class Meta:
+    class Meta:  #cambios
         ordering = ['-pk']
+    
+    def __str__(self):
+        return self.idEmpresa
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        item['total'] = format(self.total, '.2f')
+        item['fechaVenta'] = self.fechaVenta.strftime('%Y-%m-%d')
+        item['idFacturaVenta'] = self.idFacturaVenta.toJSON()
+        item['pes'] = [i.toJSON() for i in self.pesajeventamaiz_set.get(vigente=True)]#get(vigente=true)#set.all()
+        return item
         
 class FacturaVenta(models.Model):
-    numeroFactura = models.IntegerField(unique=True)
+    numeroFactura = models.CharField(max_length=12, null=False)
     fechaEmision = models.DateField()
     cantidad = models.DecimalField(max_digits=7,decimal_places=2)
     preciounitario = models.DecimalField(max_digits=4,decimal_places=2)
     precioTotal = models.DecimalField(max_digits=8,decimal_places=2)
-    estado = models.CharField(max_length=25)
-    tipoPago = models.CharField(max_length=25)
-    idVentaMaiz = models.ForeignKey('VentaMaiz', on_delete = models.CASCADE)
+    idEmpresa = models.ForeignKey('Empresa', on_delete=models.CASCADE)#para probar
+
+    class Meta:
+        verbose_name = 'facturaVenta'
+        verbose_name_plural = 'facturasVenta'
+        ordering = ['fechaEmision']
+    
+    def __str__(self):
+        return self.numeroFactura
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+
     
 class FacturaTransporte(models.Model):
-    numerofactura = models.IntegerField()
-    fechaFactura = models.DateField()
+    numerofactura = models.CharField(max_length=12, null=False)
+    fechaEmision = models.DateField()
     cantidad = models.DecimalField(max_digits=7, decimal_places=2)
     preciounitario = models.DecimalField(max_digits=4,decimal_places=2)
     precioTotal = models.DecimalField(max_digits=8,decimal_places=2)
-    estado = models.CharField(max_length=25)
-    tipoPago = models.CharField(max_length=25)
-    idVentaMaiz = models.ForeignKey('VentaMaiz', on_delete = models.CASCADE)
+    idResponsableTransporte = models.ForeignKey('ResponsableTransporte', on_delete=models.CASCADE)#para probarresponsable transporte
+
+    class Meta:
+        verbose_name = 'facturaTransporte'
+        verbose_name_plural = 'facturasTransporte'
+        ordering = ['fechaEmision']
+    
+    def __str__(self):
+        return self.numeroFactura
+
+    def toJSON(self):
+        item = model_to_dict(self)
+        return item
+
 
 class Inventario(models.Model):
     id = models.AutoField(primary_key = True)

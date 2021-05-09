@@ -46,8 +46,7 @@
                       <th class="column-title text-center">Nro.</th>
                       <th class="column-title text-center">Fecha</th>
                       <th class="column-title text-center">Razón Social Productor</th>
-                      <!--<th class="column-title text-center">Observación</th>-->
-                      <th class="column-title text-center">Estado</th>
+                      <th class="column-title text-center">Facturación</th>
                       <th class="column-title text-center">Total</th>
                       <th class="column-title text-center">Opciones</th> 
                     </tr>
@@ -59,10 +58,9 @@
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td class="text-center">{{ compra.fechaCompra }}</td>
                         <td class="text-center">{{ compra.idProductor }}</td>
-                        <!--<td class="text-center">{{ compra.observacion }}</td>-->
                         <td class="text-center">
                           {% if compra.pendiente %} <span class="label label-info">Pendiente</span>
-                          {% else %} <span class="label label-danger">Finalizada</span> {% endif %}</td>
+                          {% else %} <span class="label label-success">Finalizada</span> {% endif %}</td>
                         <td class="text-center"> <span class="badge badge-default">{{ compra.total }}</span></td>
                         <td class="text-center ">                          
                           <a href="{% url 'editar_compra' compra.pk %}" class="btn btn-info btn-xs" title="Gestionar compra"><i class="fa fa-wrench"></i></a>

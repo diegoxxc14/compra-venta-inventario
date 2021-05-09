@@ -53,7 +53,7 @@
                         <td class="text-center">{{ venta.idEmpresa }}</td>
                         <td class="text-center">
                           {% if venta.pendiente %} <span class="label label-info">Pendiente</span>
-                          {% else %} <span class="label label-danger">Finalizada</span> {% endif %}</td>
+                          {% else %} <span class="label label-success">Finalizada</span> {% endif %}</td>
                         <td class="text-center"> <span class="badge badge-default"> {{ venta.total }} </span></td>
                         <td class="text-center ">                          
                           <a href="{% url 'editar_venta' venta.pk %}" class="btn btn-info btn-xs" title="Gestionar venta"><i class="fa fa-wrench"></i></a>

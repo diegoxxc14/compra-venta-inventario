@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<style>
+    @page {
+            size: a4 portrait;
+
+        @frame content_frame {
+            /* Content Frame */
+            left: 50pt;
+            width: 512pt;
+            top: 10pt;
+              height: 632pt;
+        }
+
+        @frame footer_frame {
+            /* Another static Frame */
+            -pdf-frame-content: footer_content;
+            left: 50pt;
+            width: 512pt;
+            top: 772pt;
+            height: 20pt;
+        }
+    }   
+    
+
+    .head {
+        text-align: center;
+        color:#669999;
+        text-transform: uppercase;
+        font-size: x-large
+    } 
+
+    .reporte {
+       color: #669999;
+       font-size: large
+    }
+ 
+     
+
+    #invoice thead tr th {
+        text-align: center;
+        background-color:  #1a5276;
+        color: white;
+        text-shadow: 1px 1px 1px black;
+        border: 1px solid #abb2b9;
+        padding-top: 4px;
+    }
+
+    #invoice thead tr {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        font-size: larger;
+    }
+
+    #invoice tbody tr {        
+        border: 1px solid #abb2b9;
+        font-size: larger;        
+        color: #669999;
+        padding: 0;
+    }
+
+    .text-center{
+        text-align: center;
+    }
+</style>
+<body>  
+    <p class="head">
+        <br>
+        <b>{{ reporte.empresa|upper }}</b> <br>
+        {{ reporte.direccion }} <br>
+    </p>
+    <p class="reporte">   
+        <b>REPORTE &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;  </b> {{ reporte.nombre }} <br>
+        <b>FECHA &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  :  &nbsp;  </b> {{ reporte.fecha}} <br>
+                
+    </p>
+
+    <!-- Content for Static Frame 'footer_frame' -->
+    <div id="footer_content">(c) - Página <pdf:pagenumber>
+            de <pdf:pagecount>
+    </div>   
+    
+
+    <table border="0.5" id="invoice">
+        <thead>
+        <tr>
+            <th style="width: 12.5%;">FECHA</th>
+            <th style="width: 25%;">PRODUCTOR</th>
+            <th style="width: 12.5%;">DOCUMENTO</th>
+            <th style="width: 12.5%;">NÚMERO</th>
+            <th style="width: 12.5%;">CANTIDAD</th>
+            <th style="width: 12.5%;">PRECIO U</th>
+            <th style="width: 12.5%;">PRECIO T</th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for com in compras %}
+            <tr style="padding-top: 3px;">
+                <td class="text-center">{{ com.fechaEmision }}</td>
+                <td class="text-center">{{ com.idProductor.nombres }}</td>
+                <td class="text-center">{{ com.tipoDocumento }}</td>
+                <td class="text-center">{{ com.numeroDocumento }}</td>
+                <td class="text-center">{{ com.cantidad }}</td>
+                <td class="text-center">{{ com.preciounitario }}</td>
+                <td class="text-center">{{ com.precioTotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

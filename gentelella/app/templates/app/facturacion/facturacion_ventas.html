@@ -1,0 +1,335 @@
+{% extends "app/base_site.html" %}
+{% block stylesheets %}
+{{ block.super }}
+<link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+<link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+
+<link href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css" rel="stylesheet">
+<!-- plugin select2 -->
+<link href="/static/vendors/select2/dist/css/select2.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+{% endblock stylesheets %}
+
+{% block title %} Facturación Ventas {% endblock title %}
+
+{% block content %}
+<div class="right_col" role="main">
+  <div class="">
+  <!-- /template para la facturacion de ventas -->
+  <div class="row">
+    <div class="col-md-8 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Ventas Pendientes</h2>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">         
+          <div class="form-horizontal form-label-left ">
+            <div class="form-group">
+              <label class="control-label">Buscador de Empresas:</label>
+                <select id="nombres_productor" style="width: 100%;" class="form-control" name="state">
+                  <option></option>
+                  {% for pro in productores %}
+                  <option value="{{ pro.pk }}">{{ pro.razonSocial }}</option>
+                  {% endfor %}
+                </select>
+            </div>
+          </div>
+          <br>
+        
+          
+            <table id="tabla_facturacion" class="table table-striped jambo_table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th class="column-title text-center">Nro.</th>
+                  <th class="column-title text-center">Fecha</th>
+                  <th class="column-title text-center">Peso Neto (Quintales) </th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="btn-group  btn-group-center">
+              <div class="btn-group" role="group">
+                <button id="btnGuardarDocumento" class="btn btn-success" disabled><span class="fa fa-plus"></span>
+                  Guardar Documento</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+        <!-- /Form para empresa nueva table-striped jambo_table bulk_action  -->
+
+    <div class="col-md-4 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Facturación Ventas</h2>
+
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+    
+          <div class="form-group">
+            <label>Número de Documento:</label>
+            <input name="" id="nro_factura" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de venta:</label>
+            <input id="fecha_venta" type="date" name="fecha" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label>Productor:</label>
+            <input id="productor" type="text" class="form-control" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Cantidad (qq):</label>
+            <input id="cantidad" type="number" class="form-control" value="0.00" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Precio Unitario ($):</label>
+            <input id="precio_unitario" type="number" class="form-control" min="0" step="0.01" required>
+          </div>
+
+          <div class="form-group">
+            <label>Total a Pagar ($):</label>
+            <input id="total" type="number" class="form-control" value="0.00" readonly>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+{{ block.super}}
+<!-- jquery.inputmask -->
+<script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+
+
+  <!-- Datatables -->
+  <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+  <script src="/static/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+  <script src="/static/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+  <script src="/static/vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
+  <script src="/static/vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+  <script src="/static/vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
+  <script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+  <script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+  
+
+
+<script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+<!-- select2 -->
+<script src="/static/vendors/select2/dist/js/select2.min.js"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+  $(function () {
+    var pk_empresa = null;
+    var ventasSeleccionadas = null;
+    var PRECIO_UNITARIO = "14.00"; //Constante en caso de cambio del precio unitario
+    
+    //** Declarar la tabla de Pesajes
+    var tablaFacturacion = $('#tabla_facturacion').DataTable({
+      scrollX: true,
+      autoWidth: false,
+      
+      data: [],
+      columnDefs: [
+        {
+          targets: [0,1,2],
+          class: 'text-center',
+          orderable: true,           
+        },
+        {
+          targets: [2],
+          class: 'text-center',
+          render: function (data, type, row) {
+          return '<span class="badge badge-default">' + data + '</span>';
+          }
+        },
+      ],
+      displayLength: 5,
+      columns: [
+        { "data": null }, //Contador de filas
+        { "data": "fechaVenta", "render": function (data) {
+            return moment(data).format("DD-MM-YYYY");
+          } 
+        },
+        { "data": "total"}
+        
+      ],
+      select: {
+        "style": "multi",
+      },
+      language: {
+        "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json",
+        "select": {
+          "rows": {
+            _: "<span style='font-weight: bold;'>%d ventas seleccionadas</span>",
+            0: "<span style='font-weight: bold;'>0 ventas seleccionadas</span>",
+            1: "<span style='font-weight: bold;'>1 venta seleccionada</span>"
+          }
+        }    
+      }
+    });
+
+    
+    //** Contador de Pesajes
+    tablaFacturacion.on('order.dt search.dt', function () {
+      tablaFacturacion.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+        cell.innerHTML = i + 1;
+      });
+    }).draw();
+
+    $("#tabla_facturacion tbody").on("mouseover", "tr", function () {
+      $(this).css("cursor", "pointer");
+    });
+
+    //**validar el numero de factura
+    $('#nro_factura').inputmask({
+      mask: '999_999_9999',
+      clearIncomplete: true,
+      positionCaretOnClick: 'none'
+    });
+    
+    $("#fecha_venta").val(moment().format('YYYY-MM-DD'));    
+
+    $("#precio_unitario").val(PRECIO_UNITARIO);
+
+    $("#nombres_productor").select2({
+      placeholder: "Seleccione una empresa",
+      allowClear: true,
+    });
+
+    //Seleccionar Empresa y Cargar ventas
+    $("#nombres_productor").on("select2:select", function (e) {
+      let datosEmpresa = e.params.data;
+      pk_empresa = $(this).val();
+      //Obtener ventas
+      $.ajax({
+        data: {
+          "pk_empresa": pk_empresa
+        },
+        url: "{% url 'obtener_ventas' %}",
+        type: "POST",
+        success: function (data) {
+          tablaFacturacion.rows().remove().draw(false);
+          tablaFacturacion.rows.add(data).draw(false);
+          $("#productor").val(datosEmpresa.text);
+          $("#btnGuardarDocumento").attr("disabled",false);
+        },
+        error: function () {
+          console.log("Hubo un problema.");
+        }
+      });
+    });
+
+    //Seleccionar ventas
+    $('#tabla_facturacion tbody').on('click', 'tr', function () {
+      $(this).toggleClass('selected');
+      realizarCalculos();
+      console.log(ventasSeleccionadas);
+    });
+
+    $("#btnGuardarDocumento").on("click", function () {
+      if (ventasSeleccionadas.length > 0) { //Verificar si seleccionó ventas.
+        if (validarCampos()) {
+          let pks_ventas = $.makeArray();
+          for (var i = 0; i < ventasSeleccionadas.length; i++) {//Guardo los pk en un arreglo para pasarlos por AJAX
+            pks_ventas.push(ventasSeleccionadas[i].pk);
+          }
+          $.ajax({
+            data: {
+              "pk_empresa": pk_empresa,"pks_ventas": JSON.stringify(pks_ventas), "nro_factura": $("#nro_factura").val(),
+              "fecha_venta":$("#fecha_venta").val(), "cantidad":$("#cantidad").val(),
+              "precio_unitario": $("#precio_unitario").val(), "total": $("#total").val()
+            },
+            url: "{% url 'guardar_factura_venta' %}",
+            type: "POST",
+            success: function (data) {
+              tablaFacturacion.rows().remove().draw(false);
+              swal("Correcto","Documento guardado correctamente","success");
+              limpiarCampos();
+            },
+            error: function () {
+              console.log("Hubo un problema.");
+            }
+          });
+        } else {
+          swal("Campos vacíos","Debe ingresar todos los campos requeridos","error");  
+        }
+      } else {
+        swal("Sin ventas","Debe seleccionar al menos una venta","error");
+      }
+    });
+
+    //Si hay un cambio en el Select2
+    $('#nombres_productor').on('change.select2', function(){
+      tablaFacturacion.rows().remove().draw(false);
+      $("#productor").val("");
+      $("#btnGuardarDocumento").attr("disabled",true);
+      realizarCalculos();
+    }); 
+
+    $("#precio_unitario").on("change keyup", function () {
+      realizarCalculos();
+    });
+
+    function validarCampos() {
+      return $("#nro_factura").val()!="" && $("#precio_unitario").val()!="";
+    }
+
+    function realizarCalculos() {
+      ventasSeleccionadas = tablaFacturacion.rows('.selected').data();
+      if (ventasSeleccionadas.length > 0) {
+        calcularDocVenta(ventasSeleccionadas);        
+      } else {
+        $("#cantidad").val("0.00");
+        $("#total").val("0.00");
+      }
+    }
+
+    function calcularDocVenta(data) {
+      let suma=0;
+      let precioUnitario = parseFloat($("#precio_unitario").val());
+      for (let i = 0; i < data.length; i++) {
+        suma+=parseFloat(data[i].total);
+      }
+      let subtotal = suma * precioUnitario;
+      $("#cantidad").val(suma);
+      $("#total").val(subtotal.toFixed(2));
+    }
+
+    function limpiarCampos() {
+      $("#tipo_documento").val(1); 
+      $("#nro_factura").val("");
+      $("#fecha_venta").val(moment().format('YYYY-MM-DD')); 
+      $("#productor").val("");
+      $("#cantidad").val("0.00");
+      $("#precio_unitario").val(PRECIO_UNITARIO);
+      $("#total").val("0.00");
+      $("#tipo_pago").val(1);
+      $("#nombres_productor").val('').trigger('change'); 
+    }
+  });
+</script>
+{% endblock javascripts %}

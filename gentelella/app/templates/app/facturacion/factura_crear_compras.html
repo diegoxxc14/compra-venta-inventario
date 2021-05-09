@@ -23,11 +23,7 @@
 
 {% block content %}
 <div class="right_col" role="main">
-  <div class="page-title">
-    <div class="title_left">
-      <h4>Pago Factura de Compras</h4>
-    </div>
-  </div>
+  
 
   <!-- /Form para empresa nueva -->
   <div class="row">
@@ -40,7 +36,7 @@
         <div class="x_content">
           <div class="form-group">
             <label class="control-label">Buscador de Productores:</label>
-            <select id="nombres_productor" class="form-control" name="state">
+            <select id="nombres_productor" class="form-control" name="state"style="width: 100%;">
               <option></option>
               {% for pro in productores %}
               <option value="{{ pro.pk }}">{{ pro.nombres }}</option>
@@ -76,10 +72,7 @@
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="ln_solid"></div>
-
+          </div><!---->
         </div>
       </div>
 
@@ -102,7 +95,7 @@
           </div>
           <div class="form-group">
             <label>Número de Documento:</label>
-            <input type="number" name="" id="nro_documento" class="form-control">
+            <input name="" id="nro_documento" class="form-control" data-inputmask="'mask': '999-999-9999'" >
           </div>
 
           <div class="form-group">
@@ -138,8 +131,6 @@
               {% endfor %}
             </select>
           </div>
-
-          <div class="ln_solid"></div>
         </div>
 
       </div>
@@ -153,6 +144,8 @@
 {{ block.super}}
 <!-- jquery.inputmask -->
 <script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
+ <!-- jquery.inputmask -->
+<script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
 <!-- datatables -->
 <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
 <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
@@ -161,9 +154,7 @@
 <script src="/static/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
 <script src="/static/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
 
-<script src="/static/vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-<script src="/static/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
-<script src="/static/vendors/datatables.net-scroller/js/dataTables.scroller.min.js"></script>
+
 
 <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
 <!-- select2 -->
@@ -180,15 +171,6 @@
     //** Declarar la tabla de Pesajes
     var tablaFacturacion = $('#tabla_facturacion').DataTable({
       data: [],
-      columnDefs: [
-        {
-          "targets": -1,
-          "data": null,
-          "defaultContent": "<div class='a-center'><button class='btn btn-warning btn-xs tbEditarPesaje' title='Editar Pesaje'>" +
-            "<i class='fa fa-pencil'></i></button><button class='btn btn-danger btn-xs tbEliminarPesaje' title='Eliminar Pesaje'>" +
-            "<i class='fa fa-trash-o'></i></button></div>"
-        }
-      ],
       displayLength: 5,
       columns: [
         { "data": null }, //Contador de filas
@@ -196,7 +178,6 @@
             return moment(data).format("DD-MM-YYYY");
           } 
         },
-        { "data": "total" },
         { "data": "total" },
       ],
       select: {
@@ -225,6 +206,9 @@
       $(this).css("cursor", "pointer");
     });
 
+
+    //$("#nro_documento").inputmask({mask: "999999"});
+    
     $("#fecha_compra").val(moment().format('YYYY-MM-DD'));    
 
     $("#precio_unitario").val(PRECIO_UNITARIO);
