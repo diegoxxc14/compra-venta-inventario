@@ -38,8 +38,9 @@ class BodegaMaiz(models.Model): #Registro del stock en Bodega
     fecha = models.DateTimeField(auto_now_add=True) #Guarda la fecha de creación de un objeto
     tipoMovimiento = models.CharField(max_length=25)
     cantidad = models.DecimalField(max_digits=7, decimal_places=2)
-    stockMaiz = models.DecimalField(max_digits=7, decimal_places=2)
-    idCompraMaiz = models.ForeignKey('CompraMaiz', on_delete=models.CASCADE)
+    vigente = models.BooleanField(default=True) #En caso de eliminación o edición
+    idCompraMaiz = models.ForeignKey('CompraMaiz', on_delete=models.CASCADE, null=True)
+    idVentaMaiz = models.ForeignKey('VentaMaiz', on_delete=models.CASCADE, null=True)
 
 class ResponsableTransporte(models.Model):
     identificacion = models.CharField(max_length=10,unique=True, blank=False, null=False)

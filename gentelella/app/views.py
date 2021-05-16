@@ -71,8 +71,7 @@ def guardar_pesajes(request):
         nuevoPesaje.save()
     
     #Guardar registro en Bodega
-    bodega_registro =  BodegaMaiz(cantidad=total_pesajes, 
-        tipoMovimiento=INGRESO, stockMaiz=total_pesajes, idCompraMaiz=compra_maiz)
+    bodega_registro =  BodegaMaiz(cantidad=total_pesajes, tipoMovimiento=INGRESO, idCompraMaiz=compra_maiz)
     bodega_registro.save()
     
     #return HttpResponse(json.dumps(respuesta, cls=DjangoJSONEncoder), content_type='application/json')
@@ -93,11 +92,17 @@ def editar_pesajes(request):
     compra_maiz.total = total_pesajes
     compra_maiz.save()
 
-    #Anulo los Pesajes anteriores
+    #-- REGISTROS A ANULAR
+    #Anular Pesajes anteriores
     pes_anular = PesajeCompraMaiz.objects.filter(idCompraMaiz=pk_compra, vigente=True)
-    for pes_anu in pes_anular:
-        pes_anu.vigente = False
-        pes_anu.save()
+    for pes in pes_anular:
+        pes.vigente = False
+        pes.save()
+
+    #Anular Registro Bodega
+    bod_anular = BodegaMaiz.objects.get(idCompraMaiz_id=pk_compra, vigente=True)
+    bod_anular.vigente=False
+    bod_anular.save()
 
     #Guardar los nuevos Pesajes editados correspondientes a al Compra de Maíz
     for pes in pes_editar:
@@ -108,12 +113,10 @@ def editar_pesajes(request):
             idCompraMaiz=compra_maiz)
         nuevoPesaje.save()
     
-    #Guardar registro en Bodega
-    bodega_registro =  BodegaMaiz(cantidad=total_pesajes, 
-        tipoMovimiento=INGRESO, stockMaiz=total_pesajes, idCompraMaiz=compra_maiz)
+    #Guardar nuevo Registro en Bodega
+    bodega_registro =  BodegaMaiz(cantidad=total_pesajes, tipoMovimiento=INGRESO, idCompraMaiz=compra_maiz)
     bodega_registro.save()
 
-    #return HttpResponse(json.dumps(respuesta, cls=DjangoJSONEncoder), content_type='application/json')
     return HttpResponse('ok')
 
 @csrf_exempt
@@ -123,15 +126,11 @@ def anular_compra(request):
     compra.valida = False
     compra.save()
         
-    return HttpResponse('ok')
+    #Anular Registro Bodega
+    bodegaMaiz = BodegaMaiz.objects.get(idCompraMaiz_id=pk_compra, vigente=True)
+    bodegaMaiz.vigente=False
+    bodegaMaiz.save()
 
-@csrf_exempt
-def finalizar_compra(request):
-    pk_compra = int(request.POST['pk_compra'])
-    compra = CompraMaiz.objects.get(pk=pk_compra)
-    compra.pendiente = False
-    compra.save()
-        
     return HttpResponse('ok')
 
 @login_required
@@ -379,12 +378,12 @@ def guardar_pesajes_venta(request):
     #Obtener el Responsable de Transporte
     responsable_transporte= ResponsableTransporte.objects.get(pk=pk_responsable_transporte)
 
-    #Guardar la Compra de Maíz
+    #Guardar la Venta de Maíz
     venta_maiz = VentaMaiz(observaciones=observacion, humedad=HUMEDAD, 
         impureza=IMPUREZA, total=total_pesajes, idEmpresa=empresa,idResponsableTransporte=responsable_transporte)
     venta_maiz.save()
 
-    #Guardar los Pesajes correspondientes a al Compra de Maíz
+    #Guardar los Pesajes correspondientes a al Venta del Maíz
     for pes in pesajes:
         fecha = datetime.strptime(pes['fecha'], formato_fecha)
         nuevoPesaje = PesajeVentaMaiz(fechaPesaje=fecha, pesoBruto=int(pes['pesoBruto']),
@@ -393,13 +392,25 @@ def guardar_pesajes_venta(request):
             idVentaMaiz=venta_maiz)
         nuevoPesaje.save()
     
-    #Guardar registro en Bodega # bodega debemos guardar el ingreso y la salida del mismo
-    #bodega_registro =  BodegaMaiz(cantidad=total_pesajes, 
-    #    tipoMovimiento=SALIDA, stockMaiz=total_pesajes, idCompraMaiz=compra_maiz)
-    #bodega_registro.save()
+    #Guardar nuevo Registro en Bodega
+    bodega_registro = BodegaMaiz(cantidad=total_pesajes, tipoMovimiento=SALIDA, idVentaMaiz=venta_maiz)
+    bodega_registro.save()
     
-    #return HttpResponse(json.dumps(respuesta, cls=DjangoJSONEncoder), content_type='application/json')
     return HttpResponse('ok')
+
+@csrf_exempt
+def obtener_maiz(request):
+    ingreso = BodegaMaiz.objects.filter(tipoMovimiento=INGRESO, vigente=True).aggregate(Sum('cantidad'))
+    salida = BodegaMaiz.objects.filter(tipoMovimiento=SALIDA, vigente=True).aggregate(Sum('cantidad'))
+    
+    #Validar si la suma da 0
+    if ingreso['cantidad__sum'] is None:
+        ingreso['cantidad__sum']=0
+    if salida['cantidad__sum'] is None:
+        salida['cantidad__sum']=0
+    
+    total_bodega=ingreso['cantidad__sum']-salida['cantidad__sum']
+    return HttpResponse(total_bodega)
 
 #editar venta de maiz
 @login_required
@@ -425,11 +436,17 @@ def editar_pesajes_venta(request):
     venta_maiz.total = total_pesajes
     venta_maiz.save()
 
-    #Anulo los Pesajes anteriores
+    #-- REGISTROS A ANULAR
+    #Anular Pesajes anteriores
     pes_anular = PesajeVentaMaiz.objects.filter(idVentaMaiz=pk_venta, vigente=True)
-    for pes_anu in pes_anular:
-        pes_anu.vigente = False
-        pes_anu.save()
+    for pes in pes_anular:
+        pes.vigente = False
+        pes.save()
+
+    #Anular Registro Bodega
+    bod_anular = BodegaMaiz.objects.get(idVentaMaiz_id=pk_venta, vigente=True)
+    bod_anular.vigente=False
+    bod_anular.save()
 
     #Guardar los nuevos Pesajes editados correspondientes a al Compra de Maíz
     for pes in pes_editar:
@@ -440,12 +457,10 @@ def editar_pesajes_venta(request):
             idVentaMaiz=venta_maiz)
         nuevoPesaje.save()
     
-    #Guardar registro en Bodega
-    #bodega_registro =  BodegaMaiz(cantidad=total_pesajes, 
-    #   tipoMovimiento=INGRESO, stockMaiz=total_pesajes, idCompraMaiz=compra_maiz)
-    #bodega_registro.save()
+    #Guardar nuevo Registro en Bodega
+    bodega_registro = BodegaMaiz(cantidad=total_pesajes, tipoMovimiento=SALIDA, idVentaMaiz=venta_maiz)
+    bodega_registro.save()
 
-    #return HttpResponse(json.dumps(respuesta, cls=DjangoJSONEncoder), content_type='application/json')
     return HttpResponse('ok')
 
 @csrf_exempt
@@ -455,6 +470,11 @@ def anular_venta(request):
     venta.valida = False
     venta.save()
         
+    #Anular Registro Bodega
+    bod_anular = BodegaMaiz.objects.get(idVentaMaiz_id=pk_venta, vigente=True)
+    bod_anular.vigente=False
+    bod_anular.save()
+
     return HttpResponse('ok')
 
 @csrf_exempt
@@ -1157,7 +1177,7 @@ def guardar_documento(request):
     
     documento_compra.save()
     
-    #Actualizar las compras afectadas
+    #Actualizar las compras afectadas (Finalizar)
     for pk_compra in pks_compras:
         compra=CompraMaiz.objects.get(pk=pk_compra)
         compra.pendiente = False
@@ -1269,7 +1289,7 @@ def buscar_PesajesCompra(request):
 
 #Pagina del Dashboard 
 class DashboardView(LoginRequiredMixin, TemplateView):
-    template_name = 'app/dashboard.html'
+    template_name = 'app/index2.html'
     #Obtenemos el total de compras
     def get_total_compras(self):
         cant = 0

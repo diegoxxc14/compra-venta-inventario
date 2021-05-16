@@ -8,10 +8,12 @@ urlpatterns = [
 
     path('',views.DashboardView.as_view(), name='inicio'),
 
+    #Bodega Maiz
+    path('obtener_maiz/', views.obtener_maiz, name='obtener_maiz'),
+
     #Compras Maíz
     path('crear_compra/', views.crear_compra, name='crear_compra'),
     path('editar_compra/<int:pk>/', views.editar_compra, name='editar_compra'),
-    path('finalizar_compra/', views.finalizar_compra, name='finalizar_compra'),
     path('anular_compra/', views.anular_compra, name='anular_compra'),
     path('guardar_pesajes/', views.guardar_pesajes, name='guardar_pesajes'),
     path('editar_pesajes/', views.editar_pesajes, name='editar_pesajes'),

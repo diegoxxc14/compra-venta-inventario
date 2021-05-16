@@ -183,6 +183,7 @@
     var pesaje_editar = null;
     var pesajes = transformarPesajes(JSON.parse("{{ pesajes|escapejs }}")); //Convertir a Json
     var pk_venta = "{{ venta.pk }}";
+    var total_bodega = 0;
 
     //** Declarar la tabla de Pesajes
     var tablaPesaje = $('#tabla_pesaje').DataTable({
@@ -231,7 +232,8 @@
     }).draw();
 
     //** Calcular al cargar los pesajes por primera vez
-    $("#totalPesajes").text(calcularTotalPesaje());
+    var totalPesajesInicial=parseFloat(calcularTotalPesaje());
+    $("#totalPesajes").text(totalPesajesInicial);
 
     //** Calcular el Pesaje
     $("#btnCalcular").on('click', function () {
@@ -306,33 +308,55 @@
 
     //** Editar Venta de maíz
     $("#btnGuardar").on('click', function () {
-      if (calcularTotalPesaje() > 0) { //Si hay Pesajes en la tabla
-        let datos_tabla = tablaPesaje.rows().data();
-        let pesajes = $.makeArray();
+      let total_pesajes = parseFloat(calcularTotalPesaje());
+      if (total_pesajes > 0) { //Si hay Pesajes en la tabla
+        
+        cargarBodegaMaiz(); //Ejecutar consulta para obtener el stock de Maíz
+        if (total_bodega >= total_pesajes) { //Si en la Bodega hay más cantidad que la requerida en la venta
+          let datos_tabla = tablaPesaje.rows().data();
+          let pesajes = $.makeArray();
 
-        for (let i = 0; i < datos_tabla.length; i++) {
-          pesajes.push(datos_tabla[i]);
-        }
-        $.ajax({
-          data: {
-            "pesajes": JSON.stringify(pesajes), "pk_venta": pk_venta,
-            "total_pesajes": $("#totalPesajes").text(), "observacion": $("#observacion").val()
-          },
-          url: "{% url 'editar_pesajes_venta' %}",
-          type: "POST",
-          success: function (data) {
-            swal("Success", "¡Venta editada correctamente!", "success");
-            //Limpiar todos los campos y tabla
-            limpiarCamposVenta();
-          },
-          error: function () {
-            swal("Oops", "¡Ocurrió un problema!", "error");
+          for (let i = 0; i < datos_tabla.length; i++) {
+            pesajes.push(datos_tabla[i]);
           }
-        });
+          $.ajax({
+            data: {
+              "pesajes": JSON.stringify(pesajes), "pk_venta": pk_venta,
+              "total_pesajes": total_pesajes, "observacion": $("#observacion").val()
+            },
+            url: "{% url 'editar_pesajes_venta' %}",
+            type: "POST",
+            success: function (data) {
+              swal("Success", "¡Venta editada correctamente!", "success");
+              //Limpiar todos los campos y tabla
+              limpiarCamposVenta();
+            },
+            error: function () {
+              swal("Oops", "¡Ocurrió un problema!", "error");
+            }
+          });
+        } else {
+          swal("¡Stock insuficiente!", "Cantidad de Maiz no disponible.", "error");
+        }
+
       } else {
         swal("Warning", "No ha ingresado todos los datos.", "warning");
       }
     });
+
+    //** Obtener el maíz en Stock
+    function cargarBodegaMaiz() {
+      $.ajax({
+        url: "{% url 'obtener_maiz' %}",
+        type: "POST",
+        success: function (data) {
+          total_bodega = parseFloat(data) + totalPesajesInicial; //Agregamos el pesaje inical a la bodega ya que se va a editar          
+        },
+        error: function () {
+          total_bodega = 0;
+        }
+      });
+    }
 
     //** Finalizar Venta de maíz
     $("#btnFinalizar").on('click', function () {

@@ -337,33 +337,6 @@
       }
     });
 
-    //** Finalizar Compra de maíz
-    $("#btnFinalizar").on('click', function () {
-      swal({
-        title: "¿Está seguro de finalizar esta compra?",
-        text: "¡Una vez finalizada, no podrá ser modificada!",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-      }).then((willDelete) => {
-        if (willDelete) {
-          $.ajax({
-            data: {
-              "pk_compra": pk_compra,
-            },
-            url: "{% url 'finalizar_compra' %}",
-            type: "POST",
-            success: function (data) {
-              location.reload();
-            },
-            error: function () {
-              swal("Oops", "¡Ocurrió un problema!", "error");
-            }
-          });
-        }
-      });
-    });
-
     function calcularPesoNeto() {
       let pesoBruto = parseInt($('#peso_bruto').val());
       let pesoTara = parseInt($('#peso_tara').val());
