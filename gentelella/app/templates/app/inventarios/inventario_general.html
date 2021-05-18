@@ -1,103 +1,107 @@
-{% extends "app/base_site.html" %}
 
-{% block title %} Inventario General {% endblock title %}
+  {% extends "app/base_site.html" %} 
 
-{% block stylesheets %}
-{{ block.super }}
-<link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
-<link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
-{% endblock stylesheets %}
+  {% block title %} Inventario General {% endblock title %}
 
-{% block content %}
-  <div class="right_col" role="main">
-    <div class="">
-    <div class="clearfix"></div>
-    
-    <div class="row">     
+  {% block stylesheets %}
+  {{ block.super }}
+  <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+  {% endblock stylesheets %}
+
+  {% block content %}
+  
+    <div class="right_col" role="main">
+      <div class="">
+      <div class="clearfix"></div>
+      
+      <div class="row">     
         
-        <div class="col-md-12 col-sm-12 col-xs-12">
-        <div class="x_panel">
-          <div class="x_title">
-            <h2>Inventario General de Insumos e Implementos</h2>            
-            <div class="clearfix"></div>
-          </div>
-              <form class="form-horizontal form-label-left">                   
-                <div class="form-group">
-                  <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
-                    <div class="btn-group">
-                      <a href="{% url 'ingresar_articulo' %}" class="btn btn-success btn-flat">
-                        <i class="fa fa-plus-square"></i> Ingresar Articulo
-                      </a>
-                    </div>
-                    <div class="btn-group">
-                      <a href="{% url 'salida_articulo' %}" class="btn btn-success btn-flat">
-                        <i class="fa fa-minus-square"></i> Salida Articulo
-                      </a>
-                    </div>
-                    <div class="btn-group">
-                      <a href="{% url 'inventario_documento_pdf' %}" class="btn btn-success btn-flat">
-                        <i class="fa fa-file-pdf-o"></i> Reporte
-                      </a>
-                    </div>
+          <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Inventario General de Insumos e Implementos</h2>            
+              <div class="clearfix"></div>
+            </div>
+                <form class="form-horizontal form-label-left">                   
+                  <div class="form-group">
+                    <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
+                      <div class="btn-group">
+                        <a href="{% url 'ingresar_articulo' %}" class="btn btn-success btn-flat">
+                          <i class="fa fa-plus-square"></i> Ingresar Articulo
+                        </a>
+                      </div>
+                      <div class="btn-group">
+                        <a href="{% url 'salida_articulo' %}" class="btn btn-success btn-flat">
+                          <i class="fa fa-minus-square"></i> Salida Articulo
+                        </a>
+                      </div>
+                      <div class="btn-group">
+                        <a href="{% url 'inventario_documento_pdf' %}" class="btn btn-success btn-flat">
+                          <i class="fa fa-file-pdf-o"></i> Reporte
+                        </a>
+                      </div>
 
-                  </div>
-                </div>    
-              </form>
-              <br>              
-              <div class="x_content">
-                <table id="tblInventario" class="table table-striped jambo_table bulk_action">
-                  <thead>
-                    <tr class="headings">                                                           
-                      <th class="column-title text-center">Nro</th>
-                      <th class="column-title text-center">Descripción</th>
-                      <th class="column-title text-center">Categoria</th>
-                      <th class="column-title text-center">Stock</th>   
-                      <th class="column-title text-center">Unidad</th>   
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for articulo in form %}
-                    <tr class="even pointer">
-                      <td class="text-center">{{ forloop.counter }}</td>                                                             
-                      <td class="text-center">{{articulo.descripcion}} </td>                       
-                      <td class="text-center">{{articulo.idCategoria}}</td>                      
-                      <td class="text-center"><span class="badge badge-default"> {{articulo.stock}} </span></td>
-                      <td class="text-center"> {{articulo.unidadMedida}} </td>                        
-                    </tr>
-                    {% endfor %}                   
-                  </tbody>
-                </table>
-                                    
-          </div>
+                    </div>
+                  </div>    
+                </form>
+                <br>              
+                <div class="x_content">
+                  <table id="tblInventario" class="table table-striped jambo_table bulk_action">
+                    <thead>
+                      <tr class="headings">                                                           
+                        <th class="column-title text-center">Nro</th>
+                        <th class="column-title text-center">Descripción</th>
+                        <th class="column-title text-center">Categoria</th>
+                        <th class="column-title text-center">Stock</th>   
+                        <th class="column-title text-center">Unidad</th>   
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for articulo in form %}
+                      <tr class="even pointer">
+                        <td class="text-center">{{ forloop.counter }}</td>                                                             
+                        <td class="text-center">{{articulo.descripcion}} </td>                       
+                        <td class="text-center">{{articulo.idCategoria}}</td>                      
+                        <td class="text-center"><span class="badge badge-default"> {{articulo.stock}} </span></td>
+                        <td class="text-center"> {{articulo.unidadMedida}} </td>                        
+                      </tr>
+                      {% endfor %}                   
+                    </tbody>
+                  </table>
+                                      
+            </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-{% endblock content %}
+ 
 
-{% block javascripts %}
-  {{ block.super}}
-    <!-- Datatables -->
-  <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
-  <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-  <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-  <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
-  
-  <script>
-    $(function(){
+  {% endblock content %}
 
-      $('#tblInventario').DataTable( {
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
-          }
-      } );
+  {% block javascripts %}
+    {{ block.super}}
+      <!-- Datatables -->
+    <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+    
+    <script>
+      $(function(){
 
-    })
-  </script>
- {% endblock javascripts %}
+        $('#tblInventario').DataTable( {
+          language: {
+              "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+            }
+        } );
+
+      })
+    </script>
+  {% endblock javascripts %}
 
 

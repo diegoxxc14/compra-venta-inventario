@@ -1,19 +1,16 @@
 {% extends "app/base_site.html" %}
 
 
-{% block title %} Eliminar Categoria {% endblock title %}
+
+{% block title %} Eliminar Articulo {% endblock title %}
 
 
 {% block content %}
   <div class="right_col" role="main">
     
     <div class="row">
-        <!-- form para el ingreso de los datos de una nueva compra -->
       <div class="clearfix"></div>
-
-        
     </div>
-    <!-- /Form para el ingreso de los datos de una empresa nueva -->
         <div class="row">
         <div class="col-md-8 col-xs-12">
           <div class="x_panel">
@@ -24,13 +21,14 @@
             </div>
             <div class="x_content">
               <br />
+               
               <form method="POST"  class="form-horizontal form-label-left input_mask">
                 {% csrf_token %}
-                
-                <p><strong>¿Desea eliminar el registro de {{object.nombre}} ?</strong></p>
-                <button type="submit" class="btn btn-danger">Confirmar</button>
+                    <p><strong>¿Desea eliminar el registro de {{object}} ?</strong></p>
+                    <button type="submit" class="btn btn-danger">Confirmar</button>                
                   </div>
-                </div>          
+                </div>
+                          
               </form>
             </div>
           </div>
@@ -41,13 +39,10 @@
   </div>
 {% endblock content %}
 
+
 {% block javascripts %}
   {{ block.super}}
   
-    <!-- jquery.inputmask -->
-  <script src="/static/vendors/jquery.inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
-    <!-- Sweet Alert -->
-  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script>
     $(function(){
       $('form').on('submit', function (e) {

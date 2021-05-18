@@ -42,3 +42,28 @@
       </div>
   </div>
 {% endblock content %}
+
+{% block javascripts %}
+  {{ block.super}}
+  
+  <script>
+    $(function(){
+      $('form').on('submit', function (e) {
+          $.ajax({         
+            url: window.location.pathname,
+            type: "POST",
+            data: {},
+            dataType: 'json',
+            processData: false,
+            contentType: false,
+            success: function (data) {
+              swal("Ingreso de Articulo", "¡Correctamente!", "success"); 
+            },
+            error: function (data) {       
+            },
+          });
+      });     
+
+    })
+  </script>
+ {% endblock javascripts %}

@@ -30,6 +30,7 @@ urlpatterns = [
     path('crear_empresa/',views.CrearEmpresa.as_view(), name='crear_empresa'),
     path('listar_empresas/', views.listar_empresas, name= 'listar_empresas'),
     path('editar_empresa/<int:pk>/', views.EditarEmpresa.as_view(), name = 'editar_empresa'),
+    path('eliminar_empresa/<int:pk>/',views.EliminarEmpresa.as_view(), name = 'eliminar_empresa'),
 
     #URLs de la sección Ventas    
     path('gestion_ventas/',views.gestion_ventas, name='gestion_ventas'),
@@ -53,6 +54,7 @@ urlpatterns = [
     path('crear_responsableTransporte/',views.CrearResponsableTransporte.as_view(), name='crear_responsableTransporte'),
     path('listar_responsableTransporte/', views.listarResponsableTransporte, name= 'listar_responsableTransporte'),
     path('editar_responsableTransporte/<int:pk>/', views.EditarResponsableTransporte.as_view(), name = 'editar_responsableTransporte'),
+    path('eliminar_responsableTransporte/<int:pk>/', views.EliminarResponsableTransporte.as_view(), name = 'eliminar_responsableTransporte'),
 
     #URLs para la generación de reportes
     path('reportes_compras/', views.reportes_compras, name='reportes_compras'),
@@ -77,10 +79,14 @@ urlpatterns = [
 
     #URLs para la seccion de inventario de insumos e implementos
     path('inventario_general/',views.inventario_general, name='inventario_general'),
+    path('listar_bodega/',views.listar_bodega, name='listar_bodega'),
+    path('imprimir_bodega/', views.imprimir_bodega , name='imprimir_bodega'),
+
     
     # URLS para Articulo
     path('crear_articulo/',views.CrearArticulo.as_view(), name='crear_articulo'),     
     path('editar_articulo/<int:pk>/', views.EditarArticulo.as_view(), name = 'editar_articulo'),
+    path('eliminar_articulo/<int:pk>/', views.EliminarArticulo.as_view(), name = 'eliminar_articulo'),
     path('listar_articulo/',views.listar_articulo, name='listar_articulo'),  
 
     path('ingresar_articulo/',views.ingresar_articulo, name='ingresar_articulo'),
@@ -99,12 +105,14 @@ urlpatterns = [
     path('crear_proveedor/',views.CrearProveedor.as_view(), name='crear_proveedor'),
     path('listar_proveedor/',views.listar_proveedor, name='listar_proveedor'),
     path('editar_proveedor/<int:pk>/', views.EditarProveedor.as_view(), name = 'editar_proveedor'),
+    path('eliminar_proveedor/<int:pk>/', views.EliminarProveedor.as_view(), name = 'eliminar_proveedor'),
     
     
     #URLs para la seccion de empleado
     path('crear_empleado/',views.CrearEmpleado.as_view(), name='crear_empleado'),    
     path('listar_empleado/',views.listar_empleado, name='listar_empleado'),
     path('editar_empleado/<int:pk>/', views.EditarEmpleado.as_view(), name = 'editar_empleado'),
+    path('eliminar_empleado/<int:pk>/', views.EliminarEmpleado.as_view(), name = 'eliminar_empleado'),
     
     #pagos Aun por editar factura
     path('crear_facturacion/',views.facturacion_compra, name='facturacion_compra'),

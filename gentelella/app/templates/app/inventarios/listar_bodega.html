@@ -1,0 +1,132 @@
+
+  {% extends "app/base_site.html" %} 
+
+  {% block title %} Transacciones de Maíz {% endblock title %}
+
+  {% block stylesheets %}
+  {{ block.super }}
+  <link href="/static/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css" rel="stylesheet">
+  <link href="/static/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css" rel="stylesheet">
+  {% endblock stylesheets %}
+
+  {% block content %}
+  
+    <div class="right_col" role="main">
+      <div class="">
+      <div class="clearfix"></div>
+      
+      <div class="row">     
+        
+          <div class="col-md-12 col-sm-12 col-xs-12">
+          <div class="x_panel">
+            <div class="x_title">
+              <h2>Transacciones de Maiz amarillo duro</h2>            
+              <div class="clearfix"></div>
+            </div>
+                <!-- info row -->
+                <div class="row invoice-info">
+                    <div class="col-sm-4 invoice-col">
+                        <h4>
+                            <i class="fa fa-cart-arrow-down"></i>
+                            Compras: {{ingreso.cantidad__sum}}
+                        </h4>                      
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-sm-4 invoice-col">
+                        <h4>
+                            <i class="fa fa-cart-plus"></i>
+                            Ventas: {{salida.cantidad__sum}}
+                        </h4>                      
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-sm-4 invoice-col">
+                        <h4>
+                            <i class="fa fa-cubes"></i>
+                            Total: {{total_bodega}}
+                        </h4>
+                    </div>
+                    <!-- /.col -->
+                  </div>
+                  <!-- /.row -->            
+                <div class="x_content">
+                  <table id="tblBodega" class="table table-striped jambo_table bulk_action">
+                    <thead>
+                      <tr class="headings">                                                         
+                        <th class="column-title text-center">Nro.</th>                            
+                        <th class="column-title text-center">Fecha Movimiento</th>
+                        <th class="column-title text-center">Movimiento</th>
+                        <th class="column-title text-center">Cantidad</th>
+                      </tr>
+                    </thead> 
+                    <tbody>
+                      {% for bod in form %}
+                      <tr class="even pointer">
+                        <td class="text-center">{{ forloop.counter }}</td>                                                             
+                        <td class="text-center">{{bod.fecha}} </td>                       
+                        <td class="text-center">{{bod.tipoMovimiento}}</td>
+                        <td class="text-center"><span class="badge badge-default"> {{bod.cantidad}} </span></td>
+                      </tr>
+                      {% endfor %}                   
+                    </tbody>
+                  </table>
+                  <div class="col-md-12 col-sm-6 col-xs-12 text-center">
+                    <a class="btn btn-success" href="{% url 'imprimir_bodega' %}" target="_blank"><span class="fa fa-file-pdf-o"></span> Generar PDF</a>
+                  </div>                                 
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+
+  {% endblock content %}
+
+  {% block javascripts %}
+    {{ block.super}}
+      <!-- Datatables -->
+    <script src="/static/vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/static/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="/static/vendors/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="/static/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js"></script>
+    
+    <script>
+      $(function(){
+            var total = 0;
+            cargarBodegaMaiz();
+            console.log(total);
+
+            //** Obtener el maíz en Stock
+            function cargarBodegaMaiz() {
+                $.ajax({
+                    url: "{% url 'obtener_maiz' %}",
+                    type: "POST",
+                    success: function (data) {  
+                        total = parseFloat(data);
+                        console.log(total);
+                    },
+                    error: function () {            
+                        total_bodega = 0;
+                    }
+                });
+                console.log(total);
+            }
+       
+        
+        
+        
+        $('#tblBodega').DataTable( {
+          language: {
+              "url": "//cdn.datatables.net/plug-ins/1.10.19/i18n/Spanish.json"
+            }
+        } );
+        //$("#totalPesajes").text();
+        //** Obtener el maíz en Stock
+      })
+    </script>
+  {% endblock javascripts %}
+
+

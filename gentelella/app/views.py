@@ -10,14 +10,14 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template
 from django.db.models.functions import Coalesce
 from django.db.models import Sum,Count
+from django.db.models import ProtectedError
 from datetime import date, datetime, timedelta
 from django.contrib.auth.decorators import login_required,permission_required, user_passes_test#probando user_passes_test
 from django.utils.decorators import method_decorator
 from decimal import Decimal
 from xhtml2pdf import pisa
 from app.models import Articulo,IngresoArticulo,DetalleIngresoArticulos,DetalleSalidaArticulos,SalidaArticulo,Categoria, Inventario, Productor, Empresa, Proveedor, ResponsableTransporte, PesajeCompraMaiz,PesajeVentaMaiz, CompraMaiz, VentaMaiz, BodegaMaiz, Empleado, DocumentoCompra,FacturaVenta
-from app.models import FacturaTransporte
-from app.mixins import ValidatePermissionRequiredMixin
+from app.models import FacturaTransporte,BodegaMaiz
 from app.decorators import gerente_required
 from app.forms import ProductorForm, InventarioForm, EmpresaForm, ResponsableTransporteForm, ProveedorForm, CrearInventarioForm, ArticuloForm, CategoriaForm, EmpleadoForm,DocumentoCompraForm
 from app.utils import * #Importamos métodos útiles
@@ -162,17 +162,13 @@ class EliminarProductor(DeleteView):
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
         success_url = self.get_success_url()
-        if self.object.Productor.count() > 0:
-            messages.add_message(request, messages.ERROR, "Can't be deleted, has childern")
-            return redirect('listar_productor')
-        return super().delete(request, *args, **kwargs)
-        #try:
-        #    self.object.delete()
-        #    return HttpResponseRedirect(success_url)
-        #except ProtectedError:
-        #    messages.add_message(request, messages.ERROR, "No se puede eliminar Categoria %s, tiene Articulos vinculados" %self.object.nombre)
-       #     return redirect(success_url)
-
+        try:
+            self.object.delete()
+            return HttpResponseRedirect(success_url)
+        except ProtectedError:
+            messages.add_message(request, messages.ERROR, "No se puede eliminar el Productor %s, tiene Compras vinculados" %self.object.nombres)
+            return redirect(success_url)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
@@ -205,6 +201,26 @@ class EditarEmpresa(UpdateView):
         messages.add_message(self.request, messages.WARNING, 'Hubo problemas para editar esta Empresa.')
         return super().form_invalid(form)
 
+@method_decorator(login_required, name='dispatch')
+class EliminarEmpresa(DeleteView):
+    model = Empresa
+    template_name = "app/ventas/empresa_eliminar.html"
+    success_url = reverse_lazy('listar_empresas')
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        try:
+            self.object.delete()
+            return HttpResponseRedirect(success_url)
+        except ProtectedError:
+            messages.add_message(request, messages.ERROR, "No se puede eliminar la empresa %s, tiene ventas vinculados" %self.object.razonSocial)
+            return redirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
 @login_required
 def listar_empresas(request, template_name='app/ventas/empresa_listar.html'):
     form = Empresa.objects.all()
@@ -224,6 +240,27 @@ class EditarResponsableTransporte(UpdateView):
     form_class = ResponsableTransporteForm
     template_name = 'app/ventas/transportista_editar.html'
     success_url = reverse_lazy('listar_responsableTransporte')
+
+@method_decorator(login_required, name='dispatch')
+class EliminarResponsableTransporte(DeleteView):
+    model = ResponsableTransporte
+    template_name = "app/ventas/transportista_eliminar.html"
+    success_url = reverse_lazy('listar_responsableTransporte')
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        try:
+            self.object.delete()
+            return HttpResponseRedirect(success_url)
+        except ProtectedError:
+            messages.add_message(request, messages.ERROR, "No se puede eliminar el transportista %s, tiene ventas vinculados" %self.object.nombre)
+            return redirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
 
 @login_required
 def listarResponsableTransporte(request, template_name='app/ventas/transportista_listar.html'):
@@ -505,6 +542,26 @@ class EditarProveedor(UpdateView):
     form_class = ProveedorForm
     template_name = 'app/inventarios/proveedor/proveedor_editar.html'
     success_url = reverse_lazy('listar_proveedor')
+
+@method_decorator([login_required,gerente_required], name='dispatch')
+class EliminarProveedor(DeleteView):
+    model = Proveedor
+    template_name = "app/inventarios/proveedor/proveedor_eliminar.html"
+    success_url = reverse_lazy('listar_proveedor')    
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        try:
+            self.object.delete()
+            return HttpResponseRedirect(success_url)
+        except ProtectedError:
+            messages.add_message(request, messages.ERROR, "No se puede eliminar proveedor %s, tiene items vinculados" %self.object.razonSocial)
+            return redirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context 
 
 @login_required
 def listarVentas(request, template_name='app/inventarios/listar_ventas.html'):
@@ -864,7 +921,74 @@ def imprimir_facturacion_transporte(request):
 @gerente_required
 def inventario_general(request, template_name='app/inventarios/inventario_general.html'):
     form = Articulo.objects.all()
-    return render(request, template_name, {'form':form})           
+    return render(request, template_name, {'form':form})  
+####creando una lista bodiga
+@login_required
+@gerente_required
+def listar_bodega(request, template_name='app/inventarios/listar_bodega.html'):
+    total_bodega = 0
+    form = BodegaMaiz.objects.filter(vigente=True)
+    ingreso = BodegaMaiz.objects.filter(tipoMovimiento=INGRESO, vigente=True).aggregate(Sum('cantidad'))
+    salida = BodegaMaiz.objects.filter(tipoMovimiento=SALIDA, vigente=True).aggregate(Sum('cantidad'))
+    
+    #Validar si la suma da 0
+    if ingreso['cantidad__sum'] is None:
+        ingreso['cantidad__sum']=0
+    if salida['cantidad__sum'] is None:
+        salida['cantidad__sum']=0
+    
+    total_bodega=ingreso['cantidad__sum']-salida['cantidad__sum']
+    return render(request, template_name, {'form':form,'ingreso':ingreso,'salida':salida,'total_bodega':total_bodega})           
+
+####
+@login_required
+def imprimir_bodega(request):        
+    total_bodega = 0
+    form = BodegaMaiz.objects.filter(vigente=True)
+    ingreso = BodegaMaiz.objects.filter(tipoMovimiento=INGRESO, vigente=True).aggregate(Sum('cantidad'))
+    salida = BodegaMaiz.objects.filter(tipoMovimiento=SALIDA, vigente=True).aggregate(Sum('cantidad'))
+    
+    #Validar si la suma da 0
+    if ingreso['cantidad__sum'] is None:
+        ingreso['cantidad__sum']=0
+    if salida['cantidad__sum'] is None:
+        salida['cantidad__sum']=0
+    
+    total_bodega=ingreso['cantidad__sum']-salida['cantidad__sum']
+
+    date = datetime.now()
+    fecha = date    
+    fecha1 = date.strftime('%d-%m-%Y-%H-%M')
+    
+    #Código necesario para generar el reporte PDF
+    #template_path = 'app/compras/reporte_pdf.html'
+    template_path = 'app/reportes/reporte_bodega_pdf.html'
+    context = {
+        'form' : form,
+        'ingreso' : ingreso,
+        'salida' : salida,
+        'total_bodega' : total_bodega, 
+        'reporte' : {'empresa':'Centro de Acopio de Sabanilla',
+        'direccion':'Sabanilla-Loja-Ecuador',
+        'nombre':'Transacciones de maíz amarillo duro','fecha':fecha
+        }
+    }    
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte bodega %s.pdf"' % (fecha1)
+    # find the template and render it.
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create a pdf
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+
+    # if error then show some funy view
+    if pisa_status.err:
+       return HttpResponse('Tenemos los siguientes errores <pre>' + html + '</pre>')
+    return response
+
+####
 
 @method_decorator([login_required,gerente_required], name='dispatch') #@method_decorator([login_required,gerente_required], name='dispatch')
 class CrearArticulo(CreateView):
@@ -887,6 +1011,26 @@ def listar_articulo(request, template_name='app/inventarios/articulos/articulo_l
     return render(request, template_name, {'form':form})
 
 @method_decorator([login_required,gerente_required], name='dispatch')
+class EliminarArticulo(DeleteView):
+    model = Articulo
+    template_name = "app/inventarios/articulos/articulo_eliminar.html"
+    success_url = reverse_lazy('listar_articulo')    
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        try:
+            self.object.delete()
+            return HttpResponseRedirect(success_url)
+        except ProtectedError:
+            messages.add_message(request, messages.ERROR, "No se puede eliminar articulo %s, tiene items vinculados" %self.object.descripcion)
+            return redirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context 
+
+@method_decorator([login_required,gerente_required], name='dispatch')
 class CrearCategoria(CreateView):
     model = Categoria
     template_name = 'app/inventarios/categoria/categoria_crear.html'
@@ -906,7 +1050,7 @@ class EditarCategoria(UpdateView):
     template_name = 'app/inventarios/categoria/categoria_editar.html'
     success_url = reverse_lazy('listar_categoria')
 
-from django.db.models import ProtectedError
+
 @method_decorator([login_required,gerente_required], name='dispatch')
 class EliminarCategoria(DeleteView):
     model = Categoria
@@ -920,7 +1064,7 @@ class EliminarCategoria(DeleteView):
             self.object.delete()
             return HttpResponseRedirect(success_url)
         except ProtectedError:
-            messages.add_message(request, messages.ERROR, "No se puede eliminar Categoria %s, tiene Articulos vinculados" %self.object.nombre)
+            messages.add_message(request, messages.ERROR, "No se puede eliminar categoria %s, tiene items vinculados" %self.object.nombre)
             return redirect(success_url)
     
     def get_context_data(self, **kwargs):
@@ -1138,6 +1282,27 @@ class EditarEmpleado(UpdateView):
     template_name = 'app/inventarios/empleado/empleado_editar.html'
     success_url = reverse_lazy('listar_empleado')
 
+
+@method_decorator([login_required,gerente_required], name='dispatch')
+class EliminarEmpleado(DeleteView):
+    model = Empleado
+    template_name = "app/inventarios/empleado/empleado_eliminar.html"
+    success_url = reverse_lazy('listar_empleado')    
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        try:
+            self.object.delete()
+            return HttpResponseRedirect(success_url)
+        except ProtectedError:
+            messages.add_message(request, messages.ERROR, "No se puede eliminar empleado %s, tiene items vinculados" %self.object.nombres)
+            return redirect(success_url)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
 #Facturación Compras
 @login_required
 @gerente_required
@@ -1289,7 +1454,7 @@ def buscar_PesajesCompra(request):
 
 #Pagina del Dashboard 
 class DashboardView(LoginRequiredMixin, TemplateView):
-    template_name = 'app/index2.html'
+    template_name = 'app/dashboard.html'
     #Obtenemos el total de compras
     def get_total_compras(self):
         cant = 0

@@ -71,7 +71,7 @@ class CompraMaiz(models.Model): #Datos de la Compra
     valida = models.BooleanField(default=True) #Si la compra es válida, no eliminada
     pendiente = models.BooleanField(default=True) #Si la compra estará pendiente o no
     total = models.DecimalField(max_digits=7, decimal_places=2)
-    idProductor = models.ForeignKey('Productor', on_delete=models.CASCADE)
+    idProductor = models.ForeignKey('Productor',on_delete=models.PROTECT)
     idDocumentoCompra = models.ForeignKey('DocumentoCompra', on_delete = models.CASCADE, null=True)
     
     class Meta:
@@ -95,7 +95,7 @@ class DocumentoCompra(models.Model):
     preciounitario = models.DecimalField(max_digits=4,decimal_places=2)
     precioTotal = models.DecimalField(max_digits=8,decimal_places=2)
     tipoPago = models.CharField(max_length=25)
-    idProductor = models.ForeignKey('Productor', on_delete=models.CASCADE)#para probar
+    idProductor = models.ForeignKey('Productor', on_delete=models.PROTECT)#para probar
 
 class PesajeCompraMaiz(models.Model): #Los Pesajes correspondientes a una Compra
     fechaPesaje = models.DateTimeField() #No es "auto_now_add" porque la fecha se toma antes de guardar
@@ -171,8 +171,8 @@ class VentaMaiz(models.Model):
     pendiente = models.BooleanField(default=True) #Si la venta estará pendiente de facturacion o no
     statusFactura = models.BooleanField(default=True) #Estado de facturacion True pendiente de facturacion###########################
     total = models.DecimalField(max_digits=7, decimal_places=2)
-    idEmpresa = models.ForeignKey('Empresa', on_delete = models.CASCADE)
-    idResponsableTransporte = models.ForeignKey('ResponsableTransporte', on_delete = models.CASCADE)
+    idEmpresa = models.ForeignKey('Empresa', on_delete=models.PROTECT)
+    idResponsableTransporte = models.ForeignKey('ResponsableTransporte', on_delete=models.PROTECT)
     idFacturaVenta = models.ForeignKey('FacturaVenta', on_delete = models.CASCADE, null=True)
     idFacturaTransporte = models.ForeignKey('FacturaTransporte', on_delete = models.CASCADE, null=True)
 
@@ -196,7 +196,7 @@ class FacturaVenta(models.Model):
     cantidad = models.DecimalField(max_digits=7,decimal_places=2)
     preciounitario = models.DecimalField(max_digits=4,decimal_places=2)
     precioTotal = models.DecimalField(max_digits=8,decimal_places=2)
-    idEmpresa = models.ForeignKey('Empresa', on_delete=models.CASCADE)#para probar
+    idEmpresa = models.ForeignKey('Empresa', on_delete=models.PROTECT)#para probar
 
     class Meta:
         verbose_name = 'facturaVenta'
@@ -217,7 +217,7 @@ class FacturaTransporte(models.Model):
     cantidad = models.DecimalField(max_digits=7, decimal_places=2)
     preciounitario = models.DecimalField(max_digits=4,decimal_places=2)
     precioTotal = models.DecimalField(max_digits=8,decimal_places=2)
-    idResponsableTransporte = models.ForeignKey('ResponsableTransporte', on_delete=models.CASCADE)#para probarresponsable transporte
+    idResponsableTransporte = models.ForeignKey('ResponsableTransporte', on_delete=models.PROTECT)#para probarresponsable transporte
 
     class Meta:
         verbose_name = 'facturaTransporte'
@@ -290,7 +290,7 @@ class Articulo(models.Model):
 
 #cambiamos base de datos
 class IngresoArticulo(models.Model):
-    idProveedor = models.ForeignKey('Proveedor', on_delete = models.CASCADE)    
+    idProveedor = models.ForeignKey('Proveedor', on_delete = models.PROTECT)    
     fecha = models.DateField(default=datetime.now)
 
     def __str__(self):
@@ -303,7 +303,7 @@ class IngresoArticulo(models.Model):
     
 class DetalleIngresoArticulos(models.Model):
     idIngreso = models.ForeignKey('IngresoArticulo', on_delete = models.CASCADE) 
-    idArticulo = models.ForeignKey('Articulo', on_delete = models.CASCADE)
+    idArticulo = models.ForeignKey('Articulo', on_delete = models.PROTECT)
     cantidad = models.IntegerField(blank = False, null = False)
 
     def __str__(self):
@@ -316,7 +316,7 @@ class DetalleIngresoArticulos(models.Model):
         return item
 
 class SalidaArticulo(models.Model):
-    idEmpleado = models.ForeignKey('Empleado', on_delete = models.CASCADE)
+    idEmpleado = models.ForeignKey('Empleado', on_delete = models.PROTECT)
     fecha = models.DateField(default=datetime.now)
 
     def __str__(self):
@@ -329,7 +329,7 @@ class SalidaArticulo(models.Model):
 
 class DetalleSalidaArticulos(models.Model):
     idSalida = models.ForeignKey('SalidaArticulo', on_delete = models.CASCADE) 
-    idArticulo = models.ForeignKey('Articulo', on_delete = models.CASCADE)
+    idArticulo = models.ForeignKey('Articulo', on_delete = models.PROTECT)
     cantidad = models.IntegerField(blank = False, null = False)
 
     def __str__(self):

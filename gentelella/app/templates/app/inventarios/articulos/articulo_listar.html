@@ -21,68 +21,18 @@
             <div class="clearfix"></div>
           </div>
           <div class="x_content">
+            <!-- Presentación de mensajes  -->
+            {% if messages %}
+              {% for message in messages %}  
+                <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible"{% endif %} role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <strong>¡{{ message.tags|upper }}!</strong> {{ message }}
+                </div>
+              {% endfor %}
+            {% endif %} 
               <form class="form-horizontal form-label-left">                   
                 <div class="form-group">
-                  <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                        
-                    <!-- Split button Articulo 
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-primary">Articulo</button>
-                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href=" {% url 'crear_articulo' %}">Crear Articulo</a>
-                        </li>
-                        <li><a href=" {% url 'ingresar_articulo' %}">Ingreso Articulo</a>
-                        </li>
-                        <li><a href="{% url 'salida_articulo' %}">Salida Articulo</a>
-                        </li>
-                      </ul>
-                    </div>-->
-                    <!-- Split button Proveedor 
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-primary">Proveedor</button>
-                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href=" {% url 'crear_proveedor' %}">Crear Proveedor</a>
-                        </li>
-                        <li><a href=" {% url 'listar_proveedor' %}">Listar Proveedor</a>
-                        </li>
-                      </ul>
-                    </div>-->
-                    <!-- Split button Empleado 
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-primary">Empleado</button>
-                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href=" {% url 'crear_empleado' %}">Crear Empleado</a>
-                        </li>
-                        <li><a href="{% url 'listar_empleado' %}">Listar Empleado</a>
-                        </li>
-                      </ul>
-                    </div> --> 
-                    <!-- Split button Categoria 
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-primary">Categoria</button>
-                      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <span class="caret"></span>
-                        <span class="sr-only">Toggle Dropdown</span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a href=" {% url 'crear_categoria' %}">Crear Categoria</a>
-                        </li>
-                        <li><a href="{% url 'listar_categoria' %}">Listar Categoria</a>
-                        </li>
-                      </ul>
-                    </div>-->
-                    
+                  <div class="col-md-12 col-sm-6 col-xs-12 col-md-offset-0">                                            
                     <div class="btn-group">
                         <a href="{% url 'crear_articulo' %}" class="btn btn-primary btn-flat">
                             <i class="fa fa-plus"></i> Nuevo Articulo
@@ -120,6 +70,7 @@
                       <td class="text-center"> {{articulo.unidadMedida}} </td>
                       <td class="text-center ">
                         <a href=" {% url 'editar_articulo' articulo.id %} " class="btn btn-info btn-xs" title="Editar Articulo"><i class="fa fa-pencil"></i></a>
+                        <a href=" {% url 'eliminar_articulo' articulo.id %} " class="btn btn-danger btn-xs" title="Eliminar Articulo"><i class="fa fa-trash"></i></a>
                       </td>                        
                     </tr>
                     {% endfor %}                   

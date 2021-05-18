@@ -20,6 +20,7 @@
           </div>
           <div class="x_content">
            <!-- Presentación de mensajes  -->
+           <!-- Presentación de mensajes  -->
            {% if messages %}
            {% for message in messages %}  
            <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible"{% endif %} role="alert">
@@ -27,7 +28,7 @@
            <strong>¡{{ message.tags|upper }}!</strong> {{ message }}
            </div>
            {% endfor %}
-          {% endif %}
+           {% endif %}
           <form class="form-horizontal form-label-left">                   
             <div class="form-group">
               <div class="col-md-12 col-sm-12 col-xs-12 col-md-offset-0">                        
@@ -96,6 +97,7 @@
 
     })
   </script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
  {% endblock javascripts %}
 
 
