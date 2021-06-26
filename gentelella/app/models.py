@@ -69,7 +69,7 @@ class CompraMaiz(models.Model): #Datos de la Compra
     humedad = models.IntegerField() #Dato constante
     impureza = models.IntegerField() #Dato constante
     valida = models.BooleanField(default=True) #Si la compra es válida, no eliminada
-    pendiente = models.BooleanField(default=True) #Si la compra estará pendiente o no
+    pendiente = models.BooleanField(default=True) #Si la compra estará pendiente o no de facturar
     total = models.DecimalField(max_digits=7, decimal_places=2)
     idProductor = models.ForeignKey('Productor',on_delete=models.PROTECT)
     idDocumentoCompra = models.ForeignKey('DocumentoCompra', on_delete = models.CASCADE, null=True)
@@ -88,13 +88,12 @@ class CompraMaiz(models.Model): #Datos de la Compra
         return item
 
 class DocumentoCompra(models.Model):
-    tipoDocumento = models.CharField(max_length=25)
+    tipoDocumento = models.CharField(max_length=25) #tipo de documento de compra factura o nota de venta
     numeroDocumento = models.CharField(max_length=12, null=False) 
     fechaEmision = models.DateField()
     cantidad = models.DecimalField(max_digits=7,decimal_places=2)
     preciounitario = models.DecimalField(max_digits=4,decimal_places=2)
     precioTotal = models.DecimalField(max_digits=8,decimal_places=2)
-    tipoPago = models.CharField(max_length=25)
     idProductor = models.ForeignKey('Productor', on_delete=models.PROTECT)#para probar
 
 class PesajeCompraMaiz(models.Model): #Los Pesajes correspondientes a una Compra
@@ -232,31 +231,11 @@ class FacturaTransporte(models.Model):
         return item
 
 
-class Inventario(models.Model):
-    id = models.AutoField(primary_key = True)
-    descripcion = models.CharField(max_length=100, blank = False, null = False)
-    cantidad = models.IntegerField(default = 1, blank = False, null = False)
-    estado = models.CharField(max_length=25,blank=True, null=True)
-    cantidadMin = models.IntegerField(default=2, blank = False, null = False)
-    cantidadMax = models.IntegerField(default=10, blank = False, null = False)
-    unidadMedida = models.CharField(max_length=100, choices=UNIDAD)
-    fechaIngreso = models.DateField(auto_now = True, auto_now_add = False)#models.DateField('Fecha de creación', auto_now = True, auto_now_add = False)
-    stock = models.IntegerField(default = 1, blank = False, null = False)   
-    idProveedor = models.ForeignKey('Proveedor', on_delete = models.CASCADE)
-
-    class Meta:
-        verbose_name = 'Inventario'
-        verbose_name_plural = 'Inventarios'
-        ordering = ['descripcion']
-    
-    def __str__(self):
-        return self.descripcion
-
 #creamos un tabla Categoria que se debe cambiar en el modelo de base de datos 
     #idProveedor = models.ForeignKey('Proveedor', on_delete = models.CASCADE)
 class Categoria(models.Model):
     nombre = models.CharField(max_length=150, unique=True)
-    descripcion = models.CharField(max_length=500, null=True, blank=True, verbose_name='Descripción')
+    descripcion = models.CharField(max_length=150, null=True, blank=True, verbose_name='Descripción')
 
     def __str__(self):
         return self.nombre

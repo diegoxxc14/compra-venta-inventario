@@ -16,10 +16,10 @@ from django.contrib.auth.decorators import login_required,permission_required, u
 from django.utils.decorators import method_decorator
 from decimal import Decimal
 from xhtml2pdf import pisa
-from app.models import Articulo,IngresoArticulo,DetalleIngresoArticulos,DetalleSalidaArticulos,SalidaArticulo,Categoria, Inventario, Productor, Empresa, Proveedor, ResponsableTransporte, PesajeCompraMaiz,PesajeVentaMaiz, CompraMaiz, VentaMaiz, BodegaMaiz, Empleado, DocumentoCompra,FacturaVenta
+from app.models import Articulo,IngresoArticulo,DetalleIngresoArticulos,DetalleSalidaArticulos,SalidaArticulo,Categoria,Productor, Empresa, Proveedor, ResponsableTransporte, PesajeCompraMaiz,PesajeVentaMaiz, CompraMaiz, VentaMaiz, BodegaMaiz, Empleado, DocumentoCompra,FacturaVenta
 from app.models import FacturaTransporte,BodegaMaiz
 from app.decorators import gerente_required
-from app.forms import ProductorForm, InventarioForm, EmpresaForm, ResponsableTransporteForm, ProveedorForm, CrearInventarioForm, ArticuloForm, CategoriaForm, EmpleadoForm,DocumentoCompraForm
+from app.forms import ProductorForm, EmpresaForm, ResponsableTransporteForm, ProveedorForm, ArticuloForm, CategoriaForm, EmpleadoForm
 from app.utils import * #Importamos métodos útiles
 from app.constants import * #Importar las constantes
 
@@ -563,11 +563,6 @@ class EliminarProveedor(DeleteView):
         context = super().get_context_data(**kwargs)
         return context 
 
-@login_required
-def listarVentas(request, template_name='app/inventarios/listar_ventas.html'):
-    inventario = Inventario.objects.all()
-    return render(request, template_name, {'inventario':inventario})          
-  
 @login_required
 def reportes_compras(request, template_name='app/inventarios/listar_compras.html'):
     
@@ -1331,13 +1326,12 @@ def guardar_documento(request):
     cantidad = Decimal(request.POST['cantidad'])
     precio_unitario = Decimal(request.POST['precio_unitario'])
     total = Decimal(request.POST['total'])
-    tipo_pago = int(request.POST['tipo_pago']) #código
 
     productor=Productor.objects.get(pk=pk_productor)
 
     documento_compra = DocumentoCompra(tipoDocumento=TIPO_DOCUMENTO[tipo_documento],
         numeroDocumento=nro_documento, fechaEmision=fecha_compra, cantidad=cantidad,
-        preciounitario=precio_unitario, precioTotal=total, tipoPago=TIPO_PAGO[tipo_pago],
+        preciounitario=precio_unitario, precioTotal=total,
         idProductor=productor)
     
     documento_compra.save()
@@ -1544,6 +1538,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context['get_compras_diario'] =  self.get_compras_diario()
         context['get_ventas_diario'] =  self.get_ventas_diario()      
         return context
+
+class Error404View(TemplateView):
+    template_name = 'app/error_404.html'
+
+class Error500View(TemplateView):
+    template_name = 'app/error_500.html'
 
 def gentella_html(request):
     context = {}

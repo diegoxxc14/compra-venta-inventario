@@ -16,6 +16,9 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
+#from django.conf.urls import handler404,handler500
+#from app.views import Error404View, Error500View
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 
@@ -26,3 +29,7 @@ urlpatterns = [
     #URL necesaria para el login
     url('accounts/', include('django.contrib.auth.urls')),
 ]
+
+#handler404 = Error404View.as_view()
+#handler500 = Error500View.as_view()
+

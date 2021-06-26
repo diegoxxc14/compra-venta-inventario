@@ -187,10 +187,8 @@
   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
   <script>
     $(function () {
-
       
       var empresa = null;
-      //**var empresa_auto = null;
       var responsable_transporte = null; 
       var pesaje_editar = null;
       var total_bodega = 0;
@@ -273,6 +271,7 @@
           $(this).attr("disabled", true);
           $("#totalPesajes").text(calcularTotalPesaje());
           limpiarCamposCalculo();
+          cargarBodegaMaiz();
         }else {
           swal("Warning", "¡Valores ingresados son incorrectos2!", "warning");
         }
@@ -408,14 +407,28 @@
         $("#btnEditarPesaje").attr("disabled", false);
         $("#totalPesajes").text(calcularTotalPesaje());
       });
+      //** Obtener el maíz en Stock
+      function cargarBodegaMaiz() {
+        $.ajax({
+          url: "{% url 'obtener_maiz' %}",
+          type: "POST",
+          success: function (data) {  
+            total_bodega = parseFloat(data);
+            console.log(total_bodega);
+          },
+          error: function () {            
+            total_bodega = 0;
+          }
+        });
+      }
 
       //** Guardar Pesajes
       $("#btnGuardar").on('click', function () {
         let total_pesajes = parseFloat(calcularTotalPesaje());
-        if (total_pesajes > 0 && empresa != null) { //Si hay Pesajes en la tabla y empresa 
-          
-          cargarBodegaMaiz(); //Ejecutar consulta para obtener el stock de Maíz
-          if (total_bodega >= total_pesajes) { //Si en la Bodega hay más cantidad que la requerida en la venta
+        if (total_pesajes > 0 && empresa != null && responsable_transporte !=null) { //Si hay Pesajes en la tabla y empresa 
+       
+         
+          if (total_pesajes <= total_bodega) { //Si en la Bodega hay más cantidad que la requerida en la venta
             let datos_tabla = tablaPesaje.rows().data();
             let pesajes = $.makeArray();
             let pk_empresa = empresa.id;          
@@ -441,7 +454,7 @@
               }
             });
           } else {
-            swal("¡Stock insuficiente!", "Cantidad de Maiz no disponible.", "error");
+            swal("¡Stock insuficiente!", "Cantidad de Maiz no disponible."+total_pesajes+ "bodega"+total_bodega, "error");
           }
 
         } else {
@@ -449,19 +462,7 @@
         }
       });      
       
-      //** Obtener el maíz en Stock
-      function cargarBodegaMaiz() {
-        $.ajax({
-          url: "{% url 'obtener_maiz' %}",
-          type: "POST",
-          success: function (data) {  
-            total_bodega = parseFloat(data);
-          },
-          error: function () {            
-            total_bodega = 0;
-          }
-        });
-      }
+      
 
       function calcularPesoNeto() {
         let pesoBruto = parseInt($('#peso_bruto').val());

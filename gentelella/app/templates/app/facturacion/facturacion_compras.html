@@ -48,7 +48,7 @@
 
           <div class="clearfix"></div>
 
-          <!-- /Form para empresa nueva table-striped jambo_table bulk_action  -->
+          <!-- /  -->
           <div class="table-responsive">
             <table id="tabla_facturacion" class=" table table-striped jambo_table" width="100%">
               <thead>
@@ -121,15 +121,6 @@
             <label>Total a Pagar ($):</label>
             <input id="total" type="number" class="form-control" value="0.00" readonly>
           </div>
-
-          <div class="form-group">
-            <label>Tipo de Pago:</label>
-            <select name="tipo_pago" id="tipo_pago" class="form-control">
-              {% for clave, valor in tiposPago.items %}
-              <option value="{{ clave }}" {% if forloop.first %} selected {% endif %}>{{ valor }}</option>
-              {% endfor %}
-            </select>
-          </div>
         </div>
 
       </div>
@@ -170,9 +161,23 @@
     //** Declarar la tabla de Pesajes
     var tablaFacturacion = $('#tabla_facturacion').DataTable({
       data: [],
+      columnDefs: [
+        {
+          targets: [0,1,2],
+          class: 'text-center',
+          orderable: true,           
+        },
+        {
+          targets: [2],
+          class: 'text-center',
+          render: function (data, type, row) {
+          return '<span class="badge badge-default">' + data + '</span>';
+          }
+        },
+      ],
       displayLength: 5,
       columns: [
-        { "data": null }, //Contador de filas
+        { "data": null }, //Contador de filas 
         { "data": "fechaCompra", "render": function (data) {
             return moment(data).format("DD-MM-YYYY");
           } 
@@ -261,7 +266,7 @@
             data: {
               "pk_productor": pk_productor, "pks_compras": JSON.stringify(pks_compras), "tipo_documento": $("#tipo_documento").val(),
               "nro_documento": $("#nro_documento").val(), "fecha_compra":$("#fecha_compra").val(), "cantidad":$("#cantidad").val(),
-              "precio_unitario": $("#precio_unitario").val(), "total": $("#total").val(), "tipo_pago": $("#tipo_pago").val()
+              "precio_unitario": $("#precio_unitario").val(), "total": $("#total").val()
             },
             url: "{% url 'guardar_documento' %}",
             type: "POST",

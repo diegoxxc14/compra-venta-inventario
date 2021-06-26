@@ -119,8 +119,6 @@
             <div class="col-md-12 col-sm-12 col-xs-12 text-center">
               <button id="btnGuardar" class="btn btn-primary" {% if not venta.pendiente %} disabled {% endif %}><span
                   class="fa fa-check"></span> Editar Venta</button>
-              <button id="btnFinalizar" class="btn btn-success" {% if not venta.pendiente %} disabled {% endif %}><span
-                  class="fa fa-folder"></span> Finalizar Venta</button>
               <a class="btn btn-default" href="{% url 'gestion_ventas' %}"><span class="fa fa-undo"></span>
                 Regresar</a>
             </div>
@@ -233,6 +231,7 @@
 
     //** Calcular al cargar los pesajes por primera vez
     var totalPesajesInicial=parseFloat(calcularTotalPesaje());
+    cargarBodegaMaiz();
     $("#totalPesajes").text(totalPesajesInicial);
 
     //** Calcular el Pesaje
@@ -357,33 +356,6 @@
         }
       });
     }
-
-    //** Finalizar Venta de maíz
-    $("#btnFinalizar").on('click', function () {
-      swal({
-        title: "¿Está seguro de finalizar esta venta?",
-        text: "¡Una vez finalizada, no podrá ser modificada!",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-      }).then((willDelete) => {
-        if (willDelete) {
-          $.ajax({
-            data: {
-              "pk_venta": pk_venta,
-            },
-            url: "{% url 'finalizar_venta' %}",
-            type: "POST",
-            success: function (data) {
-              location.reload();
-            },
-            error: function () {
-              swal("Oops", "¡Ocurrió un problema!", "error");
-            }
-          });
-        }
-      });
-    });
 
     function calcularPesoNeto() {
       let pesoBruto = parseInt($('#peso_bruto').val());

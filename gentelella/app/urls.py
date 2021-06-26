@@ -114,7 +114,7 @@ urlpatterns = [
     path('editar_empleado/<int:pk>/', views.EditarEmpleado.as_view(), name = 'editar_empleado'),
     path('eliminar_empleado/<int:pk>/', views.EliminarEmpleado.as_view(), name = 'eliminar_empleado'),
     
-    #pagos Aun por editar factura
+    #facturacion compras
     path('crear_facturacion/',views.facturacion_compra, name='facturacion_compra'),
     path('buscar_pesaje_compra/',views.buscar_PesajesCompra, name='buscar_pesaje_compra'),
     path('obtener_compras/',views.obtener_compras_pendientes, name='obtener_compras'),

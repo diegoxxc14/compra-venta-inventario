@@ -74,29 +74,7 @@
   <script src="/static/vendors/highcharts-8.1.2/modules/exporting.js"></script>
   <script src="/static/vendors/highcharts-8.1.2/modules/export-data.js"></script>
   <script src="/static/vendors/highcharts-8.1.2/modules/accessibility.js"></script>
-  <!-- Chart.js -->
-  <script src="/static/vendors/Chart.js/dist/Chart.min.js"></script>
-  <!-- gauge.js -->
-  <script src="/static/vendors/gauge.js/dist/gauge.min.js"></script>
-  <!-- Skycons -->
-  <script src="/static/vendors/skycons/skycons.js"></script>
-  <!-- Flot -->
-  <script src="/static/vendors/Flot/jquery.flot.js"></script>
-  <script src="/static/vendors/Flot/jquery.flot.pie.js"></script>
-  <script src="/static/vendors/Flot/jquery.flot.time.js"></script>
-  <script src="/static/vendors/Flot/jquery.flot.stack.js"></script>
-  <script src="/static/vendors/Flot/jquery.flot.resize.js"></script>
-  <!-- Flot plugins -->
-  <script src="/static/vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
-  <script src="/static/vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
-  <script src="/static/vendors/flot.curvedlines/curvedLines.js"></script>
-  <!-- DateJS -->
-  <script src="/static/vendors/DateJS/build/date.js"></script>
-  <!-- JQVMap -->
-  <script src="/static/vendors/jqvmap/dist/jquery.vmap.js"></script>
-  <script src="/static/vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
-  <script src="/static/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
-
+  
   <script type="application/javascript">     
     function textoFecha(fecha){
       var numDiaSem = fecha.getDay(); 
@@ -116,13 +94,12 @@
   </script>
   
   <script type="application/javascript">
-  
     Highcharts.chart('container', {
     chart: {
         type: 'column'
     },
     title: {
-        text: 'Compras y Ventas Anuales del Centro de Acopio Sabanilla'
+        text: 'Compras y Ventas Diarias del Centro de Acopio Sabanilla'
     },
     subtitle: {
         text: 'Porcentejes reales'
