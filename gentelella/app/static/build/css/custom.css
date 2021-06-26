@@ -1,4 +1,3 @@
-
 html , body{
 
  height:100%;
@@ -176,7 +175,7 @@ html , body{
     display: none
 }
 .nav-sm .navbar.nav_title a i {
-    font-size: 27px;
+    font-size: 17px;
     margin: 13px 0 0 3px
 }
 .site_title i {
@@ -808,7 +807,7 @@ a:focus {
 .site_title {
     text-overflow: ellipsis;
     overflow: hidden;
-    font-weight: 400;
+    font-weight: 200;
     font-size: 22px;
     width: 100%;
     color: #ECF0F1 !important;
@@ -3407,6 +3406,11 @@ a.hiddenanchor {
     max-width: 350px;
     position: relative
 }
+.login_box blockquote{
+    background: #e9ecef;
+      
+      
+}
 .registration_form,
 .login_form {
     position: absolute;
@@ -3472,12 +3476,13 @@ form:after {
     visibility: hidden
 }
 .login_content {
-    margin: 0 auto;
+    margin: 2 auto;
     padding: 25px 0 0;
     position: relative;
     text-align: center;
     text-shadow: 0 1px 0 #fff;
-    min-width: 280px
+    min-width: 280px;
+
 }
 .login_content a,
 .login_content .btn-default:hover {
@@ -3487,7 +3492,7 @@ form:after {
     text-decoration: underline
 }
 .login_content h1 {
-    font: normal 25px Helvetica, Arial, sans-serif;
+    font: normal 25px sans-serif, Helvetica, Arial ;
     letter-spacing: -0.05em;
     line-height: 20px;
     margin: 10px 0 30px
@@ -3500,6 +3505,7 @@ form:after {
     top: 10px;
     width: 27%
 }
+
 .login_content h1:after {
     background: #7e7e7e;
     background: linear-gradient(left, #7e7e7e 0%, #fff 100%);

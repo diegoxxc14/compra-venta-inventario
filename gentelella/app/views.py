@@ -917,7 +917,7 @@ def imprimir_facturacion_transporte(request):
 def inventario_general(request, template_name='app/inventarios/inventario_general.html'):
     form = Articulo.objects.all()
     return render(request, template_name, {'form':form})  
-####creando una lista bodiga
+#creando una lista bodiga
 @login_required
 @gerente_required
 def listar_bodega(request, template_name='app/inventarios/listar_bodega.html'):
@@ -1105,7 +1105,6 @@ def guardar_salida_articulos(request):
     salida = SalidaArticulo()
     salida.idEmpleado_id = salidaArticulos['empleado']
     salida.save()
-    #empleado = salidaArticulos['empleado']
     for i in salidaArticulos['articulos']:
         det = DetalleSalidaArticulos()
         det.idArticulo_id = i['id']
@@ -1116,8 +1115,7 @@ def guardar_salida_articulos(request):
         art.stock =  art.stock - det.cantidad
         art.save()
     data = {'id': salida.id}
-    #return HttpResponse(json.dumps(respuesta, cls=DjangoJSONEncoder), content_type='application/json')
-    #return HttpResponse('ok')
+    
     return JsonResponse(data, safe=False)
 
 #imprimir pesajes de compra
